@@ -1,9 +1,4 @@
-from rdkit import Chem
-
-try:
-    from rdkit.Chem import fdMCS as MCS
-except ImportError:
-    from rdkit.Chem import MCS
+from rdkit.Chem import rdFMCS as MCS
 from rdkit.Chem import AllChem, Draw
 from tqdm import tqdm
 import timeit
