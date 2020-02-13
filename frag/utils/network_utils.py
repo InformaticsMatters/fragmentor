@@ -1,5 +1,7 @@
+from rdkit import Chem
+from rdkit.Chem import AllChem
 from rdkit.Chem import rdFMCS as MCS
-from rdkit.Chem import AllChem, Draw
+from rdkit.Chem import Draw
 from tqdm import tqdm
 import timeit
 import os
@@ -7,8 +9,7 @@ import os
 SMARTS_PATTERN = "[*;R]-;!@[*]"
 
 """ contribution from Hans de Winter """
-from rdkit import Chem
-from rdkit.Chem import AllChem
+
 
 # Instrumentation to expose the 'retrieve', 'create' and 'total' durations,
 # and the number of nodes and edges for each molecule processed
