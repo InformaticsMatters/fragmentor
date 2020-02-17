@@ -27,10 +27,6 @@ from fragclass import FragProcess
 from fragclass import FragController
 from fragclass import FileWriter
 
-
-#from frag.network.models import NodeHolder, Attr
-#from frag.utils.network_utils import build_network
-
 cache = set()
 node_count = 0
 edge_count = 0
@@ -65,6 +61,8 @@ def get_arguments():
     parser.add_argument('-p', '--processes', type=int, default=4,
                         help='Number of parallel processes')
     parser.add_argument('-c', '--chunk_size', type=int, default=10,
+                        help='size of chunk the SMILES will be grouped in to')
+    parser.add_argument('-q', '--max_queue', type=int, default=10,
                         help='size of chunk the SMILES will be grouped in to')
 
     group = parser.add_mutually_exclusive_group()
@@ -115,12 +113,11 @@ def main():
         os.mkdir(base_dir)
     nodes_f = open(os.path.join(base_dir, "nodes.csv"), "w")
     edges_f = open(os.path.join(base_dir, "edges.csv"), "w")
+    rejects_f = open(os.path.join(base_dir, "rejects.smi"), "w")
 
-    f_writer = FileWriter(args, nodes_f, edges_f)
-
+    f_writer = FileWriter(args, nodes_f, edges_f, rejects_f)
 
     num_processed = 0
-
 
     # Create Queues
     manager = multiprocessing.Manager()
@@ -132,14 +129,15 @@ def main():
     frag_processes = []
     for _ in range(args.processes):
         proc = FragProcess(
+                args,
                 process_queue,
                 results_queue)
         frag_processes.append(proc)
         proc.start()
 
     t1 = time.time()
-    # Start Fragmentation Control Thread
 
+    # Start Fragmentation Control Thread
     thrd = FragController(
                 args,
                 process_queue,
