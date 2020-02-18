@@ -96,7 +96,9 @@ class FragController(Thread):
     num_skipped = 0
     num_queued = 0
     num_processed = 0
+    num_requeued = 0
     queued_this_time = 0
+    smiles_read = 0
 
     cache = set()
 
@@ -110,6 +112,9 @@ class FragController(Thread):
 
     def get_num_processed(self) -> int:
         return self.num_processed
+
+    def get_smiles_read(self) -> int:
+        return self.smiles_read
 
     def write_data(self, node_holder, time_ms):
         """Write_data
@@ -186,7 +191,7 @@ class FragController(Thread):
         # TODO Reprocessing needs chunking.
         if len(need_further_processing) > 0:
            self.process_queue.put(need_further_processing)
-           self.num_queued += 1
+           self.num_requeued += 1
            self.queued_this_time += 1
 
         node_holder = None
@@ -195,18 +200,26 @@ class FragController(Thread):
         """Read a chunk of smiles from the standard file.
 
         """
-
         smiles_to_process = []
-        lines = 0
 
         # Change to f.readline().
-        line = standard_file.readline().strip()
+        #line = standard_file.readline().strip()
+        #smiles_to_process.append(line)
 
-        while standard_file.readline() and lines < no_of_lines:
-            smiles_to_process.append(line)
-            line = standard_file.readline()
-            lines +=1
+        #while line and len(smiles_to_process) < no_of_lines:
+        #    line = standard_file.readline().strip()
+        #    smiles_to_process.append(line)
 
+        while True and len(smiles_to_process) < no_of_lines:
+            # read a single line
+            line = standard_file.readline().strip()
+            if line:
+                smiles_to_process.append(line)
+            else:
+                break
+
+        self.smiles_read += len(smiles_to_process)
+        print ("Smiles read :", self.smiles_read)
         return smiles_to_process
 
     def run(self) -> int:
@@ -240,26 +253,35 @@ class FragController(Thread):
 
         for _ in range (self.args.max_queue):
             smiles_list = self.read_smiles_chunk(standard_file,self.args.chunk_size)
-            print(smiles_list)
             if len(smiles_list) > 0:
                 self.process_queue.put(smiles_list)
                 self.num_queued += 1
                 self.queued_this_time +=1
+                if len(smiles_list) < self.args.chunk_size:
+                    smiles_to_process = False
+                    break
+            else:
+                smiles_to_process = False
+                break
 
-        while (self.num_queued > self.num_processed):
+
+        while (self.num_queued + self.num_requeued > self.num_processed):
 
             #Check if something has been processed
-            if not self.results_queue.empty():
+            while not self.results_queue.empty():
+
                 node_list = self.results_queue.get()
-                self.queued_this_time = 0
+                self.num_processed += 1
+                # As replies are processed, room is created in the queue again
+                if self.queued_this_time > 0:
+                    self.queued_this_time -= 1
 
                 # Process results
                 for node_holder in node_list:
                     self.process_results(node_holder, max_frags=self.args.max_frag, verbosity=self.args.verbosity)
-                    self.num_processed += 1
 
             # Enough?
-            if self.args.limit and self.num_processed >= self.args.limit:
+            if self.args.limit and self.smiles_read > self.args.limit:
                 break
 
             # If there are not too many items queued then refill from queue
@@ -269,16 +291,20 @@ class FragController(Thread):
                     if len(smiles_list) > 0:
                         self.process_queue.put(smiles_list)
                         self.num_queued += 1
+                        if len(smiles_list) < self.args.chunk_size:
+                            smiles_to_process = False
+                            break
                     else:
                         smiles_to_process = False
-                        continue
-                queued_this_time =0
+                        break
+                self.queued_this_time = 0
 
             # Check
             #if self.args.report_interval > 0 and self.num_processed % self.args.report_interval == 0:
-            #    print("Number Queued {}, Number Processed mol {}".format (self.num_queued, self.num_processed))
+            #    print("Number Queued {}, Queue Processed {}".format (self.num_queued, self.num_processed))
 
-        print("Number Queued {}, Number Processed mol {}".format(self.num_queued, self.num_processed))
+        print("Number Requests {}, Number Requeued {}, Number Responses {}"
+              .format(self.num_queued, self.num_requeued, self.num_processed))
         print('fragmentation control thread end')
 
         return self.num_processed

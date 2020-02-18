@@ -44,7 +44,7 @@ def get_arguments():
     parser.add_argument("--input")
     parser.add_argument("--base_dir")
     parser.add_argument('-l', '--limit',
-                        type=int, default=0,
+                        type=int, default=1000,
                         help='Limit processing to the first N molecules,'
                              ' process all otherwise')
     parser.add_argument('-s', '--skip',
@@ -56,12 +56,12 @@ def get_arguments():
                         help='Limit processing to molecules with no more than'
                              ' this number of initial fragment (no limit if 0)')
     parser.add_argument('-r', '--report-interval', type=int, default=100, help='Reporting interval')
-    parser.add_argument('-p', '--processes', type=int, default=2,
+    parser.add_argument('-p', '--processes', type=int, default=4,
                         help='Number of parallel processes')
     parser.add_argument('-c', '--chunk_size', type=int, default=10,
-                        help='size of chunk the SMILES will be grouped in to')
-    parser.add_argument('-q', '--max_queue', type=int, default=10,
-                        help='size of chunk the SMILES will be grouped in to')
+                        help='Size of chunk the SMILES will be grouped in to')
+    parser.add_argument('-q', '--max_queue', type=int, default=50,
+                        help='Limits how many new chunks are added to the queue')
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-v", dest="verbosity", action="store_const", const=1)
@@ -99,6 +99,10 @@ def main():
     if not args.base_dir:
         print('ERROR: Must specify a base directory')
         sys.exit(3)
+
+    print ("No of Processes: ",args.processes)
+    print ("Chunk size: ",args.chunk_size)
+    print ("Max queue size (in terms of chunks): ", args.max_queue)
 
     # Create Directories for output files
 
@@ -161,8 +165,8 @@ def main():
     if rejects_f:
         rejects_f.close()
 
-    print("Processed {0} molecules, wrote {1} nodes and {2} edges, {3} rejects"
-          .format(frag.get_num_processed(), f_writer.get_node_count(), f_writer.get_edge_count(), f_writer.get_reject_count()))
+    print("Smiles: Read {0} molecules. Wrote {1} nodes and {2} edges, {3} rejects"
+          .format(frag.get_smiles_read(), f_writer.get_node_count(), f_writer.get_edge_count(), f_writer.get_reject_count()))
     print ("Fragementation took:", time.time() - t1)
 
 
