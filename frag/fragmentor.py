@@ -17,8 +17,6 @@
 import argparse
 import os
 import sys
-import threading
-import collections
 import time
 import multiprocessing
 from multiprocessing import Pool
@@ -57,8 +55,8 @@ def get_arguments():
                         type=int, default=0,
                         help='Limit processing to molecules with no more than'
                              ' this number of initial fragment (no limit if 0)')
-    parser.add_argument('-r', '--report-interval', type=int, default=10, help='Reporting interval')
-    parser.add_argument('-p', '--processes', type=int, default=4,
+    parser.add_argument('-r', '--report-interval', type=int, default=100, help='Reporting interval')
+    parser.add_argument('-p', '--processes', type=int, default=2,
                         help='Number of parallel processes')
     parser.add_argument('-c', '--chunk_size', type=int, default=10,
                         help='size of chunk the SMILES will be grouped in to')
@@ -153,8 +151,9 @@ def main():
 
     print('Fragment controller thread ended - closing down')
 
+    # Close processes when ended
     for proc in frag_processes:
-        proc.close()
+        proc.terminate()
 
     # Close and Shutdown
     nodes_f.close()
@@ -163,7 +162,7 @@ def main():
         rejects_f.close()
 
     print("Processed {0} molecules, wrote {1} nodes and {2} edges, {3} rejects"
-          .format(num_processed, frag.get_node_count(), frag.get_edge_count, frag.get_reject_count))
+          .format(frag.get_num_processed(), f_writer.get_node_count(), f_writer.get_edge_count(), f_writer.get_reject_count()))
     print ("Fragementation took:", time.time() - t1)
 
 
