@@ -7,12 +7,10 @@
 # Duncan Peacock
 # February 2020
 
+import os
 from multiprocessing import Process
 from frag.network.models import NodeHolder, Attr
 from frag.utils.network_utils import build_network
-
-FLAG_ALL_DONE = b"WORK_FINISHED"
-FLAG_WORKER_FINISHED_PROCESSING = b"WORKER_FINISHED_PROCESSING"
 
 class FragProcess(Process):
     """Class FragProcess
@@ -34,7 +32,10 @@ class FragProcess(Process):
         self.process_queue = process_queue
         self.results_queue = results_queue
 
-    def fragment_mol(self, smiles, verbosity=0): -> object
+    def fragment_mol(self, smiles, verbosity=0) -> object:
+        """Performs the fragmentation process for a smile..
+
+        """
 
         attrs = []
         attr = Attr(smiles, ["EM"])
@@ -46,7 +47,7 @@ class FragProcess(Process):
 
         return node_holder
 
-    def run(self) -> object:
+    def run(self):
         """ fragment process.
 
         Parameters:
@@ -56,19 +57,14 @@ class FragProcess(Process):
             A list of NodeHolder objects.
 
         """
-        print('fragment process')
+        print('fragment process - process id: {}'.format(os.getpid()))
         while True:
             chunk_of_smiles = self.process_queue.get()
-            if chunk_of_smiles == FLAG_ALL_DONE:
-                # flag that our results have all been pushed to the results queue
-                self.results_queue.put(FLAG_WORKER_FINISHED_PROCESSING)
-                break
-            else:
-                node_list = []
-                for smiles in chunk_of_smiles:
-                    node_holder = self.fragment_mol(smiles, verbosity=self.args.verbosity)
-                    node_list.append(node_holder)
-                self.results_queue.put(node_list)
+            node_list = []
+            for smiles in chunk_of_smiles:
+                node_holder = self.fragment_mol(smiles, verbosity=self.args.verbosity)
+                node_list.append(node_holder)
+            self.results_queue.put(node_list)
 
 from threading import Thread
 
@@ -95,7 +91,11 @@ class FragController(Thread):
     """
     node_count = 0
     edge_count = 0
-    reject_cound = 0
+    reject_count = 0
+    num_skipped = 0
+    num_queued = 0
+    num_processed = 0
+
     cache = set()
 
     def __init__(self, args, process_queue, results_queue, f_writer) -> None:
@@ -174,96 +174,110 @@ class FragController(Thread):
 
         return need_further_processing
 
-    def read_smiles_chunk(self, standard_file, chunk_size, verbosity=0) -> list:
-        smiles_to_process = []
-        chunk = 0
+    def process_results(self, node_holder, max_frags=0, verbosity=0):
+        """Process a node_holder result.
 
-        # Change to f.readline().
+        """
 
-        while standard_file.readline() and chunk < chunk_size:
-            smiles_to_process.append(line)
-
-        return smiles_to_process
-
-    def fragment_and_queue(self, smiles, max_frags=0, verbosity=0):
-
-        global rejects_count
-
-        #This time is meaningless here. Will have to store it inthe node holder.
-        #t0 = time.time()
-        node_holder = fragment_mol(smiles, verbosity=verbosity)
-        #t1 = time.time()
-        #time_ms = int(round((t1 - t0) * 1000))
+        #TODO Add time_ms back in.
         time_ms = 0
         size = node_holder.size()
         # the number of children is the number of nodes minus one (the parent)
         num_children = size[0] - 1
         if 0 < max_frags < num_children:
-            self.f_writer.write_reject(smiles)
-            rejects_count += 1
+            # TODO Reject processing needs smiles?.
+            #self.f_writer.write_reject(smiles)
+            self.rejects_count += 1
             return
+
         # print("Handling mol {0} with {1} nodes and {2} edges".format(smiles, size[0], size[1]))
+
         need_further_processing = self.f_writer.write_data(self, node_holder, time_ms)
-        reprocess_count = len(need_further_processing)
-        for smiles in need_further_processing:
-            # print("Recursing for ", child.smiles)
-            self.fragment_and_queue(self,smiles, max_frags=max_frags, verbosity=verbosity)
+        #reprocess_count = len(need_further_processing)
+        # TODO Reprocessing needs chunking.
+        self.process_queue.put(need_further_processing)
+        self.num_queued += 1
+
         node_holder = None
+
+    def read_smiles_chunk(self, standard_file, no_of_lines) -> list:
+        """Read a chunk of smiles from the standard file.
+
+        """
+
+        smiles_to_process = []
+        lines = 0
+
+        # Change to f.readline().
+        line = standard_file.readline().strip()
+
+        while standard_file.readline() and lines < no_of_lines:
+            smiles_to_process.append(line)
+            line = standard_file.readline()
+
+        return smiles_to_process
 
     def run(self) -> int:
         """Fragmentation Control Thread.
+
+        Purpose:
+
+        Fill queue - Read smiles chunk (chunk size) until max queue.
+
+        Until no-more-smiles (file empty and no-more-results) - while queued > received
+             write chunk to queue.
+             loop through results
+                   Add need-more-processing to queue (initially by molecule)
+             If space left
+                 fill with more smiles.
+
+        Write poison pills to close down processes
+
         Returns:
             the number of smiles processed.
         """
 
-        print('fragmentation control thread')
-        num_processed = 0
+        print('fragmentation control thread start')
 
-        # Fill queue.
-        #	- Read smiles chunk (chunk size) until max queue.
-        #
-        # Until no-more-smiles (file empty and no-more-results) - while queued > received
-        #     write chunk to queue.
-        #     loop through results
-        #           Add need-more-processing to queue (initially by molecule)
-        #     If space left
-        #         fill with smiles chunk.
-        #
-        # Write poison pills.
-
-        num_queued = 0
-        num_results = 0
         standard_file = open(self.args.input, 'r')
+        num_skipped = self.read_smiles_chunk(self, standard_file, self.args.skip).size()
+        queued_this_time = 0
 
-        # This needs work still
         for _ in range (self.args.max_queue):
             self.process_queue.put(self.read_smiles_chunk(self, standard_file))
-            num_queued += 1
+            self.num_queued += 1
+            queued_this_time +=1
 
-        while num_queued > num_results:
+        while self.num_queued > self.num_processed:
 
-            # Process the rest of the file...
-            num_skipped = 0
+            #Check if something has been processed
+            if not self.results_queue.empty():
+                node_list = self.results_queue.get()
 
-            for line in standard_file:
+                # Process results
+                for node_holder in node_list:
+                    self.process_results(self, node_holder, max_frags=self.args.max_frag, verbosity=self.args.verbosity)
+                    self.num_processed += 1
+                    queued_this_time +=1
 
-                # Do we need to skip molecules before processing?
-                if num_skipped < self.args.skip:
-                    num_skipped += 1
-                    continue
+            # Enough?
+            if self.args.limit and self.num_processed >= self.args.limit:
+                break
 
-                line = line.strip()
-                if line:
-                    self.fragment_and_queue(self, line, max_frags=self.args.max_frag, verbosity=self.args.verbosity)
+            # If there are not too many items queued then refill from queue
+            if queued_this_time < self.args.max_queue:
+                for _ in range(self.args.max_queue-queued_this_time):
+                    self.process_queue.put(self.read_smiles_chunk(self, standard_file))
+                    self.num_queued += 1
+                queued_this_time =0
 
-                # Enough?
-                num_processed += 1
-                if self.args.report_interval > 0 and num_processed % self.args.report_interval == 0:
-                    print("Processed mol", num_processed)
-                if self.args.limit and num_processed >= self.args.limit:
-                    break
+            # Check
+            if self.args.report_interval > 0 and self.num_processed % self.args.report_interval == 0:
+               print("Processed mol", self.num_processed)
 
-        return num_processed
+        print('fragmentation control thread end')
+
+        return self.num_processed
 
 class FileWriter:
     """Class FileWriter
@@ -280,12 +294,6 @@ class FileWriter:
         self.nodes_f = nodes_f
         self.edges_f = edges_f
         self.rejects_f = rejects_f
-
-    def write(self):
-        """Test Write from FileWriter.
-
-        """
-        print('Write')
 
     def write_node(self, node, time_ms, num_children, num_edges):
         """Write to Note File.

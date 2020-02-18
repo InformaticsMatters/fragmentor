@@ -23,9 +23,9 @@ import time
 import multiprocessing
 from multiprocessing import Pool
 # Local classes.
-from fragclass import FragProcess
-from fragclass import FragController
-from fragclass import FileWriter
+from frag.fragclass import FragProcess
+from frag.fragclass import FragController
+from frag.fragclass import FileWriter
 
 cache = set()
 node_count = 0
@@ -57,7 +57,7 @@ def get_arguments():
                         type=int, default=0,
                         help='Limit processing to molecules with no more than'
                              ' this number of initial fragment (no limit if 0)')
-    parser.add_argument('-r', '--report-interval', type=int, default=1000, help='Reporting interval')
+    parser.add_argument('-r', '--report-interval', type=int, default=10, help='Reporting interval')
     parser.add_argument('-p', '--processes', type=int, default=4,
                         help='Number of parallel processes')
     parser.add_argument('-c', '--chunk_size', type=int, default=10,
@@ -88,6 +88,7 @@ def main():
         processing details.
 
     """
+    print('Fragment process - start')
     args = get_arguments()
 
     # Do we have an input and base directory?
@@ -137,13 +138,23 @@ def main():
 
     t1 = time.time()
 
+    print('Parallel Pool Created - Now starting fragment controller thread')
+
     # Start Fragmentation Control Thread
-    thrd = FragController(
+    frag = FragController(
                 args,
                 process_queue,
                 results_queue,
                 f_writer)
-    thrd.start()
+    frag.start()
+
+    # Wait for thread to finish
+    num_processed = frag.join()
+
+    print('Fragment controller thread ended - closing down')
+
+    for proc in frag_processes:
+        proc.close()
 
     # Close and Shutdown
     nodes_f.close()
@@ -151,7 +162,8 @@ def main():
     if rejects_f:
         rejects_f.close()
 
-    print("Processed {0} molecules, wrote {1} nodes and {2} edges, {3} rejects".format(num_processed, node_count, edge_count, rejects_count))
+    print("Processed {0} molecules, wrote {1} nodes and {2} edges, {3} rejects"
+          .format(num_processed, frag.get_node_count(), frag.get_edge_count, frag.get_reject_count))
     print ("Fragementation took:", time.time() - t1)
 
 
