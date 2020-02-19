@@ -25,17 +25,18 @@ from frag.fragclass import FragProcess
 from frag.fragclass import FragController
 from frag.fragclass import FileWriter
 
-cache = set()
-node_count = 0
-edge_count = 0
-rejects_count = 0
-
 base_dir = None
 nodes_f = None
 edges_f = None
 rejects_f = None
 
 def get_arguments():
+    """Sets defaults and retrieves arguments from the command line for processing.
+    Parameters:
+
+    Returns:
+        arguments/defaults.
+    """
 
     parser = argparse.ArgumentParser(
         description="Convert un-compressed standard SMILES"
@@ -56,8 +57,10 @@ def get_arguments():
                         help='Limit processing to molecules with no more than'
                              ' this number of initial fragment (no limit if 0)')
     parser.add_argument('-r', '--report-interval', type=int, default=100, help='Reporting interval')
-    parser.add_argument('-p', '--processes', type=int, default=4,
+    parser.add_argument('-p', '--processes', type=int, default=1,
                         help='Number of parallel processes')
+
+    # TODO Strange bug if chunk set to greater than the file size - finishes but does not end master process.
     parser.add_argument('-c', '--chunk_size', type=int, default=10,
                         help='Size of chunk the SMILES will be grouped in to')
     parser.add_argument('-q', '--max_queue', type=int, default=50,

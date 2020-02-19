@@ -19,10 +19,6 @@ class FragProcess(Process):
 	    Manages the fragmention of a process queue element (consisting of a number of smiles).
 		Returns a NodeHolder object to the results queue.
 
-    Parameters:
-
-    Methods:
-
     """
 
     def __init__(self, args, process_queue, results_queue) -> None:
@@ -33,7 +29,10 @@ class FragProcess(Process):
         self.results_queue = results_queue
 
     def fragment_mol(self, smiles, verbosity=0) -> object:
-        """Performs the fragmentation process for a smile..
+        """Performs the fragmentation process for a SMILES.
+
+        Returns:
+           NodeHolder object.
 
         """
 
@@ -77,29 +76,16 @@ class FragController(Thread):
 	   2. Manages the Cache
 	   3. Manages reading of input file and writing of results??
 	   4. Runs as a seperate thread - also creates a thread for filewriting?.
-    Parameters:
-       Input queue (Object)
-       Results queue (Object)
-	   input_file_name
-	   reject_file_name
-	   chunck_size
-
-    Methods:
-
-    Requires:
-
 
     """
-    node_count = 0
-    edge_count = 0
-    reject_count = 0
-    num_skipped = 0
+
+    #Queue control
     num_queued = 0
     num_processed = 0
     num_requeued = 0
     queued_this_time = 0
-    smiles_read = 0
 
+    smiles_read = 0
     cache = set()
 
     def __init__(self, args, process_queue, results_queue, f_writer) -> None:
@@ -170,18 +156,18 @@ class FragController(Thread):
         return need_further_processing
 
     def process_results(self, node_holder, max_frags=0, verbosity=0):
-        """Process a node_holder result.
+        """Processes a NodeHolder object from the results queue.
 
         """
 
-        #TODO Add time_ms back in.
+        #TODO Add time_ms back in - has to be returned with node holders.
         time_ms = 0
         size = node_holder.size()
         # the number of children is the number of nodes minus one (the parent)
         num_children = size[0] - 1
         if 0 < max_frags < num_children:
             # TODO Reject processing needs smiles?.
-            #self.f_writer.write_reject(smiles)
+            # self.f_writer.write_reject(smiles)
             return
 
         # print("Handling mol {0} with {1} nodes and {2} edges".format(smiles, size[0], size[1]))
@@ -197,18 +183,13 @@ class FragController(Thread):
         node_holder = None
 
     def read_smiles_chunk(self, standard_file, no_of_lines) -> list:
-        """Read a chunk of smiles from the standard file.
+        """Read a chunk of SMILES from the standard file.
+
+        Returns:
+            A list of SMILES to add to the process queue.
 
         """
         smiles_to_process = []
-
-        # Change to f.readline().
-        #line = standard_file.readline().strip()
-        #smiles_to_process.append(line)
-
-        #while line and len(smiles_to_process) < no_of_lines:
-        #    line = standard_file.readline().strip()
-        #    smiles_to_process.append(line)
 
         while True and len(smiles_to_process) < no_of_lines:
             # read a single line
@@ -225,24 +206,15 @@ class FragController(Thread):
     def run(self) -> int:
         """Fragmentation Control Thread.
 
-        Purpose:
-
         Fill queue - Read smiles chunk (chunk size) until max queue.
-
-        Until no-more-smiles (file empty and no-more-results) - while queued > received
-             write chunk to queue.
+        while queued > received
              loop through results
-                   Add need-more-processing to queue (initially by molecule)
+                 Add Nodes that need-more-processing to queue
              If space left
-                 fill with more smiles.
-
-        Write poison pills to close down processes
-
-        Returns:
-            the number of smiles processed.
+                 Fill queue - Read smiles chunk (chunk size) until max queue.
         """
 
-        print('fragmentation control thread start')
+        print('Fragmentation Control Thread Start')
 
         standard_file = open(self.args.input, 'r')
         smiles_to_process = True
@@ -280,7 +252,7 @@ class FragController(Thread):
                 for node_holder in node_list:
                     self.process_results(node_holder, max_frags=self.args.max_frag, verbosity=self.args.verbosity)
 
-            # Enough?
+            #TODO Enough? - This acts as a limit but is not precise due to earlier chunking process
             if self.args.limit and self.smiles_read > self.args.limit:
                 break
 
@@ -299,13 +271,16 @@ class FragController(Thread):
                         break
                 self.queued_this_time = 0
 
-            # Check
+            #TODO re-enable this somehow - problem is that the code loops waiting for requests/replies
+            #TODO so it can remain on one num_processed for a while.
             #if self.args.report_interval > 0 and self.num_processed % self.args.report_interval == 0:
             #    print("Number Queued {}, Queue Processed {}".format (self.num_queued, self.num_processed))
 
+        #EndWhile
+
         print("Number Requests {}, Number Requeued {}, Number Responses {}"
               .format(self.num_queued, self.num_requeued, self.num_processed))
-        print('fragmentation control thread end')
+        print('Fragmentation Control Thread End')
 
         return self.num_processed
 
