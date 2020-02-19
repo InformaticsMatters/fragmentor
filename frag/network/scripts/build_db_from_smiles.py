@@ -97,7 +97,7 @@ def write_data(node_holder, time_ms):
 
     return need_further_processing
 
-def fragment_and_write(smiles, max_frags=0, verbosity=0):
+def fragment_and_write(smiles, max_frags=0, max_hac=0, verbosity=0):
 
     global rejects_count
 
@@ -108,7 +108,14 @@ def fragment_and_write(smiles, max_frags=0, verbosity=0):
     size = node_holder.size()
     # the number of children is the number of nodes minus one (the parent)
     num_children = size[0] - 1
-    if 0 < max_frags < num_children:
+    if max_hac > 0:
+        # note this is inefficient as we need to create the RDKit mol. Better to filter the inputs.
+        mol = Chem.MolFromSmiles(smiles)
+        if mol.GetNumHeavyAtoms() > max_hac:
+            write_reject(smiles)
+            rejects_count += 1
+            return
+    elif 0 < max_frags < num_children:
         write_reject(smiles)
         rejects_count += 1
         return
@@ -117,7 +124,8 @@ def fragment_and_write(smiles, max_frags=0, verbosity=0):
     reprocess_count = len(need_further_processing)
     for smiles in need_further_processing:
         # print("Recursing for ", child.smiles)
-        fragment_and_write(smiles, max_frags=max_frags, verbosity=verbosity)
+        # set max_frags and max_hac to zero as we only want filtering at the outer level.
+        fragment_and_write(smiles, max_frags=0, max_hac=0, verbosity=verbosity)
     node_holder = None
 
 def fragment_mol(smiles, verbosity=0):
@@ -159,6 +167,9 @@ def main():
                         type=int, default=0,
                         help='Limit processing to molecules with no more than'
                              ' this number of initial fragment (no limit if 0)')
+    parser.add_argument('--max-hac',
+                        type=int, default=0,
+                        help='Limit processing to molecules with no more than this heavy atoms (no limit if 0)')
     parser.add_argument('-r', '--report-interval', type=int, default=1000, help='Reporting interval')
 
 
@@ -192,7 +203,7 @@ def main():
 
     nodes_f = open(os.path.join(base_dir, "nodes.csv"), "w")
     edges_f = open(os.path.join(base_dir, "edges.csv"), "w")
-    nodes_f.close()
+
     with open(args.input, 'r') as standard_file:
 
         # Process the rest of the file...
@@ -208,7 +219,7 @@ def main():
 
             line = line.strip()
             if line:
-                fragment_and_write(line, max_frags=args.max_frag, verbosity=args.verbosity)
+                fragment_and_write(line, max_frags=args.max_frag, max_hac=args.max_hac, verbosity=args.verbosity)
 
             # Enough?
             num_processed += 1
@@ -218,6 +229,7 @@ def main():
                 break
 
 
+    nodes_f.close()
     edges_f.close()
     if rejects_f:
         rejects_f.close()
