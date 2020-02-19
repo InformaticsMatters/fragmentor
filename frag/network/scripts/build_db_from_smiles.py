@@ -192,7 +192,7 @@ def main():
 
     nodes_f = open(os.path.join(base_dir, "nodes.csv"), "w")
     edges_f = open(os.path.join(base_dir, "edges.csv"), "w")
-
+    nodes_f.close()
     with open(args.input, 'r') as standard_file:
 
         # Process the rest of the file...
@@ -217,7 +217,7 @@ def main():
             if args.limit and num_processed >= args.limit:
                 break
 
-    nodes_f.close()
+
     edges_f.close()
     if rejects_f:
         rejects_f.close()
