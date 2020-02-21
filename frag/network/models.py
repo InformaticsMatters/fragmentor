@@ -8,7 +8,7 @@ class NodeHolder(object):
     """
 
     def __init__(self, iso_flag=True):
-        self.node_list = set()
+        self.node_map = {}
         self.edge_list = set()
         self.iso_flag = iso_flag
 
@@ -20,14 +20,15 @@ class NodeHolder(object):
                  MolFromSmiles() fails then None is returned as the
                  node instance.
         """
-        mol = Chem.MolFromSmiles(child_smi)
-        if not mol:
-            return None, False
-        new_node = Node(mol, self.iso_flag)
-        if new_node not in self.node_list:
-            self.node_list.add(new_node)
+        if child_smi not in self.node_map:
+            mol = Chem.MolFromSmiles(child_smi)
+            if not mol:
+                 return None, False
+            new_node = Node(mol, self.iso_flag)
+            self.node_map[child_smi] = new_node
             return new_node, True
-        return new_node, False
+        else:
+            return  self.node_map[child_smi], False
 
     def create_or_retrieve_edge(self, excluded_smi, child_smi, input_node, new_node):
         """
@@ -42,6 +43,9 @@ class NodeHolder(object):
         self.edge_list.add(new_edge)
         return new_edge
 
+    def get_nodes(self):
+        return set(self.node_map.values())
+
     def get_edges(self):
         """
         :return:
@@ -51,7 +55,7 @@ class NodeHolder(object):
     def size(self):
         """Returns the size of the object as node and edge count.
         """
-        return len(self.node_list), len(self.edge_list)
+        return len(self.node_map), len(self.edge_list)
 
 
 

@@ -130,8 +130,9 @@ class FragController(Thread):
 
         # if no edges then this is a leaf node with no children so we just write the node
         if num_edges == 0:
-            if node_holder.node_list:
-                node = node_holder.node_list.pop()
+            node_list = node_holder.get_nodes()
+            if node_list:
+                node = node_list.pop()
                 smiles = node.SMILES
                 if smiles not in self.cache:
                     self.f_writer.write_node(node, time_ms, 0, 0)
