@@ -45,8 +45,8 @@ def get_arguments():
     parser.add_argument("--input")
     parser.add_argument("--base_dir")
     parser.add_argument('-l', '--limit',
-                        type=int, default=1000,
-                        help='Limit processing to the first N molecules,'
+                        type=int, default=0,
+                        help='Limit processing to the first N chunks,'
                              ' process all otherwise')
     parser.add_argument('-s', '--skip',
                         type=int, default=0,
@@ -57,11 +57,11 @@ def get_arguments():
                         help='Limit processing to molecules with no more than'
                              ' this number of initial fragment (no limit if 0)')
     parser.add_argument('-r', '--report-interval', type=int, default=100, help='Reporting interval')
-    parser.add_argument('-p', '--processes', type=int, default=1,
+    parser.add_argument('-p', '--processes', type=int, default=4,
                         help='Number of parallel processes')
 
     # TODO Strange bug if chunk set to greater than the file size - finishes but does not end master process.
-    parser.add_argument('-c', '--chunk_size', type=int, default=10,
+    parser.add_argument('-c', '--chunk_size', type=int, default=50,
                         help='Size of chunk the SMILES will be grouped in to')
     parser.add_argument('-q', '--max_queue', type=int, default=50,
                         help='Limits how many new chunks are added to the queue')
@@ -73,7 +73,7 @@ def get_arguments():
     parser.set_defaults(verbosity=0)
     return parser.parse_args()
 
-def main():
+def fragmentor(args):
     """ Main Function.
     1. Accept input
     2. Sets up parallel fragment worker processes using the FragWorker class
@@ -90,7 +90,6 @@ def main():
 
     """
     print('Fragment process - start')
-    args = get_arguments()
 
     # Do we have an input and base directory?
     if not args.input:
@@ -170,9 +169,10 @@ def main():
 
     print("Smiles: Read {0} molecules. Wrote {1} nodes and {2} edges, {3} rejects"
           .format(frag.get_smiles_read(), f_writer.get_node_count(), f_writer.get_edge_count(), f_writer.get_reject_count()))
-    print ("Fragementation took:", time.time() - t1)
+    print ("Fragmentation took:", time.time() - t1)
 
 
 if __name__ == "__main__":
-    main()
+    args = get_arguments()
+    fragmentor(args)
 
