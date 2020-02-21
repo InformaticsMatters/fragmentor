@@ -2,3 +2,4 @@
 **/*.pyc
 **/__pycache__
 data/chemspace_2019_07_chunk01.smi
+tmp
