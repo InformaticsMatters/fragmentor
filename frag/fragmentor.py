@@ -60,6 +60,8 @@ def get_arguments():
     parser.add_argument('-p', '--processes', type=int, default=4,
                         help='Number of parallel processes')
 
+    # TODO HAC filter - discuss implementation - possibility of general "filter" file instead of active?.
+
     # TODO Strange bug if chunk set to greater than the file size - finishes but does not end master process.
     parser.add_argument('-c', '--chunk_size', type=int, default=50,
                         help='Size of chunk the SMILES will be grouped in to')
@@ -75,9 +77,8 @@ def get_arguments():
 
 def fragmentor(args):
     """ Main Function.
-    1. Accept input
-    2. Sets up parallel fragment worker processes using the FragWorker class
-    3. Sets up fragmentation queue control thread using the FragControl class
+    1. Sets up parallel fragment worker processes using the FragWorker class
+    2. Sets up fragmentation queue control thread using the FragControl class
 
     Parameters:
         Standardized filename
@@ -153,7 +154,7 @@ def fragmentor(args):
     frag.start()
 
     # Wait for thread to finish
-    num_processed = frag.join()
+    frag.join()
 
     print('Fragment controller thread ended - closing down')
 
@@ -161,7 +162,7 @@ def fragmentor(args):
     for proc in frag_processes:
         proc.terminate()
 
-    # Close and Shutdown
+    # Close files
     nodes_f.close()
     edges_f.close()
     if rejects_f:

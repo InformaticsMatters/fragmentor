@@ -9,9 +9,82 @@
 
 import os
 import sys
+import collections
 from multiprocessing import Process
 from frag.network.models import NodeHolder, Attr
 from frag.utils.network_utils import build_network
+
+class FragData():
+    """Class FragData
+
+    Purpose:
+
+    """
+
+    def __init__(self):
+        self.parent_data = collections.OrderedDict()
+        self.nodes_map = {}
+
+    def add_nodes(self, nodes, input_smiles):
+
+        for node in nodes:
+            self.nodes_map[node.SMILES] = node
+        for smiles in input_smiles:
+            node = self.nodes_map[smiles]
+            self.parent_data[smiles] = ParentData(smiles, node.HAC, node.RAC)
+
+    def add_edges(self, edge):
+
+        p_smiles = edge.NODES[0].SMILES
+        if p_smiles in self.parent_data:
+            p_data = self.parent_data[p_smiles]
+        else:
+            # it's new to this group of edges
+            node = self.nodes_map[p_smiles]
+            p_data = ParentData(p_smiles, node.HAC, node.RAC)
+            self.parent_data[p_smiles] = p_data
+
+        p_data.add_edge(edge)
+
+    def get_parent_data_list(self):
+        """
+        Get the ParentData items as a list.
+        Unlike the FragData instance that list is a lightweight object suitable for pickling.
+        :return:
+        """
+        return list(self.parent_data.values())
+
+
+class ParentData():
+    """Class ParentData
+
+    Purpose:
+
+    """
+
+    def __init__(self, smiles, hac, rac):
+        """
+        :param smiles:
+        :param hac:
+        :param rac:
+        """
+        self.smiles = smiles
+        self.hac = hac
+        self.rac = rac
+        # children are a dict keyed by the child SMILES whose values are a list of labels
+        self.children = collections.OrderedDict()
+        self.edge_count = 0
+
+    def add_edge(self, edge):
+        c_smiles = edge.NODES[1].SMILES
+        label = edge.get_label()
+        self.edge_count += 1
+        if c_smiles in self.children:
+            self.children[c_smiles].append(label)
+        else:
+            self.children[c_smiles] = [ label ]
+
+
 
 class FragProcess(Process):
     """Class FragProcess
@@ -33,15 +106,15 @@ class FragProcess(Process):
         """Performs the fragmentation process for a SMILES.
 
         Returns:
-           NodeHolder object.
+           Fragdata object with Node/Edge data to write to files.
 
         """
-
+        # Note that in this version, only one SMILES is sent in here.
+        # There seemed to be some strange issues with edges if a combined node holder is used TBI
         attrs = []
         attr = Attr(smiles, ["EM"])
         attrs.append(attr)
-        #print('fragment smiles: {}'.format(smiles))
-        # Build the network
+
         node_holder = NodeHolder(iso_flag=False)
         node_holder = build_network(attrs, node_holder, base_dir=None, verbosity=verbosity, recurse=False)
 
@@ -56,16 +129,21 @@ class FragProcess(Process):
         Returns:
             A list of NodeHolder objects.
 
+
         """
+
         print('fragment process - process id: {}'.format(os.getpid()))
         while True:
             if not self.process_queue.empty():
                 chunk_of_smiles = self.process_queue.get()
-                node_list = []
+                frag_data = FragData()
                 for smiles in chunk_of_smiles:
                     node_holder = self.fragment_mol(smiles, verbosity=self.args.verbosity)
-                    node_list.append(node_holder)
-                self.results_queue.put(node_list)
+                    frag_data.add_nodes(node_holder.get_nodes(), [smiles])
+                    for edge in node_holder.get_edges():
+                        frag_data.add_edges(edge)
+                self.results_queue.put(frag_data)
+
 
 from threading import Thread
 
@@ -94,6 +172,7 @@ class FragController(Thread):
     max_size_of_result = 0
     cache = set()
     reprocess_buffer = set()
+    already_processed = 0
 
     def __init__(self, args, process_queue, results_queue, f_writer) -> None:
         '''Initialises the object.'''
@@ -109,59 +188,39 @@ class FragController(Thread):
     def get_smiles_read(self) -> int:
         return self.smiles_read
 
-    def write_data(self, node_holder, time_ms):
+    def write_data(self, parent_data):
         """Write_data
 
-        Write the data from the NodeHolder to the nodes.csv and edges.csv files
-
-        :param node_holder: Indivdual from the result queue.
-        :param time_ms: The time taken to perform the fragmentation
-        :param num_children: The number of child nodes
-        :param num_edges: The number of child edges (some parent->child relationships have multiple edges)
-
-        :return: the set of smiles that needs further processing.
+        node and edge data
+        return: the set of smiles that needs further processing.
 
         """
-        need_further_processing = set()
 
-        sizes = node_holder.size()  # a tuple of the number of nodes and the number of edges
-        num_children = sizes[0] - 1
-        num_edges = sizes[1]
+        children_to_process = set()
+        p_smiles = parent_data.smiles
+        num_children = len(parent_data.children)
+        num_edges = parent_data.edge_count
 
         # if no edges then this is a leaf node with no children so we just write the node
         if num_edges == 0:
-            node_list = node_holder.get_nodes()
-            if node_list:
-                node = node_list.pop()
-                smiles = node.SMILES
-                if smiles not in self.cache:
-                    self.f_writer.write_node(node, time_ms, 0, 0)
-                    self.cache.add(node.SMILES)
+            if p_smiles not in self.cache:
+                self.f_writer.write_node(p_smiles, parent_data.hac, parent_data.rac, 0, num_edges)
+                self.cache.add(p_smiles)
+            return children_to_process
         else:
             # so we have edges to process
-            p_node = None
-            for edge in node_holder.get_edges():
-                if not p_node:
-                    # this happens only for the first edge
-                    p_node = edge.NODES[0]
-                    if p_node.SMILES in self.cache:
-                        # no need to process. return immediately with need_further_processing being empty
-                        return need_further_processing
-                    # so it's a new node so we must write it
-                    self.f_writer.write_node(p_node, time_ms, num_children, num_edges)
-                    self.cache.add(p_node.SMILES)
-                elif edge.NODES[0] != p_node:
-                    # for all other edges check that the parent is the same
-                    raise ValueError("ERROR. All edges should have the same parent SMILES", p_smiles, p_node.SMILES)
+            if p_smiles not in self.cache:
+                self.f_writer.write_node(p_smiles, parent_data.hac, parent_data.rac, 0, num_edges)
+                self.cache.add(p_smiles)
 
-                c_node = edge.NODES[1]
-                p_smiles = p_node.SMILES
-                c_smiles = c_node.SMILES
-                if c_smiles not in self.cache:
-                    need_further_processing.add(c_smiles)
-                self.f_writer.write_edge(edge)
+                for c_smiles in parent_data.children:
+                    labels = parent_data.children[c_smiles]
+                    for label in labels:
+                        self.f_writer.write_edge(p_smiles, c_smiles, label)
+                    if c_smiles not in self.cache:
+                        children_to_process.add(c_smiles)
 
-        return need_further_processing
+            return children_to_process
 
     def write_process_queue (self, buffer, main_queue):
         """Write a chunk to the process queue and set flags.
@@ -214,27 +273,27 @@ class FragController(Thread):
                     self.reprocess_buffer.add(smiles)
                     buffer_size = 1
 
-    def process_results(self, node_holder, max_frags=0, verbosity=0):
+    def process_results(self, frag_data, max_frags=0, verbosity=0):
         """Processes a NodeHolder object from the results queue.
 
         """
 
-        #TODO Add time_ms back in - has to be returned with node holders.
-        time_ms = 0
-        size = node_holder.size()
-        # the number of children is the number of nodes minus one (the parent)
-        num_children = size[0] - 1
-        if 0 < max_frags < num_children:
-            # TODO Reject processing needs smiles?.
-            # self.f_writer.write_reject(smiles)
-            return
+        # Set of ALL parent smiles including ones that are in the cache
+        data = frag_data.get_parent_data_list()
 
-        # print("Handling mol {0} with {1} nodes and {2} edges".format(smiles, size[0], size[1]))
+        # Loop through remaining parent_data not in cache.
+        for parent_data in data:
+            if parent_data.smiles in self.cache:
+                continue
 
-        need_further_processing = self.write_data(node_holder, time_ms)
-        self.reprocess_smiles_chunk(need_further_processing, self.args.chunk_size, False)
+            num_children = len(parent_data.children)
+            if 0 < max_frags < num_children:
+               self.f_writer.write_reject(parent_data.smiles)
+               continue
 
-        node_holder = None
+            # This writes the parent nodes to the cache.
+            children_needing_processing = self.write_data(parent_data)
+            self.reprocess_smiles_chunk(children_needing_processing, self.args.chunk_size, False)
 
     def read_smiles_chunk(self, standard_file, no_of_lines, process) -> bool:
         """Read a chunk of SMILES from the standard file (and write to the process queue.
@@ -250,7 +309,8 @@ class FragController(Thread):
             # read a single line
             line = standard_file.readline().strip()
             if line:
-                smiles_list.append(line)
+                if line not in self.cache:
+                    smiles_list.append(line)
             else:
                 more_smiles = False
                 break
@@ -297,19 +357,20 @@ class FragController(Thread):
             #Check if something has been processed
             while not self.results_queue.empty():
 
-                node_list = self.results_queue.get()
+                #node_list = self.results_queue.get()
+                frag_data = self.results_queue.get()
                 self.num_processed += 1
                 # As replies are processed, room is created in the queue again
                 if self.queued_this_time > 0:
                     self.queued_this_time -= 1
-                size_of_result =  sys.getsizeof(node_list)
+                size_of_result =  sys.getsizeof(frag_data)
                 self.total_size_of_result += size_of_result
                 if size_of_result > self.max_size_of_result:
                     self.max_size_of_result = size_of_result
 
-                # Process results
-                for node_holder in node_list:
-                    self.process_results(node_holder, max_frags=self.args.max_frag, verbosity=self.args.verbosity)
+                self.process_results(frag_data, max_frags=self.args.max_frag, verbosity=self.args.verbosity)
+
+            # Flushes remaining smiles in reprocess buffer
             self.reprocess_smiles_chunk([], self.args.chunk_size, True)
 
             if self.args.limit and self.smiles_read > self.args.limit:
@@ -323,20 +384,15 @@ class FragController(Thread):
 
         #EndWhile
 
-        # Final reprocessing for SMILES left in reprocess buffer.
-        #self.reprocess_smiles_chunk([], self.args.chunk_size, True)
-        #node_list = self.results_queue.get()
-        #self.num_processed += 1
-        #for node_holder in node_list:
-        #    self.write_data(node_holder, 0)
-        #    node_holder = None
-
         print("Number Requests {}, Number Requeued {}, Number Responses {}"
               .format(self.num_queued, self.num_requeued, self.num_processed))
         print("SMILES {}, SMILES Requeued {}, Max SMILES to requeued {}"
               .format(self.smiles_read, self.smiles_requeued, self.max_smiles_requeued))
         print("Average Results Size {}, Max Result Size {}"
               .format((self.total_size_of_result / self.num_processed), self.max_size_of_result))
+        print("Found in Cache and removed from Reprocessing {}"
+              .format(self.already_processed))
+
         print('Fragmentation Control Thread End')
 
         return self.num_processed
@@ -371,21 +427,18 @@ class FileWriter:
     def get_reject_count(self) -> int:
         return self.reject_count
 
-    def write_node(self, node, time_ms, num_children, num_edges):
-        """Write to Note File.
-
+    def write_node(self, p_smiles, hac, rac, num_children, num_edges):
+        """Write to Node File.
         """
-        # print("writing node", node.SMILES)
         self.node_count +=1
-        self.nodes_f.write(','.join([node.SMILES, str(node.HAC), str(node.RAC), str(num_children), str(num_edges), str(time_ms)]) + '\n')
+        self.nodes_f.write(','.join([p_smiles, str(hac), str(rac), str(num_children), str(num_edges)]) + '\n')
 
-    def write_edge(self, edge):
+    def write_edge(self, p_smiles, c_smiles, label):
         """Write to Edge File.
-
         """
         # print("writing edge", edge.get_label())
+        self.edges_f.write(','.join([p_smiles, c_smiles, label]) + '\n')
         self.edge_count +=1
-        self.edges_f.write(edge.as_csv() + '\n')
 
     def write_reject(self, smiles):
         """Write to Reject File.
