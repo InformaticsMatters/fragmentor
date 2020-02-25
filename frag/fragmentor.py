@@ -168,7 +168,7 @@ def fragmentor(args):
     if rejects_f:
         rejects_f.close()
 
-    print("Smiles: Read {0} molecules. Wrote {1} nodes and {2} edges, {3} rejects"
+    print("Smiles: Processed {0} molecules. Wrote {1} nodes and {2} edges, {3} rejects"
           .format(frag.get_smiles_read(), f_writer.get_node_count(), f_writer.get_edge_count(), f_writer.get_reject_count()))
     print ("Fragmentation took:", time.time() - t1)
 

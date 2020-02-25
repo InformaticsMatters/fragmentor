@@ -165,6 +165,7 @@ class FragController(Thread):
     queued_this_time = 0
 
     smiles_read = 0
+    smiles_read_ignored = 0
     smiles_requeued = 0
     max_smiles_requeued = 0
     # This is just an indication for sizing - divide by num_processed.
@@ -204,13 +205,15 @@ class FragController(Thread):
         # if no edges then this is a leaf node with no children so we just write the node
         if num_edges == 0:
             if p_smiles not in self.cache:
-                self.f_writer.write_node(p_smiles, parent_data.hac, parent_data.rac, 0, num_edges)
+                self.f_writer.write_node(p_smiles, parent_data.hac, parent_data.rac, num_children, num_edges)
                 self.cache.add(p_smiles)
+            else:
+                self.already_processed +=1
             return children_to_process
         else:
             # so we have edges to process
             if p_smiles not in self.cache:
-                self.f_writer.write_node(p_smiles, parent_data.hac, parent_data.rac, 0, num_edges)
+                self.f_writer.write_node(p_smiles, parent_data.hac, parent_data.rac, num_children, num_edges)
                 self.cache.add(p_smiles)
 
                 for c_smiles in parent_data.children:
@@ -219,6 +222,10 @@ class FragController(Thread):
                         self.f_writer.write_edge(p_smiles, c_smiles, label)
                     if c_smiles not in self.cache:
                         children_to_process.add(c_smiles)
+                    else:
+                        self.already_processed += 1
+            else:
+                self.already_processed +=1
 
             return children_to_process
 
@@ -278,12 +285,11 @@ class FragController(Thread):
 
         """
 
-        # Set of ALL parent smiles including ones that are in the cache
         data = frag_data.get_parent_data_list()
 
-        # Loop through remaining parent_data not in cache.
         for parent_data in data:
             if parent_data.smiles in self.cache:
+                self.already_processed +=1
                 continue
 
             num_children = len(parent_data.children)
@@ -291,7 +297,6 @@ class FragController(Thread):
                self.f_writer.write_reject(parent_data.smiles)
                continue
 
-            # This writes the parent nodes to the cache.
             children_needing_processing = self.write_data(parent_data)
             self.reprocess_smiles_chunk(children_needing_processing, self.args.chunk_size, False)
 
@@ -311,6 +316,8 @@ class FragController(Thread):
             if line:
                 if line not in self.cache:
                     smiles_list.append(line)
+                else:
+                    self.smiles_read_ignored+=1
             else:
                 more_smiles = False
                 break
@@ -357,7 +364,6 @@ class FragController(Thread):
             #Check if something has been processed
             while not self.results_queue.empty():
 
-                #node_list = self.results_queue.get()
                 frag_data = self.results_queue.get()
                 self.num_processed += 1
                 # As replies are processed, room is created in the queue again
@@ -386,8 +392,8 @@ class FragController(Thread):
 
         print("Number Requests {}, Number Requeued {}, Number Responses {}"
               .format(self.num_queued, self.num_requeued, self.num_processed))
-        print("SMILES {}, SMILES Requeued {}, Max SMILES to requeued {}"
-              .format(self.smiles_read, self.smiles_requeued, self.max_smiles_requeued))
+        print("SMILES Read/Processed {}, SMILES Read/Ignored {}, SMILES Requeued {}, Max SMILES Requeued {}"
+              .format(self.smiles_read, self.smiles_read_ignored, self.smiles_requeued, self.max_smiles_requeued))
         print("Average Results Size {}, Max Result Size {}"
               .format((self.total_size_of_result / self.num_processed), self.max_size_of_result))
         print("Found in Cache and removed from Reprocessing {}"
