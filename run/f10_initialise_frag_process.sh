@@ -18,7 +18,7 @@ echo "Initialising Fragmentation Process .."
 
 echo $PYTHONPATH
 
-# Remove Stadardisation Output Directory
+# Check Python path.
 if [ -d $PYTHONPATH/run ]; then
     echo "Python path set correctly"
 else
@@ -27,6 +27,11 @@ else
     echo "Initialisation Failed"
     exit 1
 fi
+
+# Create Fragmentation base directory if it doesn't exist
+if [ ! -d $PYTHONPATH/$FRAGBASEDIR ]; then
+    mkdir $PYTHONPATH/$FRAGBASEDIR
+fi    
 
 echo "Initialisation Complete"
 exit 0
