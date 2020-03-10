@@ -28,8 +28,11 @@ class FragData():
         for node in nodes:
             self.nodes_map[node.SMILES] = node
         for smiles in input_smiles:
-            node = self.nodes_map[smiles]
-            self.parent_data[smiles] = ParentData(smiles, node.HAC, node.RAC)
+            if smiles in self.nodes_map:
+                node = self.nodes_map[smiles]
+                self.parent_data[smiles] = ParentData(smiles, node.HAC, node.RAC)
+            else:
+                print("WARNING: SMILES", smiles, "not present in NodeHolder")
 
     def add_edge(self, edge):
         p_smiles = edge.NODES[0].SMILES
@@ -154,6 +157,9 @@ def fragment_and_write(input_smiles, max_frags=0, max_hac=0, verbosity=0):
         new_list = []
         for smiles in input_smiles:
             mol = Chem.MolFromSmiles(smiles)
+            if not mol:
+                print("WARNING: could not parse", smiles)
+                continue
             if mol.GetNumHeavyAtoms() > max_hac:
                 write_reject(smiles)
                 rejects_count += 1
@@ -163,7 +169,7 @@ def fragment_and_write(input_smiles, max_frags=0, max_hac=0, verbosity=0):
             return
         input_smiles = new_list
 
-    frag_data = fragment_mols(input_smiles, verbosity=verbosity)
+    frag_data = fragment_mols(input_smiles, verbosity=verbosity, recurse=False)
 
     all_needing_further_processing = set()
     parent_smiles = set()
@@ -198,7 +204,7 @@ def fragment_and_write(input_smiles, max_frags=0, max_hac=0, verbosity=0):
     # if all_needing_further_processing:
     #     fragment_and_write(all_needing_further_processing, max_frags=0, max_hac=0, verbosity=verbosity)
 
-def fragment_mols(input_smiles, verbosity=0):
+def fragment_mols(input_smiles, verbosity=0, recurse=False):
 
     #print("Fragmenting", smiles)
 
@@ -211,7 +217,7 @@ def fragment_mols(input_smiles, verbosity=0):
     # print("Processing", len(input_smiles), "mols")
     # print('INPUT ', ','.join(sorted(input_smiles)))
     node_holder = NodeHolder(iso_flag=False)
-    node_holder = build_network(attrs, node_holder, base_dir=None, verbosity=verbosity, recurse=False)
+    node_holder = build_network(attrs, node_holder, base_dir=None, verbosity=verbosity, recurse=recurse)
     # output_smiles = [n.SMILES for n in node_holder.get_nodes()]
     # print('OUTPUT', ','.join(sorted(output_smiles)))
 

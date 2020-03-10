@@ -1,0 +1,7 @@
+FROM continuumio/miniconda:4.7.12
+
+
+WORKDIR /fragmentor
+COPY environment.yml /fragmentor/
+
+RUN conda env create -f environment.yml

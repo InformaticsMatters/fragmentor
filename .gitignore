@@ -4,3 +4,8 @@
 data/chemspace_2019_07_chunk01.smi
 data/chemspace-*
 tmp
+.nextflow*
+work
+nodes.csv
+edges.csv
+rejects.smi
