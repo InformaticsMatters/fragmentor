@@ -15,19 +15,19 @@ set -u
 
 source fragparam.sh
 echo $FRAGMENTOR
-echo $PYTHONPATH/$FRAGBASEDIR/$FRAGSMIFILE
-echo $PYTHONPATH/$FRAGBASEDIR
+echo $REPPATH/$FRAGBASEDIR/$FRAGSMIFILE
+echo $REPPATH/$FRAGBASEDIR
 
 export PGPASSFILE=fragpass
-echo $PYTHONPATH
+echo $REPPATH
 
 python --version
 
 echo "Fragmentation Starting ..."
 
-#time python -m $FRAGMENTOR --input $PYTHONPATH/$FRAGBASEDIR/$FRAGSMIFILE --base_dir $PYTHONPATH/$FRAGBASEDIR
+#time python -m $FRAGMENTOR --input $REPPATH/$FRAGBASEDIR/$FRAGSMIFILE --base_dir $REPPATH/$FRAGBASEDIR
 #time python -m frag.network.scripts.build_db_from_smiles --input /data/xchem/nonisomol.smi --base_dir /data/xchem/
-nextflow run -c nextflow/nextflow.config nextflow/fragmentation.nf -with-docker --input $PYTHONPATH/$FRAGBASEDIR/$FRAGSMIFILE --out_dir $PYTHONPATH/$FRAGBASEDIR
+time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/fragmentation.nf -with-docker --input $REPPATH/$FRAGBASEDIR/$FRAGSMIFILE --out_dir $REPPATH/$FRAGBASEDIR
 
 
 if [ $? -ne 0 ]; then

@@ -14,48 +14,24 @@ set -e
 set -u
 
 source fragparam.sh
-echo $PYTHONPATH
+echo $REPPATH
 echo $VENDORPATH
-source $PYTHONPATH/$VENDORPATH/vendorparam.sh
+source $REPPATH/$VENDORPATH/vendorparam.sh
 
 echo $STANDARDISER
-echo $PYTHONPATH/$STANDDATADIR
-echo $PYTHONPATH/$STANDOUTPUTDIR
-echo $PYTHONPATH/$STANDDATADIR/$STANDINPUTFILE
-echo $PYTHONPATH/$STANDDATADIR/$STANDOUTPUTZIP
+echo $REPPATH/$STANDDATADIR
+echo $REPPATH/$STANDOUTPUTDIR
+echo $REPPATH/$STANDDATADIR/$STANDINPUTFILE
+echo $REPPATH/$STANDDATADIR/$STANDOUTPUTZIP
 
 export PGPASSFILE=fragpass
 
 echo "Starting Standardisation Process .."
 
-# Remove Stadardisation Output Directory
-if [ -d $PYTHONPATH/$STANDOUTPUTDIR ]; then
-    echo "Standardisation Output directory $PYTHONPATH/$STANDOUTPUTDIR exists"
-    echo -n "Remove directory [Y/N]? "
-    read choice
-    if [ $choice == "Y" ] ; then
-	      echo "Removing Standardisation Output Directory"
-	      rm -r $PYTHONPATH/$STANDOUTPUTDIR
-	  else
-        echo "Standardisation step will not process if this directory exists"
-        exit 1
-    fi
-fi
-
-python --version
-time python -m $STANDARDISER $PYTHONPATH/$STANDDATADIR $STANDINPUTFILE $PYTHONPATH/$STANDOUTPUTDIR
+time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/standardizer.nf -with-docker --script $STANDARDISER --input $REPPATH/$STANDDATADIR/$STANDINPUTFILE --out_dir $REPPATH/$STANDOUTPUTDIR
 
 if [ $? -ne 0 ]; then
-    echo "Standardisation failed, fault:" 1>&2
-    exit $?
-fi
-
-gunzip $PYTHONPATH/$STANDOUTPUTDIR/$STANDOUTPUTZIP
-#python -m frag.network.scripts.standardise_xchem_compounds ~/data dsip ~/data/standardised
-#gunzip ~/data/standardised/standardised-compounds.tab.gz
-
-if [ $? -ne 0 ]; then
-    echo "Standardisation unzip, fault:" 1>&2
+    echo "Standardisation fault, fault:" 1>&2
     exit $?
 fi
 

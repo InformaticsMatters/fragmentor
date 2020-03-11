@@ -10,9 +10,8 @@ DBHOST=localhost
 DATABASE=mydatabase
 export PGPASSFILE=fragpass
 
-# Environment Parameters - Modify to directory of your repository.
-export PYTHONPATH=/home/duncan/Documents/dev/InfoMat/fragmentor
-#export PYTHONPATH=${PYTHONPATH}:/home/[your username]/Documents/.../fragmentor
+# Environment Parameters - Repository path needs to be changed if running the bash scripts from a different directory.
+export REPPATH=..
 
 # identification of run path for vendor specific processing
 VENDORPATH='run/vendor/dsip'

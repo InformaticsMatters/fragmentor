@@ -17,9 +17,9 @@ source fragparam.sh
 echo $DBHOST
 echo $DATABASE
 echo $VENDORPATH
-source $PYTHONPATH/$VENDORPATH/vendorparam.sh
+source $REPPATH/$VENDORPATH/vendorparam.sh
 
-echo $PYTHONPATH/$STANDOUTPUTDIR/$STANDOUTPUTFILE
+echo $REPPATH/$STANDOUTPUTDIR/$STANDOUTPUTFILE
 
 export PGPASSFILE=fragpass
 
@@ -30,7 +30,7 @@ psql \
     -X \
     -U postgres \
     -h $DBHOST \
-    -f $PYTHONPATH/$VENDORPATH/f40_create_stand_database.sql \
+    -f $REPPATH/$VENDORPATH/f40_create_stand_database.sql \
     --echo-all \
     --set AUTOCOMMIT=on \
     --set ON_ERROR_STOP=on \
@@ -44,7 +44,7 @@ fi
 echo "Load Standardised Results Starting ..."
 
 #\COPY i_mols(osmiles, isosmiles, nonisosmiles, hac, cmpd_id) FROM '/data/xchem/standardised/standardised-compounds.tab' CSV DELIMITER E'\t' HEADER;
-source $PYTHONPATH/$VENDORPATH/f40_copy_standardised_data.sh
+source $REPPATH/$VENDORPATH/f40_copy_standardised_data.sh
 
 if [ $? -ne 0 ]; then
     echo "Load Standardised File failed, fault:" 1>&2
@@ -55,7 +55,7 @@ psql \
     -X \
     -U postgres \
     -h $DBHOST \
-    -f $PYTHONPATH/$VENDORPATH/f40_load_standardised_data.sql \
+    -f $REPPATH/$VENDORPATH/f40_load_standardised_data.sql \
     --echo-all \
     --set AUTOCOMMIT=off \
     --set ON_ERROR_STOP=on \

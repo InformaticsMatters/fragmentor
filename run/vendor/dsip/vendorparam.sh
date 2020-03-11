@@ -17,7 +17,7 @@ STANDARDISER='frag.standardise.scripts.dsip.standardise_xchem_compounds'
 STANDDATADIR='run/data/dsip'
 
 # Filename of file to standardise - will be a txt.gz file
-STANDINPUTFILE='dsip'
+STANDINPUTFILE='dsip.txt'
 
 # Folder that contains the standardised data
 STANDOUTPUTDIR='run/standardised-dsip'

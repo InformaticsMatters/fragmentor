@@ -12,7 +12,7 @@
 
 
 source fragparam.sh
-echo $PYTHONPATH/$FRAGBASEDIR
+echo $REPPATH/$FRAGBASEDIR
 echo $FRAGNODEFILE
 echo $FRAGEDGEFILE
 
@@ -43,7 +43,7 @@ psql \
     --echo-all \
     --set AUTOCOMMIT=on \
     --set ON_ERROR_STOP=on \
-    -c "\COPY i_node(smiles, hac, rac, child_count, edge_count) FROM '$PYTHONPATH/$FRAGBASEDIR/$FRAGNODEFILE' DELIMITER ',' CSV;" \
+    -c "\COPY i_node(smiles, hac, rac, child_count, edge_count) FROM '$REPPATH/$FRAGBASEDIR/$FRAGNODEFILE' DELIMITER ',' CSV;" \
     $DATABASE
 
 if [ $? -ne 0 ]; then
@@ -79,7 +79,7 @@ psql \
     --echo-all \
     --set AUTOCOMMIT=on \
     --set ON_ERROR_STOP=on \
-    -c "\COPY i_edge(p_smiles, c_smiles, label) FROM '$PYTHONPATH/$FRAGBASEDIR/$FRAGEDGEFILE' DELIMITER ',' CSV;" \
+    -c "\COPY i_edge(p_smiles, c_smiles, label) FROM '$REPPATH/$FRAGBASEDIR/$FRAGEDGEFILE' DELIMITER ',' CSV;" \
     $DATABASE
 
 if [ $? -ne 0 ]; then
