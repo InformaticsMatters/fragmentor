@@ -2,8 +2,7 @@ params.input = 'nonisomol.smi'
 params.chunk_size = 500000
 params.max_hac = 36
 params.max_frag = 12
-params.outDir = '.'
-params.outMode = 'move'
+params.out_dir = '.'
 
 chunks = Channel.from(file(params.input))
     .splitText(by: params.chunk_size, file: 'chunk_')
@@ -28,6 +27,6 @@ process fragment {
     """
 }
 
-node_chunks.collectFile(name: "nodes.csv", storeDir: "${params.outDir}")
-edge_chunks.collectFile(name: "edges.csv", storeDir: "${params.outDir}")
-rejects_chunks.collectFile(name: "rejects.smi", storeDir: "${params.outDir}")
+node_chunks.collectFile(name: "nodes.csv", storeDir: "${params.out_dir}")
+edge_chunks.collectFile(name: "edges.csv", storeDir: "${params.out_dir}")
+rejects_chunks.collectFile(name: "rejects.smi", storeDir: "${params.out_dir}")

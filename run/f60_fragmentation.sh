@@ -25,8 +25,10 @@ python --version
 
 echo "Fragmentation Starting ..."
 
-time python -m $FRAGMENTOR --input $PYTHONPATH/$FRAGBASEDIR/$FRAGSMIFILE --base_dir $PYTHONPATH/$FRAGBASEDIR
+#time python -m $FRAGMENTOR --input $PYTHONPATH/$FRAGBASEDIR/$FRAGSMIFILE --base_dir $PYTHONPATH/$FRAGBASEDIR
 #time python -m frag.network.scripts.build_db_from_smiles --input /data/xchem/nonisomol.smi --base_dir /data/xchem/
+nextflow run -c nextflow/nextflow.config nextflow/fragmentation.nf -with-docker --input $PYTHONPATH/$FRAGBASEDIR/$FRAGSMIFILE --out_dir $PYTHONPATH/$FRAGBASEDIR
+
 
 if [ $? -ne 0 ]; then
     echo "Fragmentation failed, fault:" 1>&2
