@@ -28,47 +28,6 @@ process fragment {
     """
 }
 
-process collect_nodes {
-
-     publishDir params.outDir, mode: params.outMode
-
-     input:
-     file chunks from node_chunks.collect()
-
-     output:
-     file 'nodes.csv'
-
-     """
-     cat $chunks | sort -u > nodes.csv
-     """
-}
-
-process collect_edges {
-
-     publishDir params.outDir, mode: params.outMode
-
-     input:
-     file chunks from edge_chunks.collect()
-
-     output:
-     file 'edges.csv'
-
-     """
-     cat $chunks | sort -u > edges.csv
-     """
-}
-
-process collect_rejects {
-
-     publishDir params.outDir, mode: params.outMode
-
-     input:
-     file chunks from rejects_chunks.collect()
-
-     output:
-     file 'rejects.smi'
-
-     """
-     cat $chunks | sort -u > rejects.smi
-     """
-}
+node_chunks.collectFile(name: "nodes.csv", storeDir: "${params.outDir}")
+edge_chunks.collectFile(name: "edges.csv", storeDir: "${params.outDir}")
+rejects_chunks.collectFile(name: "rejects.smi", storeDir: "${params.outDir}")
