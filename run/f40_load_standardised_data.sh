@@ -16,23 +16,35 @@ set -u
 source fragparam.sh
 echo $DBHOST
 echo $DATABASE
+echo $VENDORPATH
+source $PYTHONPATH/$VENDORPATH/vendorparam.sh
+
 echo $PYTHONPATH/$STANDOUTPUTDIR/$STANDOUTPUTFILE
 
 export PGPASSFILE=fragpass
 
-echo "Load Standardised Results Starting ..."
 
-#\COPY i_mols(osmiles, isosmiles, nonisosmiles, hac, cmpd_id) FROM '/data/xchem/standardised/standardised-compounds.tab' CSV DELIMITER E'\t' HEADER;
+echo "Creating Standardisation tables"
 
 psql \
     -X \
     -U postgres \
     -h $DBHOST \
+    -f $PYTHONPATH/$VENDORPATH/f40_create_stand_database.sql \
     --echo-all \
     --set AUTOCOMMIT=on \
     --set ON_ERROR_STOP=on \
-    -c "\COPY i_mols(osmiles, isosmiles, nonisosmiles, hac, cmpd_id) FROM '$PYTHONPATH/$STANDOUTPUTDIR/$STANDOUTPUTFILE' CSV DELIMITER E'\t' HEADER;" \
     $DATABASE
+
+if [ $? -ne 0 ]; then
+    echo "Create Standardisation tables failed, fault:" 1>&2
+    exit $?
+fi
+
+echo "Load Standardised Results Starting ..."
+
+#\COPY i_mols(osmiles, isosmiles, nonisosmiles, hac, cmpd_id) FROM '/data/xchem/standardised/standardised-compounds.tab' CSV DELIMITER E'\t' HEADER;
+source $PYTHONPATH/$VENDORPATH/f40_copy_standardised_data.sh
 
 if [ $? -ne 0 ]; then
     echo "Load Standardised File failed, fault:" 1>&2
@@ -43,14 +55,14 @@ psql \
     -X \
     -U postgres \
     -h $DBHOST \
-    -f f40_load_standardised_data.sql \
+    -f $PYTHONPATH/$VENDORPATH/f40_load_standardised_data.sql \
     --echo-all \
     --set AUTOCOMMIT=off \
     --set ON_ERROR_STOP=on \
     $DATABASE
 
 if [ $? -ne 0 ]; then
-    echo "Load Standardised Results failed, fault:" 1>&2
+    echo "Update database with Standardised Results failed, fault:" 1>&2
     exit $?
 fi
 

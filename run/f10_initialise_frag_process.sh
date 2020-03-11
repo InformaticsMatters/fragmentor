@@ -17,12 +17,23 @@ source fragparam.sh
 echo "Initialising Fragmentation Process .."
 
 echo $PYTHONPATH
+echo $VENDORPATH
 
 # Check Python path.
 if [ -d $PYTHONPATH/run ]; then
     echo "Python path set correctly"
 else
     echo "Python path must be set to the base directory for the repository"
+    echo "Processing cannot proceed if this is not set correctly - see fragparam.sh file in run folder"
+    echo "Initialisation Failed"
+    exit 1
+fi
+
+# Check Vendor path.
+if [ -d $PYTHONPATH/$VENDORPATH ]; then
+    echo "vendor path set correctly"
+else
+    echo "Vendor path must be set to the base directory for access to vendor specific parameters"
     echo "Processing cannot proceed if this is not set correctly - see fragparam.sh file in run folder"
     echo "Initialisation Failed"
     exit 1

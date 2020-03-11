@@ -16,9 +16,25 @@ echo $PYTHONPATH/$FRAGBASEDIR
 echo $FRAGNODEFILE
 echo $FRAGEDGEFILE
 
-echo "Load table i_node from nodes CSV file"
+echo "Create tables i_node and i_edge"
 
-#\COPY i_node(smiles, hac, rac, child_count, edge_count, ftime) FROM '/data/xchem/nodes.csv' DELIMITER ',' CSV;
+psql \
+    -X \
+    -U postgres \
+    -h $DBHOST \
+    -f f80_create_frag_database.sql \
+    --echo-all \
+    --set AUTOCOMMIT=on \
+    --set ON_ERROR_STOP=on \
+    $DATABASE
+
+if [ $? -ne 0 ]; then
+    echo "Create tables i_node and i_edge failed, fault:" 1>&2
+    exit $?
+fi
+
+
+echo "Load table i_node from nodes CSV file"
 
 psql \
     -X \
@@ -55,7 +71,6 @@ fi
 
 echo "Load table i_edge from edges CSV file"
 
-#\COPY i_edge(p_smiles, c_smiles, label) FROM '/data/xchem/edges.csv' DELIMITER ',' CSV;
 
 psql \
     -X \

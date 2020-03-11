@@ -19,6 +19,9 @@ echo $DATABASE
 echo $PYTHONPATH/$FRAGBASEDIR/$FRAGSMIFILE
 export PGPASSFILE=fragpass
 
+echo $VENDORPATH
+source $PYTHONPATH/$VENDORPATH/vendorparam.sh
+
 
 echo "SMILES Extraction Starting..."
 #\COPY (SELECT n.smiles FROM nonisomol n WHERE NOT EXISTS (SELECT 1 FROM edge e WHERE e.parent_id = n.id)) TO '/data/xchem/nonisomol.smi';
@@ -30,7 +33,7 @@ psql \
     --echo-all \
     --set AUTOCOMMIT=off \
     --set ON_ERROR_STOP=on \
-    -c "\COPY (SELECT n.smiles FROM nonisomol n WHERE NOT EXISTS (SELECT 1 FROM edge e WHERE e.parent_id = n.id)) TO '$PYTHONPATH/$FRAGBASEDIR/$FRAGSMIFILE'" \
+    -c "\COPY (SELECT n.smiles FROM nonisomol n WHERE NOT EXISTS (SELECT 1 FROM edge e WHERE e.parent_id = n.id) ) TO '$PYTHONPATH/$FRAGBASEDIR/$FRAGSMIFILE'" \
     $DATABASE
 
 if [ $? -ne 0 ]; then

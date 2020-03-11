@@ -15,6 +15,9 @@ set -u
 
 source fragparam.sh
 echo $PYTHONPATH
+echo $VENDORPATH
+source $PYTHONPATH/$VENDORPATH/vendorparam.sh
+
 echo $STANDARDISER
 echo $PYTHONPATH/$STANDDATADIR
 echo $PYTHONPATH/$STANDOUTPUTDIR
