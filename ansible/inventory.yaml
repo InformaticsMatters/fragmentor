@@ -1,0 +1,10 @@
+---
+
+# Provide details of one of the compute cluster nodes
+# to act as the 'master'. Ansible will use this to
+# deploy the nextflow files...
+master:
+  hosts:
+    localhost:
+      ansible_connection: local
+      ansible_python_interpreter: python
