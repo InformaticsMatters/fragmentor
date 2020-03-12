@@ -1,2 +1,5 @@
 ---
 
+- name: Include vendor-specific varaibles
+  include_vars:
+    file: "{{ vendor }}-variables.yaml"

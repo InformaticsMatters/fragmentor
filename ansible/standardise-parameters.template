@@ -1,0 +1,8 @@
+---
+
+# A template of typical Parameters the user might want to change.
+# The user will copy this to 'parameters', edit it and then run...
+#
+# ansible-playbook standardise.yaml -e "@parameters"
+
+vendor: molport
