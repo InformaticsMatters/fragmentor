@@ -1,0 +1,10 @@
+---
+
+# Lint Ansible but exclude some forms of error.
+# See https://docs.ansible.com/ansible-lint/rules/default_rules.html
+#
+# 204 : Lines should be no longer than 160 chars
+# 301 : Commands should not change things if nothing needs doing
+skip_list:
+- '204'
+- '301'

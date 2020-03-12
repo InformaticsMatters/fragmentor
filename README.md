@@ -1,5 +1,7 @@
 # Fragmentation optimisation
 
+[![Build Status](https://travis-ci.com/InformaticsMatters/fragmentor.svg?branch=master)](https://travis-ci.com/InformaticsMatters/fragmentor)
+
 ## Using a conda environment
 
 Create the environment:
