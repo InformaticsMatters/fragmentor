@@ -16,15 +16,15 @@ process fragment {
     file chunks
 
     output:
-    file 'nodes*.csv' into node_chunks
-    file 'edges*.csv' into edge_chunks
-    file 'rejects*.smi' optional true into rejects_chunks
+    file 'nodes_*.csv' into node_chunks
+    file 'edges_*.csv' into edge_chunks
+    file 'rejects_*.smi' optional true into rejects_chunks
 
     """
     python -m frag.network.scripts.build_db_from_smiles --input $chunks --base_dir ./ --max-frag ${params.max_frag} --max-hac ${params.max_hac}
     mv nodes.csv nodes_${chunks}.csv
     mv edges.csv edges_${chunks}.csv
-    if [ -f rejects.smi ]; then mv rejects.smi rejects_${chunks}.rmi; fi
+    if [ -f rejects.smi ]; then mv rejects.smi rejects_${chunks}.smi; fi
     """
 }
 
