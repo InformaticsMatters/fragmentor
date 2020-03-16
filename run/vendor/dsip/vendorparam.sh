@@ -25,3 +25,6 @@ STANDOUTPUTDIR='run/standardised-dsip'
 # Filenames for standardised data tab separated files
 STANDOUTPUTZIP='standardised-compounds.tab.gz'
 STANDOUTPUTFILE='standardised-compounds.tab'
+
+# Chunksize for loading standardised data tab separated files
+STANDCHUNK=25000

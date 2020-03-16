@@ -1,7 +1,7 @@
 #!/bin/bash
 # 
 # Load Fragmentation results: 
-# Purpose: Load Nodes and Edges from Fragmentation step into ISO database 
+# Purpose: Load Nodes and Edges from Fragmentation step into Frag database
 #
 # Parameters:
 #    - See file: fragparam.sh and fragpass for fragmentation configuration.
@@ -51,7 +51,7 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
-echo "Load ISO database from i_nodes"
+echo "Load Frag database from i_nodes"
 
 psql \
     -X \
@@ -87,7 +87,7 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
-echo "Load ISO database from i_edges"
+echo "Load Frag database from i_edges"
 
 psql \
     -X \

@@ -1,6 +1,6 @@
 /*
  * Load Fragmented Nodes Results SQL Statements: 
- * Purpose: Loads fragmented node data into ISO database
+ * Purpose: Loads fragmented node data into Frag database
  *
  * Called from p80_load_frag_results.sh
  *
@@ -12,6 +12,8 @@
 /*
  * Update i_node with smailes from existing nonisomol table 
  */
+\timing
+
 begin;
 UPDATE i_node i SET nonisomol_id = n.id
   FROM nonisomol n WHERE n.smiles = i.smiles;

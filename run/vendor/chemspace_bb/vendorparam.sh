@@ -17,7 +17,7 @@ STANDARDISER='frag.standardise.scripts.chemspace_bb.standardise_chemspace_bb_pri
 STANDDATADIR='run/data/chemspace_bb'
 
 # Filename of file to standardise - will be a txt.gz file
-STANDINPUTFILE='chemspace_bb'
+STANDINPUTFILE='chemspace_bb.txt'
 
 # Folder that contains the standardised data
 STANDOUTPUTDIR='run/standardised-chemspace_bb'
@@ -25,3 +25,6 @@ STANDOUTPUTDIR='run/standardised-chemspace_bb'
 # Filenames for standardised data tab separated files
 STANDOUTPUTZIP='standardised-compounds.tab.gz'
 STANDOUTPUTFILE='standardised-compounds.tab'
+
+# Chunksize for loading standardised data tab separated files
+STANDCHUNK=25000

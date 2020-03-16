@@ -8,6 +8,8 @@
 /*
  * Load nonisomol except where already exists 
  */
+\timing
+
 begin;
 INSERT INTO nonisomol (smiles, hac)
   SELECT nonisosmiles, hac from i_mols_chemspace
@@ -44,20 +46,10 @@ UPDATE i_mols_chemspace i SET isomol_id = iso.id
     WHERE iso.smiles = i.isosmiles;
 commit;
 
-/* ASK
-*UPDATE i_mols i SET isomol_id = n.id
-*  FROM isomol n
-*    WHERE n.smiles = i.isosmiles
-*    AND i.isosmiles != i.nonisosmiles;
-
-*
-* LOOKUP the ID generated - it may not be 2
-* ### TODO handle the price info
-*
-*/
-
 /*
  * Load mol_source from i_mols 
+ * ### TODO source should not be hard coded
+ * ### TODO handle the price info
  */
 begin;
 INSERT INTO mol_source (smiles, code, source_id, nonisomol_id, isomol_id)

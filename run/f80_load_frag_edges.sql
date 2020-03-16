@@ -1,6 +1,6 @@
 /*
  * Load Fragmented Results SQL Statements: 
- * Purpose: Loads fragmented node and edge data into ISO database
+ * Purpose: Loads fragmented node and edge data into Frag database
  *
  * Called from p80_load_frag_results.sh
  *
@@ -12,6 +12,9 @@
 /*
  * Check which edges are already present in the database 
  */
+
+\timing
+
 begin;
 UPDATE i_edge i SET present = TRUE WHERE EXISTS
   (SELECT 1 FROM edge e 

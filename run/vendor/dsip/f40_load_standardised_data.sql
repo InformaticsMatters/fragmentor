@@ -8,6 +8,8 @@
 /*
  * Load nonisomol except where already exists 
  */
+\timing
+
 begin;
 INSERT INTO nonisomol (smiles, hac, rac)
   SELECT nonisosmiles, hac, rac from i_mols_dsip
@@ -44,6 +46,7 @@ commit;
 
 /*
  * Load mol_source from i_mols 
+ * ### TODO source should not be hard coded
  */
 begin;
 INSERT INTO mol_source (smiles, code, source_id, nonisomol_id, isomol_id)

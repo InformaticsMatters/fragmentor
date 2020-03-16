@@ -14,7 +14,11 @@ export PGPASSFILE=fragpass
 export REPPATH=..
 
 # identification of run path for vendor specific processing
-VENDORPATH='run/vendor/dsip'
+# Supported vendors
+#    dsip
+#    chemspace_bb
+#
+VENDORPATH='run/vendor/chemspace_bb'
 
 # Fragmentation Parameters 
 
@@ -26,6 +30,10 @@ FRAGSMIFILE='fragmentinput.smi'
 
 # Base directory for fragmentation processing - contains input and output files
 FRAGBASEDIR='run/fragment'
+
+# Base directory for fragmentation processing - contains input and output files
+# FRAGCHUNKSIZE=25000
+FRAGCHUNKSIZE=500000
 
 #NB: Maybe check for these before use.
 FRAGNODEFILE='nodes.csv'
