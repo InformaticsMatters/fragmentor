@@ -18,7 +18,7 @@ export REPPATH=..
 #    dsip
 #    chemspace_bb
 #
-VENDORPATH='run/vendor/chemspace_bb'
+VENDORPATH='run/vendor/molport'
 
 # Fragmentation Parameters 
 
@@ -32,8 +32,8 @@ FRAGSMIFILE='fragmentinput.smi'
 FRAGBASEDIR='run/fragment'
 
 # Base directory for fragmentation processing - contains input and output files
-# FRAGCHUNKSIZE=25000
-FRAGCHUNKSIZE=500000
+FRAGCHUNKSIZE=25000
+# FRAGCHUNKSIZE=500000
 
 #NB: Maybe check for these before use.
 FRAGNODEFILE='nodes.csv'
