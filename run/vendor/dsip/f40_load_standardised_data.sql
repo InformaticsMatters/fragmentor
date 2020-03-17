@@ -46,9 +46,8 @@ commit;
 
 /*
  * Load mol_source from i_mols 
- * ### TODO source should not be hard coded
  */
 begin;
 INSERT INTO mol_source (smiles, code, source_id, nonisomol_id, isomol_id)
-  (SELECT osmiles, cmpd_id, 6, nonisomol_id, isomol_id FROM i_mols_dsip);
+  (SELECT osmiles, cmpd_id, :SOURCEID, nonisomol_id, isomol_id FROM i_mols_dsip);
 commit;

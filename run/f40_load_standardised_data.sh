@@ -22,13 +22,15 @@ echo $DATABASE
 echo $VENDORPATH
 source $REPPATH/$VENDORPATH/vendorparam.sh
 echo $STANDCHUNK
+echo $SOURCEID
 
-echo $REPPATH/$STANDOUTPUTDIR/$STANDOUTPUTFILE
+
+echo $REPPATH/$STANDOUTPUTDIR
 
 export PGPASSFILE=fragpass
 
-head -1 $REPPATH/$STANDOUTPUTDIR/$STANDOUTPUTFILE > standardheader
-tail -n +2 $REPPATH/$STANDOUTPUTDIR/$STANDOUTPUTFILE | split -d -l $STANDCHUNK - chunk_
+head -1 $REPPATH/$STANDOUTPUTDIR/standardised-compounds.tab > standardheader
+tail -n +2 $REPPATH/$STANDOUTPUTDIR/standardised-compounds.tab | split -d -l $STANDCHUNK - chunk_
 
 for f in chunk*; do
   cat standardheader > $REPPATH/$STANDOUTPUTDIR/standardised$f.tab
@@ -65,6 +67,7 @@ for f in chunk*; do
       -X \
       -U postgres \
       -h $DBHOST \
+      -v SOURCEID=$SOURCEID \
       -f $REPPATH/$VENDORPATH/f40_load_standardised_data.sql \
       --echo-all \
       --set AUTOCOMMIT=off \

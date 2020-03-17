@@ -17,8 +17,9 @@ export REPPATH=..
 # Supported vendors
 #    dsip
 #    chemspace_bb
+#    molport
 #
-VENDORPATH='run/vendor/molport'
+VENDORPATH='run/vendor/dsip'
 
 # Fragmentation Parameters 
 
@@ -31,9 +32,13 @@ FRAGSMIFILE='fragmentinput.smi'
 # Base directory for fragmentation processing - contains input and output files
 FRAGBASEDIR='run/fragment'
 
-# Base directory for fragmentation processing - contains input and output files
-FRAGCHUNKSIZE=25000
+# Chunk size for fragmentation processing
+FRAGCHUNKSIZE=2500
 # FRAGCHUNKSIZE=500000
+# Maximum heavy atom count for extraction/fragmentation processing
+FRAGHAC=36
+# Maximum frag cycles for fragmentation processing
+FRAGMAXFRAGS=12
 
 #NB: Maybe check for these before use.
 FRAGNODEFILE='nodes.csv'

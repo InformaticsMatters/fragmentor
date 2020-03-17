@@ -6,7 +6,7 @@
 
 # Filename of file to standardise - will be a txt.gz file
 VENDOR='molport'
-SOURCEID=4
+SOURCEID=5
 
 # Standardisation Parameters
 
@@ -17,14 +17,10 @@ STANDARDISER='frag.standardise.scripts.molport.standardise_molport_compounds'
 STANDDATADIR='run/data/molport'
 
 # Filename of file to standardise - will be a txt.gz file
-STANDINPUTFILE='molport.txt'
+STANDINPUTFILE='molport*.txt'
 
 # Folder that contains the standardised data
 STANDOUTPUTDIR='run/standardised-molport'
-
-# Filenames for standardised data tab separated files
-STANDOUTPUTZIP='standardised-compounds.tab.gz'
-STANDOUTPUTFILE='standardised-compounds.tab'
 
 # Chunksize for loading standardised data tab separated files
 STANDCHUNK=25000

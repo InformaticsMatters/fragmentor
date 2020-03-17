@@ -500,17 +500,20 @@ ALTER TABLE ONLY public.price
 --
 -- Table: Source data load.
 --
+-- Note that these values are fixed as they relate to the vendor parameter numbers.
+--
 
-INSERT INTO source (name, version, currency)
-VALUES ('chembl', '25','');
-INSERT INTO source (name, version, currency)
-VALUES ('chemspace-bb', '2019-07','');
-INSERT INTO source (name, version, currency)
-VALUES ('chemspace-bb', '2019-12','USD');
-INSERT INTO source (name, version, currency)
-VALUES ('molport', '2019-12','USD');
-INSERT INTO source (name, version, currency)
-VALUES ('molport', '2020-01','USD');
-INSERT INTO source (name, version, currency)
-VALUES ('dsip', '1','');
+INSERT INTO source (id, name, version, currency)
+VALUES (1, 'chembl', '25','');
+INSERT INTO source (id, name, version, currency)
+VALUES (2, 'chemspace-bb', '2019-07','');
+INSERT INTO source (id, name, version, currency)
+VALUES (3, 'chemspace-bb', '2019-12','USD');
+INSERT INTO source (id, name, version, currency)
+VALUES (4, 'molport', '2019-12','USD');
+INSERT INTO source (id, name, version, currency)
+VALUES (5, 'molport', '2020-01','USD');
+INSERT INTO source (id, name, version, currency)
+VALUES (6, 'dsip', '1','');
 
+SELECT * FROM source;
