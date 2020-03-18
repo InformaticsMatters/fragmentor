@@ -48,11 +48,22 @@ commit;
 
 /*
  * Load mol_source from i_mols 
- * ### TODO handle the price info
  */
 begin;
 INSERT INTO mol_source (smiles, code, source_id, nonisomol_id, isomol_id)
   (SELECT osmiles, cmpd_id, :SOURCEID, nonisomol_id, isomol_id FROM i_mols_chemspace);
+commit;
+
+/*
+ * Load price information from i_mols and mol_source
+ */
+begin;
+INSERT INTO price (quantity_mg, price, price_min, price_max, molsource_id)
+  (SELECT 0, im.price, 0, 0, ms.id
+   FROM  i_mols_chemspace im, mol_source ms
+   WHERE im.nonisomol_id = ms.nonisomol_id
+     AND ms.source_id =:SOURCEID
+  );
 commit;
 
 

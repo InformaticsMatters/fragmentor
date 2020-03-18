@@ -22,5 +22,6 @@ STANDINPUTFILE='chemspace_bb.txt'
 # Folder that contains the standardised data
 STANDOUTPUTDIR='run/standardised-chemspace_bb'
 
-# Chunksize for loading standardised data tab separated files
+# Chunksize for standardizing/loading standardised data tab separated files
+STANDCHUNKSIZE=15000
 STANDCHUNK=25000
