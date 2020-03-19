@@ -23,5 +23,5 @@ STANDINPUTFILE='molport*.txt'
 STANDOUTPUTDIR='run/standardised-molport'
 
 # Chunksize for standardizing/loading standardised data tab separated files
-STANDCHUNKSIZE=15000
-STANDCHUNK=25000
+STANDCHUNKSIZE=1500
+STANDCHUNK=50000

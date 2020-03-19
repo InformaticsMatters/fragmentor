@@ -36,7 +36,7 @@ fi
 
 for f in $REPPATH/$STANDDATADIR/$STANDINPUTFILE;
 do
-   time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/standardizer.nf -with-docker --script $STANDARDISER --input $f --out_dir $REPPATH/$STANDOUTPUTDIR --chunk_size $STANDCHUNKSIZE $@
+   time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/standardizer.nf --script $STANDARDISER --input $f --out_dir $REPPATH/$STANDOUTPUTDIR --chunk_size $STANDCHUNKSIZE $@
 
    if [ ! -f $REPPATH/$STANDOUTPUTDIR/standardised-tmp.tab ] ; then
        cp $REPPATH/$STANDOUTPUTDIR/standardised-compounds.tab $REPPATH/$STANDOUTPUTDIR/standardised-tmp.tab
