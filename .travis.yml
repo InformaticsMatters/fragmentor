@@ -11,10 +11,6 @@
 # DOCKER_USERNAME       If PUBLISH_IMAGES is 'yes'
 # DOCKER_PASSWORD       If PUBLISH_IMAGES is 'yes'
 
-language: python
-python:
-- '3.8'
-
 services:
 - docker
 
@@ -39,6 +35,9 @@ jobs:
 
   - stage: test
     name: Static Analysis
+    language: python
+    python:
+    - '3.8'
     script:
     - pip install -r build-requirements.txt
     - pip install -r requirements.txt
