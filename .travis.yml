@@ -56,6 +56,7 @@ jobs:
 
   - stage: publish tag
     name: Tagged Image
+    script:
     - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
     - docker build -t informaticsmatters/fragmentor:${TRAVIS_TAG} .
     - docker push informaticsmatters/fragmentor:${TRAVIS_TAG}
