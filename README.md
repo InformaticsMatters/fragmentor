@@ -1,6 +1,7 @@
 # Fragmentation optimisation
 
 [![Build Status](https://travis-ci.com/InformaticsMatters/fragmentor.svg?branch=master)](https://travis-ci.com/InformaticsMatters/fragmentor)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/informaticsmatters/fragmentor)
 
 ## Using a conda environment
 
