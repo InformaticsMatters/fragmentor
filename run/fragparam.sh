@@ -19,7 +19,7 @@ export REPPATH=..
 #    chemspace_bb
 #    molport
 #
-VENDORPATH='run/vendor/dsip'
+VENDORPATH='run/vendor/molport'
 
 # Fragmentation Parameters 
 

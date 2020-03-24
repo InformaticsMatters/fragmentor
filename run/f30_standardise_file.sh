@@ -24,30 +24,14 @@ source $REPPATH/$VENDORPATH/vendorparam.sh
 echo $STANDARDISER
 echo $REPPATH/$STANDDATADIR
 echo $REPPATH/$STANDOUTPUTDIR
-echo $REPPATH/$STANDDATADIR/$STANDINPUTFILE
+echo $REPPATH/$STANDDATADIR/"$STANDINPUTFILE"
 
 export PGPASSFILE=fragpass
 
 echo "Starting Standardisation Process .."
 
-if [ -f $REPPATH/$STANDOUTPUTDIR/standardised-tmp.tab ] ; then
-    rm $REPPATH/$STANDOUTPUTDIR/standardised-tmp.tab
-fi
-
-for f in $REPPATH/$STANDDATADIR/$STANDINPUTFILE;
-do
-   time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/standardizer.nf --script $STANDARDISER --input $f --out_dir $REPPATH/$STANDOUTPUTDIR --chunk_size $STANDCHUNKSIZE $@
-
-   if [ ! -f $REPPATH/$STANDOUTPUTDIR/standardised-tmp.tab ] ; then
-       cp $REPPATH/$STANDOUTPUTDIR/standardised-compounds.tab $REPPATH/$STANDOUTPUTDIR/standardised-tmp.tab
-   else
-       tail -n +2 $REPPATH/$STANDOUTPUTDIR/standardised-compounds.tab >> $REPPATH/$STANDOUTPUTDIR/standardised-tmp.tab
-   fi
-
-done
-
-rm $REPPATH/$STANDOUTPUTDIR/standardised-compounds.tab
-mv $REPPATH/$STANDOUTPUTDIR/standardised-tmp.tab $REPPATH/$STANDOUTPUTDIR/standardised-compounds.tab
+time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/standardizer.nf -with-report $REPPATH/$STANDOUTPUTDIR/standardise_report.html \
+     --script $STANDARDISER --inputs $REPPATH/$STANDDATADIR/"$STANDINPUTFILE" --out_dir $REPPATH/$STANDOUTPUTDIR --chunk_size $STANDCHUNKSIZE $@
 
 if [ $? -ne 0 ]; then
     echo "Standardisation fault, fault:" 1>&2

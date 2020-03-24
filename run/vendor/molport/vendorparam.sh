@@ -17,7 +17,7 @@ STANDARDISER='frag.standardise.scripts.molport.standardise_molport_compounds'
 STANDDATADIR='run/data/molport'
 
 # Filename of file to standardise - will be a txt.gz file
-STANDINPUTFILE='molport*.txt'
+STANDINPUTFILE="molport.*.txt"
 
 # Folder that contains the standardised data
 STANDOUTPUTDIR='run/standardised-molport'
