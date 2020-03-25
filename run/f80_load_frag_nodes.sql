@@ -15,6 +15,8 @@
 \timing
 
 begin;
+SELECT clock_timestamp();
+
 UPDATE i_node i SET nonisomol_id = n.id
   FROM nonisomol n WHERE n.smiles = i.smiles;
 commit;
@@ -23,6 +25,8 @@ commit;
  * Insert new Nodes into nonismol  
  */
 begin;
+SELECT clock_timestamp();
+
 INSERT INTO nonisomol (smiles, hac, rac, child_count, edge_count, ftime)
   SELECT smiles, hac, rac, child_count, edge_count, ftime FROM i_node
   WHERE nonisomol_id IS NULL;
@@ -32,6 +36,8 @@ commit;
  * Update counts 
  */
 begin;
+SELECT clock_timestamp();
+
 -- this next query needs optimising
 WITH s AS (SELECT i.nonisomol_id, i.child_count, i.edge_count, i.ftime FROM i_node i
   JOIN nonisomol n ON n.id = i.nonisomol_id

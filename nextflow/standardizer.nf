@@ -19,9 +19,10 @@ process standardise {
 
     """
     cp $chunks input.dat
-    gzip input.dat
+//    gzip input.dat
     python -m $params.script ./ input.dat ./output
-    gunzip -c output/standardised-compounds.tab.gz > ./${chunks}_standardised.tab
+//    gunzip -c output/standardised-compounds.tab.gz > ./${chunks}_standardised.tab
+    cp standardised-compounds.tab ./${chunks}_standardised.tab
     """
 
 }

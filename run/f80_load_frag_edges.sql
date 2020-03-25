@@ -16,6 +16,8 @@
 \timing
 
 begin;
+SELECT clock_timestamp();
+
 UPDATE i_edge i SET present = TRUE WHERE EXISTS
   (SELECT 1 FROM edge e 
   JOIN nonisomol np ON np.id = e.parent_id 
@@ -26,17 +28,18 @@ commit;
 /*
  * count present edges  
  */
-begin;
 SELECT present, count(*) FROM i_edge GROUP BY present;
-commit;
 
 /*
  * Load new edges 
  */
 begin;
+SELECT clock_timestamp();
+
 INSERT INTO edge (parent_id, child_id, label)
   SELECT np.id, nc.id, i.label FROM i_edge i
     JOIN nonisomol np ON np.smiles = i.p_smiles 
     JOIN nonisomol nc ON nc.smiles = i.c_smiles
     WHERE i.present IS NULL;
 commit;
+

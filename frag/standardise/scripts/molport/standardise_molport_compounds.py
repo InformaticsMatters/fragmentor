@@ -8,13 +8,13 @@ information and generates a 'standard' tab-separated output.
 We create a 'molport-standardised-compounds.tab' file that contains a 1st-line
 'header' formed from the _OUTPUT_COLUMNS list.
 
-Alan Christie
-January 2019
+Alan Christie January 2019  Initial Version
+Duncan Peacock March 2020   Update to remove zip/unzip
+
 """
 
 import argparse
 import glob
-import gzip
 import logging
 import os
 import sys
@@ -72,7 +72,6 @@ expected_input_cols = {smiles_col: 'SMILES',
                        blt_col: 'BEST_LEAD_TIME'}
 
 # The output file.
-# Which will be gzipped.
 output_filename = 'standardised-compounds.tab'
 
 # The compound identifier prefix
@@ -123,13 +122,13 @@ def standardise_vendor_compounds(output_file, file_name, limit):
 
     line_num = 0
     num_processed = 0
-    with gzip.open(file_name, 'rt') as gzip_file:
+    with open(file_name, 'rt') as input_file:
 
         # Check first line (a space-delimited header).
         # This is a basic sanity-check to make sure the important column
         # names are what we expect.
 
-        hdr = gzip_file.readline()
+        hdr = input_file.readline()
         field_names = hdr.split('\t')
         # Expected minimum number of columns...
         if len(field_names) < expected_min_num_cols:
@@ -146,7 +145,7 @@ def standardise_vendor_compounds(output_file, file_name, limit):
 
         # Columns look right...
 
-        for line in gzip_file:
+        for line in input_file:
 
             line_num += 1
             fields = line.split('\t')
@@ -224,7 +223,7 @@ if __name__ == '__main__':
     # Output is either s fixed name in an output directory
     # or a prefixed filename (without an output directory)
     if args.output_is_prefix:
-        output_filename = '{}.{}.gz'.format(args.output, output_filename)
+        output_filename = '{}.{}'.format(args.output, output_filename)
     else:
         # Create the output directory
         if os.path.exists(args.output):
@@ -233,7 +232,7 @@ if __name__ == '__main__':
         os.mkdir(args.output)
         os.chmod(args.output, 0o777)
         output_filename = os.path.join(args.output,
-                                       '{}.gz'.format(output_filename))
+                                       '{}'.format(output_filename))
 
     # Suppress basic RDKit logging...
     RDLogger.logger().setLevel(RDLogger.ERROR)
@@ -245,21 +244,21 @@ if __name__ == '__main__':
     # Before we open the output file
     # get a lit of all the input files (the prefix may be the same)
     # so we don't want our file in the list of files to be processed)
-    molport_files = glob.glob('{}/{}*.gz'.format(args.vendor_dir,
+    molport_files = glob.glob('{}/{}*'.format(args.vendor_dir,
                                                  args.vendor_prefix))
 
     # Open the file we'll write the standardised data set to.
     # A text, tab-separated file.
     logger.info('Writing %s...', output_filename)
     num_processed = 0
-    with gzip.open(output_filename, 'wt') as output_gzip_file:
+    with open(output_filename, 'wt') as output_file:
 
         # Write the header...
-        output_gzip_file.write('\t'.join(_OUTPUT_COLUMNS) + '\n')
+        output_file.write('\t'.join(_OUTPUT_COLUMNS) + '\n')
 
         # Process all the Vendor files...
         for molport_file in molport_files:
-            num_processed += standardise_vendor_compounds(output_gzip_file,
+            num_processed += standardise_vendor_compounds(output_file,
                                                           molport_file,
                                                           args.limit)
             if args.limit and num_processed >= args.limit:
