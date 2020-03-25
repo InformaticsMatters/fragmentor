@@ -1,3 +1,15 @@
+/*
+ * Molecule Fragmentation Nextflow process:
+ * Purpose: Fragmentation of molecules across a cluster.
+ *
+ * Called from f60_fragmentation.sh
+ *
+ * Author | Date    | Version
+ * Tim    | 03/2020 | Initial Version
+ * Duncan | 03/2020 | Add comtainer to collect* processes.
+ *
+ */
+
 params.input = 'nonisomol.smi'
 params.chunk_size = 500000
 params.max_hac = 36
@@ -12,7 +24,7 @@ chunks = Channel.from(file(params.input))
 
 process fragment {
 
-    container 'informaticsmatters/fragmentor:molport-01'
+    container 'informaticsmatters/fragmentor:molport-02'
 
     input:
     file chunks
@@ -32,7 +44,7 @@ process fragment {
 
 process collect_nodes {
 
-    container 'informaticsmatters/fragmentor:molport-01'
+    container 'informaticsmatters/fragmentor:molport-02'
     cpus params.cpus
     publishDir params.out_dir, mode: params.out_mode
 
@@ -43,13 +55,14 @@ process collect_nodes {
     file 'nodes.csv'
 
     """
+    // Use temporary directory (params.tmp) to avoid write limits for sort on .tmp
     sort -u -T params.tmp_dir $chunks > nodes.csv
     """
 }
 
 process collect_edges {
 
-    container 'informaticsmatters/fragmentor:molport-01'
+    container 'informaticsmatters/fragmentor:molport-02'
     cpus params.cpus
     publishDir params.out_dir, mode: params.out_mode
 
@@ -66,7 +79,7 @@ process collect_edges {
 
 process collect_rejects {
 
-    container 'informaticsmatters/fragmentor:molport-01'
+    container 'informaticsmatters/fragmentor:molport-02'
     cpus params.cpus
     publishDir params.out_dir, mode: params.out_mode
 
