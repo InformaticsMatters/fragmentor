@@ -2,7 +2,7 @@
  * Load Fragmented Nodes Results SQL Statements: 
  * Purpose: Loads fragmented node data into Frag database
  *
- * Called from p80_load_frag_results.sh
+ * Called from p80_load_nodes.sh
  *
  * Author | Date    | Version
  * Duncan | 03/2020 | Initial Version

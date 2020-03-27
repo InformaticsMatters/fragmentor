@@ -55,7 +55,6 @@ process collect_nodes {
     file 'nodes.csv'
 
     """
-    // Use temporary directory (params.tmp) to avoid write limits for sort on .tmp
     sort -u -T params.tmp_dir $chunks > nodes.csv
     """
 }

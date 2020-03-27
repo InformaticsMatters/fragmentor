@@ -19,7 +19,7 @@ export REPPATH=..
 #    chemspace_bb
 #    molport
 #
-VENDORPATH='run/vendor/molport'
+VENDORPATH='run/vendor/chemspace_bb'
 
 # Fragmentation Parameters 
 
@@ -33,7 +33,7 @@ FRAGSMIFILE='fragmentinput.smi'
 FRAGBASEDIR='run/fragment'
 
 # Chunk size for fragmentation processing
-FRAGCHUNKSIZE=2500
+FRAGCHUNKSIZE=10000
 # FRAGCHUNKSIZE=500000
 # Maximum heavy atom count for extraction/fragmentation processing
 FRAGHAC=36
@@ -43,3 +43,5 @@ FRAGMAXFRAGS=12
 #NB: Maybe check for these before use.
 FRAGNODEFILE='nodes.csv'
 FRAGEDGEFILE='edges.csv'
+# Chunk size for loading edges
+EDGECHUNK=150000
