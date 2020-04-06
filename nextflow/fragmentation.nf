@@ -24,7 +24,7 @@ chunks = Channel.from(file(params.input))
 
 process fragment {
 
-    container 'informaticsmatters/fragmentor:molport-02'
+    container 'informaticsmatters/fragmentor:molport-03'
 
     input:
     file chunks
@@ -44,7 +44,7 @@ process fragment {
 
 process collect_nodes {
 
-    container 'informaticsmatters/fragmentor:molport-02'
+    container 'informaticsmatters/fragmentor:molport-03'
     cpus params.cpus
     publishDir params.out_dir, mode: params.out_mode
 
@@ -61,7 +61,7 @@ process collect_nodes {
 
 process collect_edges {
 
-    container 'informaticsmatters/fragmentor:molport-02'
+    container 'informaticsmatters/fragmentor:molport-03'
     cpus params.cpus
     publishDir params.out_dir, mode: params.out_mode
 
@@ -78,7 +78,7 @@ process collect_edges {
 
 process collect_rejects {
 
-    container 'informaticsmatters/fragmentor:molport-02'
+    container 'informaticsmatters/fragmentor:molport-03'
     cpus params.cpus
     publishDir params.out_dir, mode: params.out_mode
 

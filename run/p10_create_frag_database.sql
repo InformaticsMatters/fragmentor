@@ -19,19 +19,19 @@
  * Drop all tables if they exist (NB Order because of table key constrants) 
  */
 
-DROP TABLE IF EXISTS EDGE;           
+drop table IF EXISTS EDGE;
 
-DROP TABLE IF EXISTS price;             
+drop table IF EXISTS price;
 
-DROP TABLE IF EXISTS mol_source;        
+drop table IF EXISTS mol_source;
 
-DROP TABLE IF EXISTS isomol;            
+drop table IF EXISTS isomol;
 
-DROP TABLE IF EXISTS nonisomol;         
+drop table IF EXISTS nonisomol;
 
-DROP TABLE IF EXISTS inchi;             
+drop table IF EXISTS inchi;
 
-DROP TABLE IF EXISTS source;            
+drop table IF EXISTS source;
 
 /*
  * Regenerate database 
@@ -41,7 +41,7 @@ DROP TABLE IF EXISTS source;
 -- Name: edge; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.edge (
+create TABLE public.edge (
     id integer NOT NULL,
     parent_id integer,
     child_id integer,
@@ -52,10 +52,10 @@ CREATE TABLE public.edge (
 -- Name: edge_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.edge_id_seq
+create sequence public.edge_id_seq
     AS integer
-    START WITH 1
-    INCREMENT BY 1
+    start with 1
+    increment by 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
@@ -64,14 +64,14 @@ CREATE SEQUENCE public.edge_id_seq
 -- Name: edge_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.edge_id_seq OWNED BY public.edge.id;
+alter sequence public.edge_id_seq OWNED BY public.edge.id;
 
 
 --
 -- Name: inchi; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.inchi (
+create TABLE public.inchi (
     id integer NOT NULL,
     inchik text NOT NULL,
     inchis text NOT NULL
@@ -81,10 +81,10 @@ CREATE TABLE public.inchi (
 -- Name: inchi_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.inchi_id_seq
+create sequence public.inchi_id_seq
     AS integer
-    START WITH 1
-    INCREMENT BY 1
+    start with 1
+    increment by 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
@@ -93,14 +93,14 @@ CREATE SEQUENCE public.inchi_id_seq
 -- Name: inchi_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.inchi_id_seq OWNED BY public.inchi.id;
+alter sequence public.inchi_id_seq OWNED BY public.inchi.id;
 
 
 --
 -- Name: isomol; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.isomol (
+create TABLE public.isomol (
     id integer NOT NULL,
     smiles text NOT NULL,
     inchik text,
@@ -112,10 +112,10 @@ CREATE TABLE public.isomol (
 -- Name: isomol_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.isomol_id_seq
+create sequence public.isomol_id_seq
     AS integer
-    START WITH 1
-    INCREMENT BY 1
+    start with 1
+    increment by 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
@@ -124,14 +124,14 @@ CREATE SEQUENCE public.isomol_id_seq
 -- Name: isomol_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.isomol_id_seq OWNED BY public.isomol.id;
+alter sequence public.isomol_id_seq OWNED BY public.isomol.id;
 
 
 --
 -- Name: mol_source; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.mol_source (
+create TABLE public.mol_source (
     id integer NOT NULL,
     smiles text NOT NULL,
     code text NOT NULL,
@@ -144,10 +144,10 @@ CREATE TABLE public.mol_source (
 -- Name: mol_source_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.mol_source_id_seq
+create sequence public.mol_source_id_seq
     AS integer
-    START WITH 1
-    INCREMENT BY 1
+    start with 1
+    increment by 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
@@ -156,13 +156,13 @@ CREATE SEQUENCE public.mol_source_id_seq
 -- Name: mol_source_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.mol_source_id_seq OWNED BY public.mol_source.id;
+alter sequence public.mol_source_id_seq OWNED BY public.mol_source.id;
 
 --
 -- Name: nonisomol; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.nonisomol (
+create TABLE public.nonisomol (
     id integer NOT NULL,
     smiles text NOT NULL,
     inchik text,
@@ -179,10 +179,10 @@ CREATE TABLE public.nonisomol (
 -- Name: nonisomol_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.nonisomol_id_seq
+create sequence public.nonisomol_id_seq
     AS integer
-    START WITH 1
-    INCREMENT BY 1
+    start with 1
+    increment by 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
@@ -191,14 +191,14 @@ CREATE SEQUENCE public.nonisomol_id_seq
 -- Name: nonisomol_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.nonisomol_id_seq OWNED BY public.nonisomol.id;
+alter sequence public.nonisomol_id_seq OWNED BY public.nonisomol.id;
 
 
 --
 -- Name: price; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.price (
+create TABLE public.price (
     id integer NOT NULL,
     quantity_mg integer,
     price integer,
@@ -211,10 +211,10 @@ CREATE TABLE public.price (
 -- Name: price_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.price_id_seq
+create sequence public.price_id_seq
     AS integer
-    START WITH 1
-    INCREMENT BY 1
+    start with 1
+    increment by 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
@@ -223,14 +223,14 @@ CREATE SEQUENCE public.price_id_seq
 -- Name: price_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.price_id_seq OWNED BY public.price.id;
+alter sequence public.price_id_seq OWNED BY public.price.id;
 
 
 --
 -- Name: source; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.source (
+create TABLE public.source (
     id integer NOT NULL,
     name text NOT NULL,
     version text NOT NULL,
@@ -241,10 +241,10 @@ CREATE TABLE public.source (
 -- Name: source_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.source_id_seq
+create sequence public.source_id_seq
     AS integer
-    START WITH 1
-    INCREMENT BY 1
+    start with 1
+    increment by 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
@@ -253,62 +253,62 @@ CREATE SEQUENCE public.source_id_seq
 -- Name: source_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.source_id_seq OWNED BY public.source.id;
+alter sequence public.source_id_seq OWNED BY public.source.id;
 
 --
 -- Name: edge id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.edge ALTER COLUMN id SET DEFAULT nextval('public.edge_id_seq'::regclass);
+alter table ONLY public.edge alter COLUMN id SET DEFAULT nextval('public.edge_id_seq'::regclass);
 
 
 --
 -- Name: inchi id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.inchi ALTER COLUMN id SET DEFAULT nextval('public.inchi_id_seq'::regclass);
+alter table ONLY public.inchi alter COLUMN id SET DEFAULT nextval('public.inchi_id_seq'::regclass);
 
 
 --
 -- Name: isomol id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.isomol ALTER COLUMN id SET DEFAULT nextval('public.isomol_id_seq'::regclass);
+alter table ONLY public.isomol alter COLUMN id SET DEFAULT nextval('public.isomol_id_seq'::regclass);
 
 
 --
 -- Name: mol_source id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.mol_source ALTER COLUMN id SET DEFAULT nextval('public.mol_source_id_seq'::regclass);
+alter table ONLY public.mol_source alter COLUMN id SET DEFAULT nextval('public.mol_source_id_seq'::regclass);
 
 
 --
 -- Name: nonisomol id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.nonisomol ALTER COLUMN id SET DEFAULT nextval('public.nonisomol_id_seq'::regclass);
+alter table ONLY public.nonisomol alter COLUMN id SET DEFAULT nextval('public.nonisomol_id_seq'::regclass);
 
 
 --
 -- Name: price id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.price ALTER COLUMN id SET DEFAULT nextval('public.price_id_seq'::regclass);
+alter table ONLY public.price alter COLUMN id SET DEFAULT nextval('public.price_id_seq'::regclass);
 
 
 --
 -- Name: source id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.source ALTER COLUMN id SET DEFAULT nextval('public.source_id_seq'::regclass);
+alter table ONLY public.source alter COLUMN id SET DEFAULT nextval('public.source_id_seq'::regclass);
 
 
 --
 -- Name: edge edge_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.edge
+alter table ONLY public.edge
     ADD CONSTRAINT edge_pkey PRIMARY KEY (id);
 
 
@@ -316,7 +316,7 @@ ALTER TABLE ONLY public.edge
 -- Name: inchi inchi_inchis_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.inchi
+alter table ONLY public.inchi
     ADD CONSTRAINT inchi_inchis_key UNIQUE (inchis);
 
 
@@ -324,7 +324,7 @@ ALTER TABLE ONLY public.inchi
 -- Name: inchi inchi_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.inchi
+alter table ONLY public.inchi
     ADD CONSTRAINT inchi_pkey PRIMARY KEY (id);
 
 
@@ -332,7 +332,7 @@ ALTER TABLE ONLY public.inchi
 -- Name: isomol isomol_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.isomol
+alter table ONLY public.isomol
     ADD CONSTRAINT isomol_pkey PRIMARY KEY (id);
 
 
@@ -340,7 +340,7 @@ ALTER TABLE ONLY public.isomol
 -- Name: isomol isomol_smiles_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.isomol
+alter table ONLY public.isomol
     ADD CONSTRAINT isomol_smiles_key UNIQUE (smiles);
 
 
@@ -348,7 +348,7 @@ ALTER TABLE ONLY public.isomol
 -- Name: mol_source mol_source_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.mol_source
+alter table ONLY public.mol_source
     ADD CONSTRAINT mol_source_pkey PRIMARY KEY (id);
 
 
@@ -356,7 +356,7 @@ ALTER TABLE ONLY public.mol_source
 -- Name: nonisomol nonisomol_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.nonisomol
+alter table ONLY public.nonisomol
     ADD CONSTRAINT nonisomol_pkey PRIMARY KEY (id);
 
 
@@ -364,7 +364,7 @@ ALTER TABLE ONLY public.nonisomol
 -- Name: nonisomol nonisomol_smiles_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.nonisomol
+alter table ONLY public.nonisomol
     ADD CONSTRAINT nonisomol_smiles_key UNIQUE (smiles);
 
 
@@ -372,7 +372,7 @@ ALTER TABLE ONLY public.nonisomol
 -- Name: price price_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.price
+alter table ONLY public.price
     ADD CONSTRAINT price_pkey PRIMARY KEY (id);
 
 
@@ -380,7 +380,7 @@ ALTER TABLE ONLY public.price
 -- Name: source source_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.source
+alter table ONLY public.source
     ADD CONSTRAINT source_pkey PRIMARY KEY (id);
 
 
@@ -388,7 +388,7 @@ ALTER TABLE ONLY public.source
 -- Name: source uq_source; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.source
+alter table ONLY public.source
     ADD CONSTRAINT uq_source UNIQUE (name, version);
 
 
@@ -396,49 +396,53 @@ ALTER TABLE ONLY public.source
 -- Name: ix_edge_parent_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX ix_edge_parent_id ON public.edge USING btree (parent_id);
+create INDEX ix_edge_parent_id ON public.edge USING btree (parent_id);
 
+--
+-- Name: ix_edge_parent_child; Type: INDEX; Schema: public; Owner: postgres
+--
+create INDEX ix_edge_parent_child ON public.edge USING btree (parent_id, child_id);
 
 --
 -- Name: ix_inchik; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX ix_inchik ON public.inchi USING hash (inchik);
+create INDEX ix_inchik ON public.inchi USING hash (inchik);
 
 
 --
 -- Name: ix_isomol_nonisomol_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX ix_isomol_nonisomol_id ON public.isomol USING btree (nonisomol_id);
+create INDEX ix_isomol_nonisomol_id ON public.isomol USING btree (nonisomol_id);
 
 
 --
 -- Name: ix_mol_source_isomol_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX ix_mol_source_isomol_id ON public.mol_source USING btree (isomol_id);
+create INDEX ix_mol_source_isomol_id ON public.mol_source USING btree (isomol_id);
 
 
 --
 -- Name: ix_mol_source_nonisomol_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX ix_mol_source_nonisomol_id ON public.mol_source USING btree (nonisomol_id);
+create INDEX ix_mol_source_nonisomol_id ON public.mol_source USING btree (nonisomol_id);
 
 
 --
 -- Name: ix_mol_source_source_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX ix_mol_source_source_id ON public.mol_source USING btree (source_id);
+create INDEX ix_mol_source_source_id ON public.mol_source USING btree (source_id);
 
 
 --
 -- Name: edge edge_child_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.edge
+alter table ONLY public.edge
     ADD CONSTRAINT edge_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.nonisomol(id);
 
 
@@ -446,7 +450,7 @@ ALTER TABLE ONLY public.edge
 -- Name: edge edge_parent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.edge
+alter table ONLY public.edge
     ADD CONSTRAINT edge_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.nonisomol(id);
 
 
@@ -454,7 +458,7 @@ ALTER TABLE ONLY public.edge
 -- Name: isomol isomol_nonisomol_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.isomol
+alter table ONLY public.isomol
     ADD CONSTRAINT isomol_nonisomol_id_fkey FOREIGN KEY (nonisomol_id) REFERENCES public.nonisomol(id);
 
 
@@ -462,7 +466,7 @@ ALTER TABLE ONLY public.isomol
 -- Name: mol_source mol_source_isomol_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.mol_source
+alter table ONLY public.mol_source
     ADD CONSTRAINT mol_source_isomol_id_fkey FOREIGN KEY (isomol_id) REFERENCES public.isomol(id);
 
 
@@ -470,7 +474,7 @@ ALTER TABLE ONLY public.mol_source
 -- Name: mol_source mol_source_nonisomol_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.mol_source
+alter table ONLY public.mol_source
     ADD CONSTRAINT mol_source_nonisomol_id_fkey FOREIGN KEY (nonisomol_id) REFERENCES public.nonisomol(id);
 
 
@@ -478,15 +482,15 @@ ALTER TABLE ONLY public.mol_source
 -- Name: mol_source mol_source_source_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.mol_source
-    ADD CONSTRAINT mol_source_source_id_fkey FOREIGN KEY (source_id) REFERENCES public.source(id) ON DELETE CASCADE;
+alter table ONLY public.mol_source
+    ADD CONSTRAINT mol_source_source_id_fkey FOREIGN KEY (source_id) REFERENCES public.source(id) ON delete CASCADE;
 
 
 --
 -- Name: nonisomol nonisomol_inchi_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.nonisomol
+alter table ONLY public.nonisomol
     ADD CONSTRAINT nonisomol_inchi_id_fkey FOREIGN KEY (inchi_id) REFERENCES public.inchi(id);
 
 
@@ -494,8 +498,22 @@ ALTER TABLE ONLY public.nonisomol
 -- Name: price price_molsource_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.price
-    ADD CONSTRAINT price_molsource_id_fkey FOREIGN KEY (molsource_id) REFERENCES public.mol_source(id) ON DELETE CASCADE;
+alter table ONLY public.price
+    ADD CONSTRAINT price_molsource_id_fkey FOREIGN KEY (molsource_id) REFERENCES public.mol_source(id) ON delete CASCADE;
+
+
+--
+-- Tuning Parameters
+--
+
+-- This is set for the largest tables so that autovacuuming starts more quickly.
+
+alter table nonisomol set (autovacuum_vacuum_scale_factor = 0.01);
+alter table nonisomol set (autovacuum_vacuum_cost_limit = 2000);
+alter table edge set (autovacuum_vacuum_scale_factor = 0.01);
+alter table edge set (autovacuum_vacuum_cost_limit = 2000);
+alter table mol_source set (autovacuum_vacuum_scale_factor = 0.01);
+alter table mol_source set (autovacuum_vacuum_cost_limit = 2000);
 
 --
 -- Table: Source data load.
@@ -503,17 +521,19 @@ ALTER TABLE ONLY public.price
 -- Note that these values are fixed as they relate to the vendor parameter numbers.
 --
 
-INSERT INTO source (id, name, version, currency)
-VALUES (1, 'chembl', '25','');
-INSERT INTO source (id, name, version, currency)
-VALUES (2, 'chemspace-bb', '2019-07','');
-INSERT INTO source (id, name, version, currency)
-VALUES (3, 'chemspace-bb', '2019-12','USD');
-INSERT INTO source (id, name, version, currency)
-VALUES (4, 'molport', '2019-12','USD');
-INSERT INTO source (id, name, version, currency)
-VALUES (5, 'molport', '2020-01','USD');
-INSERT INTO source (id, name, version, currency)
-VALUES (6, 'dsip', '1','');
+insert into source (id, name, version, currency)
+values (1, 'chembl', '25','');
+insert into source (id, name, version, currency)
+values (2, 'chemspace-bb', '2019-07','');
+insert into source (id, name, version, currency)
+values (3, 'chemspace-bb', '2019-12','USD');
+insert into source (id, name, version, currency)
+values (4, 'molport', '2019-12','USD');
+insert into source (id, name, version, currency)
+values (5, 'molport', '2020-02','USD');
+insert into source (id, name, version, currency)
+values (6, 'dsip', '1','');
+insert into source (id, name, version, currency)
+values (7, 'molport', '2020-03','USD');
 
-SELECT * FROM source;
+select * from source;

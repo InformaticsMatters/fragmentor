@@ -19,12 +19,9 @@ export REPPATH=..
 #    chemspace_bb
 #    molport
 #
-VENDORPATH='run/vendor/chemspace_bb'
+VENDORPATH='run/vendor/dsip'
 
 # Fragmentation Parameters 
-
-# Module to fragment the standardised data
-FRAGMENTOR='frag.network.scripts.build_db_from_smiles'
 
 # Filename of standardised SMILES extracted from i_mols for fragmentation
 FRAGSMIFILE='fragmentinput.smi'
@@ -33,15 +30,22 @@ FRAGSMIFILE='fragmentinput.smi'
 FRAGBASEDIR='run/fragment'
 
 # Chunk size for fragmentation processing
-FRAGCHUNKSIZE=10000
+FRAGCHUNKSIZE=15000
 # FRAGCHUNKSIZE=500000
 # Maximum heavy atom count for extraction/fragmentation processing
 FRAGHAC=36
 # Maximum frag cycles for fragmentation processing
 FRAGMAXFRAGS=12
 
-#NB: Maybe check for these before use.
+# Nodes and Edges Files produced by fragmentation - currently hardcoded into build_db_from_smiles.
 FRAGNODEFILE='nodes.csv'
 FRAGEDGEFILE='edges.csv'
-# Chunk size for loading edges
-EDGECHUNK=150000
+
+# Chunk size for loading edges and nodes
+NODECHUNK=100000
+EDGECHUNK=250000
+
+# Module to add the inchi key - creates inchi.tab from nodes.csv.
+INCHITAB='inchi.tab'
+INCHICHUNK=1000000
+

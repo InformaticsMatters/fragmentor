@@ -27,9 +27,10 @@ SELECT clock_timestamp();
 UPDATE i_mols_molport i SET nonisomol_id = n.id
   FROM nonisomol n
     WHERE n.smiles = i.nonisosmiles;
-commit;
 
 SELECT count(*) FROM i_mols_molport where nonisomol_id is not null;
+commit;
+
 
 /*
  * Load isomol from i_mols_chemspace
@@ -84,7 +85,8 @@ INSERT INTO price (quantity_mg, price, price_min, price_max, molsource_id)
        end,
        ms.id
    from  i_mols_molport im, mol_source ms
-   where im.nonisomol_id = ms.nonisomol_id
+   where (im.nonisomol_id = ms.nonisomol_id and im.isomol_id = ms.isomol_id)
+       or (im.nonisomol_id = ms.nonisomol_id and im.isomol_id is null and ms.isomol_id is null)
      and ms.source_id = :SOURCEID
    union all
    SELECT 5, 0,
@@ -99,7 +101,8 @@ INSERT INTO price (quantity_mg, price, price_min, price_max, molsource_id)
        end,
        ms.id
    from  i_mols_molport im, mol_source ms
-   where im.nonisomol_id = ms.nonisomol_id
+   where (im.nonisomol_id = ms.nonisomol_id and im.isomol_id = ms.isomol_id)
+       or (im.nonisomol_id = ms.nonisomol_id and im.isomol_id is null and ms.isomol_id is null)
      and ms.source_id = :SOURCEID
    union all
    SELECT 50, 0,
@@ -114,7 +117,8 @@ INSERT INTO price (quantity_mg, price, price_min, price_max, molsource_id)
        end,
        ms.id
    from  i_mols_molport im, mol_source ms
-   where im.nonisomol_id = ms.nonisomol_id
+   where (im.nonisomol_id = ms.nonisomol_id and im.isomol_id = ms.isomol_id)
+       or (im.nonisomol_id = ms.nonisomol_id and im.isomol_id is null and ms.isomol_id is null)
      and ms.source_id = :SOURCEID
   );
 commit;

@@ -6,7 +6,7 @@
 
 # Filename of file to standardise - will be a txt.gz file
 VENDOR='molport'
-SOURCEID=5
+SOURCEID=7
 
 # Standardisation Parameters
 
@@ -24,4 +24,4 @@ STANDOUTPUTDIR='run/standardised-molport'
 
 # Chunksize for standardizing/loading standardised data tab separated files
 STANDCHUNKSIZE=1500
-STANDCHUNK=50000
+STANDCHUNK=1000000

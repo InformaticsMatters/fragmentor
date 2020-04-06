@@ -9,9 +9,6 @@
  *
  */
 
-/*
- * Update i_node with smailes from existing nonisomol table 
- */
 \timing
 
 begin;
@@ -22,7 +19,7 @@ UPDATE i_node i SET nonisomol_id = n.id
 commit;
 
 /*
- * Insert new Nodes into nonismol  
+ * Insert new Nodes into nonismol
  */
 begin;
 SELECT clock_timestamp();
@@ -33,7 +30,7 @@ INSERT INTO nonisomol (smiles, hac, rac, child_count, edge_count, ftime)
 commit;
 
 /*
- * Update counts 
+ * Update counts
  */
 begin;
 SELECT clock_timestamp();
@@ -45,3 +42,4 @@ WITH s AS (SELECT i.nonisomol_id, i.child_count, i.edge_count, i.ftime FROM i_no
 UPDATE nonisomol n SET child_count = s.child_count, edge_count = s.edge_count, ftime = s.ftime FROM s
   WHERE s.nonisomol_id = n.id;
 commit;
+

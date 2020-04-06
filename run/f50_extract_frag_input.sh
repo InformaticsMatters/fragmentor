@@ -23,6 +23,9 @@ echo $VENDORPATH
 source $REPPATH/$VENDORPATH/vendorparam.sh
 
 echo "SMILES Extraction Starting..."
+TSTART=$(date +"%T")
+echo "Current time : $TSTART"
+
 #\COPY (SELECT n.smiles FROM nonisomol n WHERE NOT EXISTS (SELECT 1 FROM edge e WHERE e.parent_id = n.id)) TO '/data/xchem/nonisomol.smi';
 
 psql \
@@ -45,4 +48,6 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "SMILES Extraction Successful"
+TEND=$(date +"%T")
+echo "Current time : $TEND"
 exit 0

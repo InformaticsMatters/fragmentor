@@ -24,4 +24,4 @@ STANDOUTPUTDIR='run/standardised-chemspace_bb'
 
 # Chunksize for standardizing/loading standardised data tab separated files
 STANDCHUNKSIZE=15000
-STANDCHUNK=25000
+STANDCHUNK=1000000

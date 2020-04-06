@@ -21,8 +21,8 @@ import sys
 
 from rdkit import RDLogger
 
-from frag.standardise.utils import standardise_utils
 from frag.std_utils import parser
+from frag.utils import standardise_utils
 
 # The columns in our output file.
 _OUTPUT_COLUMNS = parser.STANDARD_COLUMNS + \

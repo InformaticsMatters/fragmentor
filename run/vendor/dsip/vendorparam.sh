@@ -23,5 +23,5 @@ STANDINPUTFILE='dsip.txt'
 STANDOUTPUTDIR='run/standardised-dsip'
 
 # Chunksize for standardizing/loading standardised data tab separated files
-STANDCHUNKSIZE=15000
-STANDCHUNK=25000
+STANDCHUNKSIZE=250
+STANDCHUNK=1000000

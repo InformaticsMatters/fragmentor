@@ -1,6 +1,6 @@
 /*
  * Create Fragmentation i_node Table SQL Statements :
- * Purpose: Creates fragmentation company specific tables
+ * Purpose: Creates fragmentation specific i_node table
  *
  * Called from p80_load_nodes.sh
  *

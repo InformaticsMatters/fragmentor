@@ -21,7 +21,7 @@ chunks = Channel
 
 process standardise {
 
-    container 'informaticsmatters/fragmentor:molport-02'
+    container 'informaticsmatters/fragmentor:molport-03'
 
     input:
     file chunks

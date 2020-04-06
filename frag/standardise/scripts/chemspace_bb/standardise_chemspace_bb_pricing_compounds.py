@@ -24,8 +24,8 @@ import sys
 
 from rdkit import RDLogger
 
-from frag.standardise.utils import standardise_utils
 from frag.std_utils import parser
+from frag.utils import standardise_utils
 
 # Configure basic logging
 logger = logging.getLogger('chemspace')
