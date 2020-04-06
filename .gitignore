@@ -7,12 +7,4 @@ data/chemspace-*
 tmp
 .nextflow*
 work
-standardised-chemspace_bb
-standardised-dsip
-standardised-molport
-fragment
-nodes.csv
-edges.csv
-rejects.smi
-fragmentinput.smi
-
+/testrun/

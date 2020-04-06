@@ -16,7 +16,7 @@ set -u
 source fragparam.sh
 echo $DBHOST
 echo $DATABASE
-echo $REPPATH/$FRAGBASEDIR/$FRAGSMIFILE
+echo $FRAGPATH/fragment/$FRAGSMIFILE
 export PGPASSFILE=fragpass
 
 echo $VENDORPATH
@@ -39,7 +39,7 @@ psql \
          WHERE NOT EXISTS (SELECT 1 FROM edge e WHERE e.parent_id = n.id) \
          AND EXISTS (SELECT 1 FROM mol_source m WHERE n.id = m.nonisomol_id \
          AND m.source_id = $SOURCEID) \
-         AND n.hac <= $FRAGHAC ) TO '$REPPATH/$FRAGBASEDIR/$FRAGSMIFILE'" \
+         AND n.hac <= $FRAGHAC ) TO '$FRAGPATH/fragment/$FRAGSMIFILE'" \
     $DATABASE
 
 if [ $? -ne 0 ]; then

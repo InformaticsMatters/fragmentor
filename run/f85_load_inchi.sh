@@ -13,7 +13,7 @@
 
 
 source fragparam.sh
-echo $REPPATH/$FRAGBASEDIR
+echo $FRAGPATH/fragment
 echo $INCHITAB
 echo $INCHICHUNK
 
@@ -21,11 +21,11 @@ echo "Loading Inchis Starting"
 TSTART=$(date +"%T")
 echo "Current time : $TSTART"
 
-read lines filename <<< $(wc -l $REPPATH/$FRAGBASEDIR/$INCHITAB)
+read lines filename <<< $(wc -l $FRAGPATH/fragment/$INCHITAB)
 echo "lines=$lines filename=$filename"
 
-cat $REPPATH/$FRAGBASEDIR/$INCHITAB | split -d -l $INCHICHUNK - $REPPATH/$FRAGBASEDIR/inchchunk_
-for f in $REPPATH/$FRAGBASEDIR/inchchunk*; do
+cat $FRAGPATH/fragment/$INCHITAB | split -d -l $INCHICHUNK - $FRAGPATH/fragment/inchchunk_
+for f in $FRAGPATH/fragment/inchchunk*; do
 
     echo "Processing Filename $f"
 
@@ -78,7 +78,7 @@ for f in $REPPATH/$FRAGBASEDIR/inchchunk*; do
 
 done
 
-rm $REPPATH/$FRAGBASEDIR/inchchunk_*
+rm $FRAGPATH/fragment/inchchunk_*
 
 if [ $? -ne 0 ]; then
     echo "Load Inchi keys failed, fault:" 1>&2

@@ -14,18 +14,18 @@
 
 
 source fragparam.sh
-echo $REPPATH/$FRAGBASEDIR
+echo $FRAGPATH/fragment
 echo $FRAGEDGEFILE
 
 echo "Loading Edges Starting"
 TSTART=$(date +"%T")
 echo "Current time : $TSTART"
 
-read lines filename <<< $(wc -l $REPPATH/$FRAGBASEDIR/$FRAGEDGEFILE)
+read lines filename <<< $(wc -l $FRAGPATH/fragment/$FRAGEDGEFILE)
 echo "lines=$lines filename=$filename"
 
-cat $REPPATH/$FRAGBASEDIR/$FRAGEDGEFILE | split -d -l $EDGECHUNK - $REPPATH/$FRAGBASEDIR/edgechunk_
-for f in $REPPATH/$FRAGBASEDIR/edgechunk*; do
+cat $FRAGPATH/fragment/$FRAGEDGEFILE | split -d -l $EDGECHUNK - $FRAGPATH/fragment/edgechunk_
+for f in $FRAGPATH/fragment/edgechunk*; do
 
     echo "Processing Filename $f"
 
@@ -89,7 +89,7 @@ for f in $REPPATH/$FRAGBASEDIR/edgechunk*; do
 
 done
 
-rm $REPPATH/$FRAGBASEDIR/edgechunk_*
+rm $FRAGPATH/fragment/edgechunk_*
 
 echo "Loading Edges Successful"
 TEND=$(date +"%T")

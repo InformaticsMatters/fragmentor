@@ -22,9 +22,9 @@ echo $VENDORPATH
 source $REPPATH/$VENDORPATH/vendorparam.sh
 
 echo $STANDARDISER
-echo $REPPATH/$STANDDATADIR
-echo $REPPATH/$STANDOUTPUTDIR
-echo $REPPATH/$STANDDATADIR/"$STANDINPUTFILE"
+echo $DATAPATH/data/$VENDOR
+echo $STANDPATH/standardise
+echo $DATAPATH/data/$VENDOR/"$STANDINPUTFILE"
 
 export PGPASSFILE=fragpass
 
@@ -32,8 +32,8 @@ echo "Starting Standardisation Process .."
 TSTART=$(date +"%T")
 echo "Current time : $TSTART"
 
-time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/standardizer.nf -with-report $REPPATH/$STANDOUTPUTDIR/standardise_report.html -with-tower \
-     --script $STANDARDISER --inputs $REPPATH/$STANDDATADIR/"$STANDINPUTFILE" --out_dir $REPPATH/$STANDOUTPUTDIR --chunk_size $STANDCHUNKSIZE $@
+time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/standardizer.nf -with-report $STANDPATH/standardise/standardise_report.html -with-tower \
+     --script $STANDARDISER --inputs $DATAPATH/data/$VENDOR/"$STANDINPUTFILE" --out_dir $STANDPATH/standardise --chunk_size $STANDCHUNKSIZE $@
 
 if [ $? -ne 0 ]; then
     echo "Standardisation fault, fault:" 1>&2

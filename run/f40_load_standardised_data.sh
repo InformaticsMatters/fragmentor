@@ -24,7 +24,7 @@ source $REPPATH/$VENDORPATH/vendorparam.sh
 echo $STANDCHUNK
 echo $SOURCEID
 
-echo $REPPATH/$STANDOUTPUTDIR
+echo $STANDPATH/standardise
 
 export PGPASSFILE=fragpass
 
@@ -32,15 +32,15 @@ echo "Load Standardisation Results Starting"
 TSTART=$(date +"%T")
 echo "Current time : $TSTART"
 
-read lines filename <<< $(wc -l $REPPATH/$STANDOUTPUTDIR/standardised-compounds.tab)
+read lines filename <<< $(wc -l $STANDPATH/standardise/standardised-compounds.tab)
 echo "lines=$lines filename=$filename"
 
-head -1 $REPPATH/$STANDOUTPUTDIR/standardised-compounds.tab > standardheader
-tail -n +2 $REPPATH/$STANDOUTPUTDIR/standardised-compounds.tab | split -d -l $STANDCHUNK - chunk_
+head -1 $STANDPATH/standardise/standardised-compounds.tab > standardheader
+tail -n +2 $STANDPATH/standardise/standardised-compounds.tab | split -d -l $STANDCHUNK - chunk_
 
 for f in chunk*; do
-    cat standardheader > $REPPATH/$STANDOUTPUTDIR/standardised$f.tab
-    cat $f >> $REPPATH/$STANDOUTPUTDIR/standardised$f.tab
+    cat standardheader > $STANDPATH/standardise/standardised$f.tab
+    cat $f >> $STANDPATH/standardise/standardised$f.tab
 
     echo "Processing Filename $f"
 
@@ -91,7 +91,7 @@ done
 
 rm standardheader
 rm chunk*
-rm $REPPATH/$STANDOUTPUTDIR/standardisedchunk*
+rm $STANDPATH/standardise/standardisedchunk*
 
 echo "Load Standardised Results Successful"
 TEND=$(date +"%T")

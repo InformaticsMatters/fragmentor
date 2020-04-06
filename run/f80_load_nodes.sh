@@ -19,11 +19,11 @@ echo "Loading Nodes Starting"
 TSTART=$(date +"%T")
 echo "Current time : $TSTART"
 
-read lines filename <<< $(wc -l $REPPATH/$FRAGBASEDIR/$FRAGNODEFILE)
+read lines filename <<< $(wc -l $FRAGPATH/fragment/$FRAGNODEFILE)
 echo "lines=$lines filename=$filename"
 
-cat $REPPATH/$FRAGBASEDIR/$FRAGNODEFILE | split -d -l $NODECHUNK - $REPPATH/$FRAGBASEDIR/nodechunk_
-for f in $REPPATH/$FRAGBASEDIR/nodechunk*; do
+cat $FRAGPATH/fragment/$FRAGNODEFILE | split -d -l $NODECHUNK - $FRAGPATH/fragment/nodechunk_
+for f in $FRAGPATH/fragment/nodechunk*; do
 
     echo "Processing Filename $f"
 
@@ -76,7 +76,7 @@ for f in $REPPATH/$FRAGBASEDIR/nodechunk*; do
 
 done
 
-rm $REPPATH/$FRAGBASEDIR/nodechunk_*
+rm $FRAGPATH/fragment/nodechunk_*
 
 if [ $? -ne 0 ]; then
     echo "Load Nodes results failed, fault:" 1>&2

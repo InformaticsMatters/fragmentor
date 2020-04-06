@@ -17,6 +17,9 @@ source fragparam.sh
 echo "Initialising Fragmentation Process .."
 
 echo $REPPATH
+echo $DATAPATH
+echo $STANDPATH
+echo $FRAGPATH
 echo $VENDORPATH
 
 TSTART=$(date +"%T")
@@ -42,10 +45,41 @@ else
     exit 1
 fi
 
-# Create Fragmentation base directory if it doesn't exist
-if [ ! -d $REPPATH/$FRAGBASEDIR ]; then
-    mkdir $REPPATH/$FRAGBASEDIR
-fi    
+# Create Process Base directories if they don't exist
+if [ ! -d $DATAPATH ]; then
+    mkdir $DATAPATH
+    mkdir $DATAPATH/data
+fi
+
+if [ ! -d $STANDPATH ]; then
+    mkdir $STANDPATH
+    mkdir $STANDPATH/standardise
+fi
+
+if [ ! -d $FRAGPATH ]; then
+    mkdir $FRAGPATH
+    mkdir $FRAGPATH/fragment
+fi
+
+if [ ! -d $DATAPATH/data ]; then
+    mkdir $DATAPATH/data
+fi
+
+if [ ! -d $STANDPATH/standardise ]; then
+    mkdir $STANDPATH/standardise
+fi
+
+if [ ! -d $FRAGPATH/fragment ]; then
+    mkdir $FRAGPATH/fragment
+fi
+
+
+source $REPPATH/$VENDORPATH/vendorparam.sh
+
+# Create Data directory if it doesn't exist
+if [ ! -d $DATAPATH/data/$VENDOR ]; then
+    mkdir $DATAPATH/data/$VENDOR
+fi
 
 # Set fragpass (database settings) security so that it will be picked up correctly later
 # Note that the database in fragparam.sh must match the database in fragpass
@@ -61,13 +95,15 @@ fi
 echo
 echo "Parameters for run are currently as follows:"
 echo
-
-source $REPPATH/$VENDORPATH/vendorparam.sh
-
-read lines filename <<< $(wc -l $REPPATH/$STANDDATADIR/$STANDINPUTFILE)
 echo "Vendor: $VENDOR"
-echo "Molecules to Process (at least)          : $lines from filename: $filename"
-echo "Note that there may be more that one file"
+echo
+if [ -f $DATAPATH/data/$VENDOR/$STANDINPUTFILE ]; then
+    read lines filename <<< $(wc -l $DATAPATH/data/$VENDOR/"$STANDINPUTFILE")
+    echo "Molecules to Process (at least)          : $lines from filename: $filename"
+    echo "Note that there may be more that one file"
+else
+    echo "Please set up Data files in directory: $DATAPATH/data/$VENDOR"
+fi
 echo
 echo "Chunksize for standardising              : $STANDCHUNKSIZE"
 echo "Chunksize for uploading Standardised data: $STANDCHUNK"

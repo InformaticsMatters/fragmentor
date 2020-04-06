@@ -19,8 +19,8 @@ set -e
 set -u
 
 source fragparam.sh
-echo $REPPATH/$FRAGBASEDIR/$FRAGNODEFILE
-echo $REPPATH/$FRAGBASEDIR/$INCHITAB
+echo $FRAGPATH/fragment/$FRAGNODEFILE
+echo $FRAGPATH/fragment/$INCHITAB
 
 export PGPASSFILE=fragpass
 echo $REPPATH
@@ -29,7 +29,7 @@ echo "Calculation of Inchi starting ..."
 TSTART=$(date +"%T")
 echo "Current time : $TSTART"
 
-time python -m frag.network.scripts.generate_inchi -i $REPPATH/$FRAGBASEDIR/$FRAGNODEFILE -o $REPPATH/$FRAGBASEDIR/$INCHITAB -n -s -node
+time python -m frag.network.scripts.generate_inchi -i $FRAGPATH/fragment/$FRAGNODEFILE -o $FRAGPATH/fragment/$INCHITAB -n -s -node
 
 if [ $? -ne 0 ]; then
     echo "Fragmentation failed, fault:" 1>&2

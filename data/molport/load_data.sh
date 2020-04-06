@@ -1,0 +1,16 @@
+gunzip -c iis_smiles-000-500-000--000-999-999.txt.gz > /data/molport/molport.01.txt
+gunzip -c iis_smiles-000-500-000--000-999-999.txt.gz > /data/molport/molport.02.txt
+gunzip -c iis_smiles-001-000-000--001-499-999.txt.gz > /data/molport/molport.03.txt
+gunzip -c iis_smiles-001-500-000--001-999-999.txt.gz > /data/molport/molport.04.txt
+gunzip -c iis_smiles-002-000-000--002-499-999.txt.gz > /data/molport/molport.05.txt
+gunzip -c iis_smiles-002-500-000--002-999-999.txt.gz > /data/molport/molport.06.txt
+gunzip -c iis_smiles-003-000-000--003-499-999.txt.gz > /data/molport/molport.07.txt
+gunzip -c iis_smiles-003-500-000--003-999-999.txt.gz > /data/molport/molport.08.txt
+gunzip -c iis_smiles-004-000-000--004-499-999.txt.gz > /data/molport/molport.09.txt
+gunzip -c iis_smiles-004-500-000--004-999-999.txt.gz > /data/molport/molport.10.txt
+gunzip -c iis_smiles-005-000-000--005-499-999.txt.gz > /data/molport/molport.11.txt
+gunzip -c iis_smiles-005-500-000--005-999-999.txt.gz > /data/molport/molport.12.txt
+gunzip -c iis_smiles-006-000-000--006-499-999.txt.gz > /data/molport/molport.13.txt
+gunzip -c iis_smiles-006-500-000--006-999-999.txt.gz > /data/molport/molport.14.txt
+gunzip -c iis_smiles-007-000-000--007-499-999.txt.gz > /data/molport/molport.15.txt
+gunzip -c iis_smiles-007-500-000--007-999-999.txt.gz > /data/molport/molport.16.txt
