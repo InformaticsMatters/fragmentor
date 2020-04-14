@@ -14,6 +14,7 @@
 source fragparam.sh
 echo $REPPATH/$FRAGBASEDIR
 echo $FRAGNODEFILE
+source $REPPATH/$VENDORPATH/vendorparam.sh
 
 echo "Loading Nodes Starting"
 TSTART=$(date +"%T")
@@ -33,7 +34,7 @@ for f in $FRAGPATH/fragment/nodechunk*; do
         -X \
         -U postgres \
         -h $DBHOST \
-        -f f80_create_i_nodes.sql \
+        -f sql/f80_create_i_nodes.sql \
         --echo-all \
         --set AUTOCOMMIT=on \
         --set ON_ERROR_STOP=on \
@@ -54,7 +55,7 @@ for f in $FRAGPATH/fragment/nodechunk*; do
         --echo-all \
         --set AUTOCOMMIT=on \
         --set ON_ERROR_STOP=on \
-        -c "\COPY i_node(smiles, hac, rac, child_count, edge_count) FROM '$f' DELIMITER ',' CSV;" \
+        -c "\COPY i_node(smiles, hac, rac, ring_smiles, child_count, edge_count) FROM '$f' DELIMITER ',' CSV;" \
         $DATABASE
 
     if [ $? -ne 0 ]; then
@@ -68,7 +69,8 @@ for f in $FRAGPATH/fragment/nodechunk*; do
         -X \
         -U postgres \
         -h $DBHOST \
-        -f f80_load_frag_nodes.sql \
+        -v SOURCEID=$SOURCEID \
+        -f sql/f80_load_frag_nodes.sql \
         --echo-all \
         --set AUTOCOMMIT=off \
         --set ON_ERROR_STOP=on \

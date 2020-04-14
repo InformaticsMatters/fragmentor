@@ -14,7 +14,8 @@ set -e
 set -u
 
 source fragparam.sh
-echo $FRAGPATH/fragment/$FRAGSMIFILE
+echo $FRAGDATA/fragment/$FRAGSMIFILE
+echo $FRAGPATH
 echo $FRAGCHUNKSIZE
 
 export PGPASSFILE=fragpass
@@ -27,7 +28,7 @@ echo "Current time : $TSTART"
 
 #time python -m frag.network.scripts.build_db_from_smiles --input /data/xchem/nonisomol.smi --base_dir /data/xchem/
 time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/fragmentation.nf -with-report $FRAGPATH/fragment/frag_report.html -with-tower\
-    --input $FRAGPATH/fragment/$FRAGSMIFILE --out_dir $FRAGPATH/fragment --tmp_dir $FRAGPATH/fragment --chunk_size $FRAGCHUNKSIZE --max_hac $FRAGHAC --max_frag $FRAGMAXFRAGS $@
+    --input $FRAGDATA/fragment/$FRAGSMIFILE --out_dir $FRAGPATH/fragment --tmp_dir $FRAGPATH/fragment --chunk_size $FRAGCHUNKSIZE --max_hac $FRAGHAC --max_frag $FRAGMAXFRAGS $@
 
 
 if [ $? -ne 0 ]; then

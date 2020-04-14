@@ -20,6 +20,7 @@ CREATE TABLE i_node (
   nonisomol_id INTEGER,
   hac SMALLINT,
   rac SMALLINT,
+  ring_smiles TEXT,
   child_count INTEGER,
   edge_count INTEGER,
   ftime INTEGER

@@ -1,8 +1,9 @@
 #!/bin/bash
 # 
 # Calculate inchi key
-# Purpose: Takes a list of smiles and calculates the inchi key.
-# Note that f80 and f90 can be run without this step.
+# Purpose:
+#  Takes nodes.csv and calculates the inchi key to create inchi.tab - loaded in f85
+#  Note that f80 and f90 can be run without this step.
 #
 # Parameters:
 #    - See file: fragparam.sh for configuration.

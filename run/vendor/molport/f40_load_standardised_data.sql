@@ -1,6 +1,6 @@
 /*
  * Load Standardised Data SQL Statements: 
- * Purpose: Loads standardised data into ISO database
+ * Purpose: Loads standardised data into Frag database
  *
  * Called from p40_load_standardised_data.sh
  */
@@ -13,13 +13,13 @@
 begin;
 SELECT clock_timestamp();
 
-INSERT INTO nonisomol (smiles, hac)
-  SELECT nonisosmiles, hac from i_mols_molport
+INSERT INTO nonisomol (smiles, hac, source_id)
+  SELECT nonisosmiles, hac, :SOURCEID from i_mols_molport
   ON CONFLICT ON CONSTRAINT nonisomol_smiles_key DO NOTHING;
 commit;
 
 /*
- * Update i_mols_chemspace with nonisomol_id
+ * Update i_mols with nonisomol_id
  */
 begin;
 SELECT clock_timestamp();
@@ -33,13 +33,13 @@ commit;
 
 
 /*
- * Load isomol from i_mols_chemspace
+ * Load isomol from i_mols
  */
 begin;
 SELECT clock_timestamp();
 
-INSERT INTO isomol (smiles, nonisomol_id)
-  SELECT isosmiles, nonisomol_id from i_mols_molport
+INSERT INTO isomol (smiles, nonisomol_id, source_id)
+  SELECT isosmiles, nonisomol_id, :SOURCEID from i_mols_molport
   WHERE isosmiles != nonisosmiles
   ON CONFLICT ON CONSTRAINT isomol_smiles_key DO NOTHING;
 commit;
@@ -61,8 +61,8 @@ commit;
 begin;
 SELECT clock_timestamp();
 
-INSERT INTO mol_source (smiles, code, source_id, nonisomol_id, isomol_id)
-  (SELECT osmiles, cmpd_id, :SOURCEID, nonisomol_id, isomol_id FROM i_mols_molport);
+INSERT INTO mol_source (smiles, code, source_id, lead_time, nonisomol_id, isomol_id)
+  (SELECT osmiles, cmpd_id, :SOURCEID, lead_time, nonisomol_id, isomol_id FROM i_mols_molport);
 commit;
 
 /*

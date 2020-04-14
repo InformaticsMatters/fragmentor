@@ -88,7 +88,7 @@ def process_node(input, output, gen_std, flags=''):
         num_processed = 0
         errors = 0
 
-        fieldnames = ['smiles', 'hac','rac','child_count','edge_count']
+        fieldnames = ['smiles', 'hac','rac', 'ring_smiles','child_count','edge_count']
         reader = csv.DictReader(csvinfile,fieldnames=fieldnames[0:5])
 
         for row in reader:

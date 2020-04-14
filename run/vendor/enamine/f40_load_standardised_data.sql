@@ -13,8 +13,8 @@
 begin;
 SELECT clock_timestamp();
 
-INSERT INTO nonisomol (smiles, hac, source_id)
-  SELECT nonisosmiles, hac, :SOURCEID from i_mols_dsip
+INSERT INTO nonisomol (smiles, hac, rac, source_id)
+  SELECT nonisosmiles, hac, rac, :SOURCEID from i_mols_dsip
   ON CONFLICT ON CONSTRAINT nonisomol_smiles_key DO NOTHING;
 commit;
 
@@ -25,7 +25,7 @@ commit;
 begin;
 SELECT clock_timestamp();
 
-UPDATE i_mols_dsip i SET nonisomol_id = n.id
+UPDATE i_mols_enamine i SET nonisomol_id = n.id
   FROM nonisomol n
     WHERE n.smiles = i.nonisosmiles;
 commit;
@@ -38,7 +38,7 @@ begin;
 SELECT clock_timestamp();
 
 INSERT INTO isomol (smiles, nonisomol_id, source_id)
-  SELECT isosmiles, nonisomol_id, :SOURCEID from i_mols_dsip
+  SELECT isosmiles, nonisomol_id, :SOURCEID from i_mols_enamine
   WHERE isosmiles != nonisosmiles
   ON CONFLICT ON CONSTRAINT isomol_smiles_key DO NOTHING;
 commit;
@@ -50,7 +50,7 @@ commit;
 begin;
 SELECT clock_timestamp();
 
-UPDATE i_mols_dsip i SET isomol_id = iso.id
+UPDATE i_mols_enamine i SET isomol_id = iso.id
   FROM isomol iso
     WHERE iso.smiles = i.isosmiles;
 commit;
@@ -63,5 +63,5 @@ begin;
 SELECT clock_timestamp();
 
 INSERT INTO mol_source (smiles, code, source_id, lead_time, nonisomol_id, isomol_id)
-  (SELECT osmiles, cmpd_id, :SOURCEID, 0, nonisomol_id, isomol_id FROM i_mols_dsip);
+  (SELECT osmiles, cmpd_id, :SOURCEID, 0, nonisomol_id, isomol_id FROM i_mols_enamine);
 commit;

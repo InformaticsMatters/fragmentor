@@ -45,8 +45,9 @@ commit;
 begin;
 SELECT clock_timestamp();
 
-INSERT INTO edge (parent_id, child_id, label)
-  SELECT np.id, nc.id, i.label FROM i_edge i
+INSERT INTO edge (parent_id, child_id, label, source_id)
+  SELECT np.id, nc.id, i.label, :SOURCEID \
+ FROM i_edge i
     JOIN nonisomol np ON np.smiles = i.p_smiles 
     JOIN nonisomol nc ON nc.smiles = i.c_smiles
     WHERE i.present IS NULL;

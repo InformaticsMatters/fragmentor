@@ -5,6 +5,8 @@
 # 1. Split edges file into chunks of chunk_size EDGECHUNK for loading into the frag database
 # 2. For each chunk copy the data into i_edge and then load it into the databse
 #
+# NOTE: f90_cpload_edges.sh should be used as it will be faster. This is an older method included for emergencies.
+#
 # Parameters:
 #    - See file: fragparam.sh and fragpass for fragmentation configuration.
 #
@@ -16,6 +18,7 @@
 source fragparam.sh
 echo $FRAGPATH/fragment
 echo $FRAGEDGEFILE
+source $REPPATH/$VENDORPATH/vendorparam.sh
 
 echo "Loading Edges Starting"
 TSTART=$(date +"%T")
@@ -35,7 +38,7 @@ for f in $FRAGPATH/fragment/edgechunk*; do
         -X \
         -U postgres \
         -h $DBHOST \
-        -f f90_create_i_edges.sql \
+        -f sql/f90_create_i_edges.sql \
         --echo-all \
         --set AUTOCOMMIT=on \
         --set ON_ERROR_STOP=on \
@@ -73,7 +76,8 @@ for f in $FRAGPATH/fragment/edgechunk*; do
          -X \
          -U postgres \
          -h $DBHOST \
-         -f f90_load_frag_edges.sql \
+         -v SOURCEID=$SOURCEID \
+         -f sql/f90_load_frag_edges.sql \
          --echo-all \
          --set AUTOCOMMIT=off \
          --set ON_ERROR_STOP=on \

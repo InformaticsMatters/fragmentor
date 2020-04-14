@@ -3,7 +3,7 @@
 # Based on build_db.py, this module builds the graph network nodes and edges from
 # the Informatics Matters 'standard' (uncompressed) file representation.
 # The output is these files:
-# nodes.csv containing the molecules. The fields are: SMILES, HAC, RAC, NUM_CHILDREN, NUM_EDGES, TIME_MS
+# nodes.csv containing the molecules. The fields are: SMILES, HAC, RAC, RING_SMILES, NUM_CHILDREN, NUM_EDGES, TIME_MS
 # edges.csv containing the edges. The fields are: PARENT_SMILES, CHILD_SMILES, LABEL
 # rejects.smi containing the SMILES that were rejected because of the fragment count filter.
 #
@@ -30,7 +30,7 @@ class FragData():
         for smiles in input_smiles:
             if smiles in self.nodes_map:
                 node = self.nodes_map[smiles]
-                self.parent_data[smiles] = ParentData(smiles, node.HAC, node.RAC)
+                self.parent_data[smiles] = ParentData(smiles, node.HAC, node.RAC, node.RING_SMILES)
             else:
                 print("WARNING: SMILES", smiles, "not present in NodeHolder")
 
@@ -41,7 +41,7 @@ class FragData():
         else:
             # it's new to this group of edges
             node = self.nodes_map[p_smiles]
-            p_data = ParentData(p_smiles, node.HAC, node.RAC)
+            p_data = ParentData(p_smiles, node.HAC, node.RAC, node.RING_SMILES)
             self.parent_data[p_smiles] = p_data
 
         p_data.add_edge(edge)
@@ -56,15 +56,17 @@ class FragData():
 
 
 class ParentData():
-    def __init__(self, smiles, hac, rac):
+    def __init__(self, smiles, hac, rac, ring_smiles):
         """
         :param smiles:
         :param hac:
         :param rac:
+        :param ring_smiles:
         """
         self.smiles = smiles
         self.hac = hac
         self.rac = rac
+        self.ring_smiles = ring_smiles
         # children are a dict keyed by the child SMILES whose values are a list of labels
         self.children = collections.OrderedDict()
         self.edge_count = 0
@@ -89,11 +91,11 @@ nodes_f = None
 edges_f = None
 rejects_f = None
 
-def write_node(smiles, hac, rac, num_children, num_edges):
+def write_node(smiles, hac, rac, ring_smiles, num_children, num_edges):
     global node_count
     # print("writing node", smiles)
     # nodes_f.write(smiles + '\n')
-    nodes_f.write(','.join([smiles, str(hac), str(rac), str(num_children), str(num_edges)]) + '\n')
+    nodes_f.write(','.join([smiles, str(hac), str(rac), ring_smiles, str(num_children), str(num_edges)]) + '\n')
     node_count += 1
     cache.add(smiles)
 
@@ -142,7 +144,7 @@ def write_nodes(parent_data):
     p_smiles = parent_data.smiles
     num_children = len(parent_data.children)
     num_edges = parent_data.edge_count
-    write_node(p_smiles, parent_data.hac, parent_data.rac, num_children, num_edges)
+    write_node(p_smiles, parent_data.hac, parent_data.rac, parent_data.ring_smiles, num_children, num_edges)
 
 
 def fragment_and_write(input_smiles, max_frags=0, max_hac=0, verbosity=0):

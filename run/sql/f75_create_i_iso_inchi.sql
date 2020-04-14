@@ -14,11 +14,9 @@
 /*
  * Create i_node             
  */
-DROP TABLE IF EXISTS i_inchi;
-CREATE TABLE i_inchi (
+DROP TABLE IF EXISTS i_iso_inchi;
+CREATE TABLE i_iso_inchi (
   smiles TEXT,
-  sinchik TEXT,
-  sinchis TEXT,
   ninchik TEXT,
   ninchis TEXT
 );

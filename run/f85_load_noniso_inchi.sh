@@ -29,25 +29,25 @@ for f in $FRAGPATH/fragment/inchchunk*; do
 
     echo "Processing Filename $f"
 
-    echo "Create table i_inchi"
+    echo "Create table i_noniso_inchi"
 
     psql \
         -X \
         -U postgres \
         -h $DBHOST \
-        -f f85_create_i_inchi.sql \
+        -f sql/f85_create_i_noniso_inchi.sql \
         --echo-all \
         --set AUTOCOMMIT=on \
         --set ON_ERROR_STOP=on \
         $DATABASE
 
     if [ $? -ne 0 ]; then
-        echo "Create table i_inchi failed, fault:" 1>&2
+        echo "Create table i_noniso_inchi failed, fault:" 1>&2
         exit $?
     fi
 
 
-    echo "Load table i_inchi from inch TAB file"
+    echo "Load table i_noniso_inchi from inch TAB file"
 
     psql \
         -X \
@@ -56,7 +56,7 @@ for f in $FRAGPATH/fragment/inchchunk*; do
         --echo-all \
         --set AUTOCOMMIT=on \
         --set ON_ERROR_STOP=on \
-        -c "\COPY i_inchi(smiles, sinchik, sinchis, ninchik, ninchis) FROM '$f' DELIMITER E'\t' CSV;" \
+        -c "\COPY i_noniso_inchi(smiles, sinchik, sinchis, ninchik, ninchis) FROM '$f' DELIMITER E'\t' CSV;" \
         $DATABASE
 
     if [ $? -ne 0 ]; then
@@ -64,13 +64,13 @@ for f in $FRAGPATH/fragment/inchchunk*; do
         exit $?
     fi
 
-    echo "Load Frag database from i_inchi"
+    echo "Load Frag database from i_noniso_inchi"
 
     psql \
         -X \
         -U postgres \
         -h $DBHOST \
-        -f f85_update_inchi.sql \
+        -f sql/f85_update_noniso_inchi.sql \
         --echo-all \
         --set AUTOCOMMIT=off \
         --set ON_ERROR_STOP=on \

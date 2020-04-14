@@ -13,8 +13,8 @@
 begin;
 SELECT clock_timestamp();
 
-INSERT INTO nonisomol (smiles, hac)
-  SELECT nonisosmiles, hac from i_mols_chemspace
+INSERT INTO nonisomol (smiles, hac, source_id)
+  SELECT nonisosmiles, hac, :SOURCEID from i_mols_chemspace
   ON CONFLICT ON CONSTRAINT nonisomol_smiles_key DO NOTHING;
 commit;
 
@@ -37,8 +37,8 @@ SELECT count(*) FROM i_mols_chemspace where nonisomol_id is not null;
 begin;
 SELECT clock_timestamp();
 
-INSERT INTO isomol (smiles, nonisomol_id)
-  SELECT isosmiles, nonisomol_id from i_mols_chemspace
+INSERT INTO isomol (smiles, nonisomol_id, source_id)
+  SELECT isosmiles, nonisomol_id, :SOURCEID from i_mols_chemspace
   WHERE isosmiles != nonisosmiles
   ON CONFLICT ON CONSTRAINT isomol_smiles_key DO NOTHING;
 commit;
@@ -60,8 +60,8 @@ commit;
 begin;
 SELECT clock_timestamp();
 
-INSERT INTO mol_source (smiles, code, source_id, nonisomol_id, isomol_id)
-  (SELECT osmiles, cmpd_id, :SOURCEID, nonisomol_id, isomol_id FROM i_mols_chemspace);
+INSERT INTO mol_source (smiles, code, source_id, lead_time, nonisomol_id, isomol_id)
+  (SELECT osmiles, cmpd_id, :SOURCEID, 0, nonisomol_id, isomol_id FROM i_mols_chemspace);
 commit;
 
 /*

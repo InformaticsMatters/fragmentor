@@ -22,6 +22,7 @@
 source fragparam.sh
 echo $FRAGPATH/fragment
 echo $FRAGEDGEFILE
+source $REPPATH/$VENDORPATH/vendorparam.sh
 
 echo "Loading Edges Starting"
 TSTART=$(date +"%T")
@@ -44,7 +45,7 @@ for f in $FRAGPATH/fragment/edgechunk*; do
         -X \
         -U postgres \
         -h $DBHOST \
-        -f f90_create_i_edges.sql \
+        -f sql/f90_create_i_edges.sql \
         --echo-all \
         --set AUTOCOMMIT=on \
         --set ON_ERROR_STOP=on \
@@ -82,7 +83,7 @@ for f in $FRAGPATH/fragment/edgechunk*; do
          -X \
          -U postgres \
          -h $DBHOST \
-         -f f90_set_indexes.sql \
+         -f sql/f90_set_indexes.sql \
          --echo-all \
          --set AUTOCOMMIT=off \
          --set ON_ERROR_STOP=on \
@@ -104,7 +105,7 @@ for f in $FRAGPATH/fragment/edgechunk*; do
         --echo-all \
         --set AUTOCOMMIT=off \
         --set ON_ERROR_STOP=on \
-        -c "\COPY (SELECT np.id, nc.id, ied.label \
+        -c "\COPY (SELECT np.id, nc.id, ied.label, $SOURCEID \
                     FROM i_edge ied \
                     JOIN nonisomol np ON np.smiles = ied.p_smiles \
                     JOIN nonisomol nc ON nc.smiles = ied.c_smiles \
@@ -122,25 +123,34 @@ for f in $FRAGPATH/fragment/edgechunk*; do
 
 done
 
-echo "Drop indexes from Edge table"
-TSTART=$(date +"%T")
-echo "Current time : $TSTART"
+# Drop indexes if we are dealing with a very large number of edges
+# This will speed up the load but it takes 1:15 approx to recreate them.
+if [ $lines -gt $EDGEINDEXTHRESHOLD ]; then
 
-psql \
-  -X \
-  -U postgres \
-  -h $DBHOST \
-  --echo-all \
-  --set AUTOCOMMIT=on \
-  --set ON_ERROR_STOP=on \
-  -c "DROP INDEX IF EXISTS ix_edge_parent_id;
-      DROP INDEX IF EXISTS ix_edge_parent_child;" \
-  $DATABASE
+    echo "Drop indexes from Edge table"
+    TSTART=$(date +"%T")
+    echo "Current time : $TSTART"
 
-if [ $? -ne 0 ]; then
-  echo "Drop indexes failed, fault:" 1>&2
-  exit $?
+    psql \
+      -X \
+      -U postgres \
+      -h $DBHOST \
+      --echo-all \
+      --set AUTOCOMMIT=on \
+      --set ON_ERROR_STOP=on \
+      -c "DROP INDEX IF EXISTS ix_edge_parent_id;
+          DROP INDEX IF EXISTS ix_edge_parent_child;" \
+      $DATABASE
+
+    if [ $? -ne 0 ]; then
+      echo "Drop indexes failed, fault:" 1>&2
+      exit $?
+    fi
+else
+    echo "Only $lines edges to process"
+    echo "Leaving indexes in place"
 fi
+
 
 echo "Load table edge from New Edges CSV files"
 
@@ -158,7 +168,7 @@ for f in $FRAGPATH/fragment/edgechunk_*.new; do
         --echo-all \
         --set AUTOCOMMIT=on \
         --set ON_ERROR_STOP=on \
-        -c "\COPY edge(parent_id, child_id, label) FROM '$f' DELIMITER ',' CSV;" \
+        -c "\COPY edge(parent_id, child_id, label, source_id) FROM '$f' DELIMITER ',' CSV;" \
         $DATABASE
 
     if [ $? -ne 0 ]; then
@@ -168,24 +178,28 @@ for f in $FRAGPATH/fragment/edgechunk_*.new; do
 
 done
 
-echo "Drop indexes from Edge table"
-TSTART=$(date +"%T")
-echo "Current time : $TSTART"
+# Create indexes at end if we are dealing with a very large number of edges
+if [ $lines -gt $EDGEINDEXTHRESHOLD ]; then
 
-psql \
-  -X \
-  -U postgres \
-  -h $DBHOST \
-  --echo-all \
-  --set AUTOCOMMIT=on \
-  --set ON_ERROR_STOP=on \
-  -c "CREATE INDEX ix_edge_parent_id ON public.edge USING btree (parent_id);
-      CREATE INDEX ix_edge_parent_child ON public.edge USING btree (parent_id, child_id);" \
-  $DATABASE
+    echo "Create indexes from Edge table"
+    TSTART=$(date +"%T")
+    echo "Current time : $TSTART"
 
-if [ $? -ne 0 ]; then
-  echo "Drop indexes failed, fault:" 1>&2
-  exit $?
+    psql \
+      -X \
+      -U postgres \
+      -h $DBHOST \
+      --echo-all \
+      --set AUTOCOMMIT=on \
+      --set ON_ERROR_STOP=on \
+      -c "CREATE INDEX ix_edge_parent_id ON public.edge USING btree (parent_id);
+          CREATE INDEX ix_edge_parent_child ON public.edge USING btree (parent_id, child_id);" \
+      $DATABASE
+
+    if [ $? -ne 0 ]; then
+      echo "Create indexes failed, fault:" 1>&2
+      exit $?
+    fi
 fi
 
 rm $FRAGPATH/fragment/edgechunk_*

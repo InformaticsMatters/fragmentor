@@ -14,16 +14,17 @@
  * Drop all tables if they exist (NB Order because of table key constrants) 
  */
 
-DROP TABLE IF EXISTS i_mols_dsip;
+DROP TABLE IF EXISTS i_mols_enamine;
 
 /*
  * Create i_mols        
  */
-CREATE TABLE i_mols_dsip (
+CREATE TABLE i_mols_enamine (
   osmiles TEXT,
   isosmiles TEXT,
   nonisosmiles TEXT,
   hac SMALLINT,
+  rac SMALLINT,
   cmpd_id TEXT,
   isomol_id INTEGER,
   nonisomol_id INTEGER

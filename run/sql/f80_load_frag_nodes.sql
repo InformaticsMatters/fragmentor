@@ -24,8 +24,8 @@ commit;
 begin;
 SELECT clock_timestamp();
 
-INSERT INTO nonisomol (smiles, hac, rac, child_count, edge_count, ftime)
-  SELECT smiles, hac, rac, child_count, edge_count, ftime FROM i_node
+INSERT INTO nonisomol (smiles, hac, rac, ring_smiles, child_count, edge_count, ftime, source_id)
+  SELECT smiles, hac, rac, ring_smiles, child_count, edge_count, ftime, :SOURCEID FROM i_node
   WHERE nonisomol_id IS NULL;
 commit;
 
@@ -36,10 +36,10 @@ begin;
 SELECT clock_timestamp();
 
 -- this next query needs optimising
-WITH s AS (SELECT i.nonisomol_id, i.child_count, i.edge_count, i.ftime FROM i_node i
+WITH s AS (SELECT i.nonisomol_id, i.hac, i.rac, i.ring_smiles, i.child_count, i.edge_count, i.ftime FROM i_node i
   JOIN nonisomol n ON n.id = i.nonisomol_id
   WHERE i.nonisomol_id = n.id AND i.nonisomol_id IS NOT NULL)
-UPDATE nonisomol n SET child_count = s.child_count, edge_count = s.edge_count, ftime = s.ftime FROM s
+UPDATE nonisomol n SET hac = s.hac, rac = s.rac, ring_smiles = s.ring_smiles, child_count = s.child_count, edge_count = s.edge_count, ftime = s.ftime FROM s
   WHERE s.nonisomol_id = n.id;
 commit;
 
