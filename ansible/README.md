@@ -6,7 +6,7 @@ Run with something like: -
 And pass variables in directly or via a file: -
 
     $ ansible-playbook site-configure.yaml -e x=42
-    $ ansible-playbook site-configure.yaml -e "@parameters"
+    $ ansible-playbook site-configure.yaml -e @parameters
 
 ## Variable location
 -   Role-specific variables that a user might change often in the corresponding

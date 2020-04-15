@@ -2,3 +2,6 @@
 
 # Variables that a user might want to change
 # through the command-line or a parameter file.
+
+nextflow_timeout_minutes: 60
+nextflow_poll_period_minutes: 1

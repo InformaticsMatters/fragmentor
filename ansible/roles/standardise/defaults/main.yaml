@@ -2,5 +2,18 @@
 
 # Variables that a user might want to change
 # through the command-line or a parameter file.
+#
+# Less common variables can be found in vars/main.yaml
 
+standinputfile: SetMe
+standchunksize: 10
+
+datapath: SetMe
+reppath: SetMe
+vendorpath: SetMe
+standpath: SetMe
+fragpath: SetMe
+
+# The following is used (amongst other things)
+# to load vendor-specific variables...
 vendor: dsip

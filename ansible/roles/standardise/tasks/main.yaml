@@ -3,3 +3,6 @@
 - name: Include vendor-specific varaibles
   include_vars:
     file: "{{ vendor }}-variables.yaml"
+
+- import_tasks: initialise-frag-process.yaml
+- import_tasks: standardise-file.yaml
