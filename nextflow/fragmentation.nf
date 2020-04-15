@@ -1,16 +1,30 @@
+/*
+ * Molecule Fragmentation Nextflow process:
+ * Purpose: Fragmentation of molecules across a cluster.
+ *
+ * Called from f60_fragmentation.sh
+ *
+ * Author | Date    | Version
+ * Tim    | 03/2020 | Initial Version
+ * Duncan | 03/2020 | Add comtainer to collect* processes.
+ *
+ */
+
 params.input = 'nonisomol.smi'
 params.chunk_size = 500000
 params.max_hac = 36
 params.max_frag = 12
 params.out_dir = '.'
 params.out_mode = 'move'
+params.tmp_dir = '.'
+params.cpus = 8
 
 chunks = Channel.from(file(params.input))
     .splitText(by: params.chunk_size, file: 'chunk_')
 
 process fragment {
 
-    container 'informaticsmatters/fragmentor:latest'
+    container 'informaticsmatters/fragmentor:molport-04'
 
     input:
     file chunks
@@ -30,45 +44,51 @@ process fragment {
 
 process collect_nodes {
 
-     publishDir params.out_dir, mode: params.out_mode
+    container 'informaticsmatters/fragmentor:molport-04'
+    cpus params.cpus
+    publishDir params.out_dir, mode: params.out_mode
 
-     input:
-     file chunks from node_chunks.collect()
+    input:
+    file chunks from node_chunks.collect()
 
-     output:
-     file 'nodes.csv'
+    output:
+    file 'nodes.csv'
 
-     """
-     sort -u $chunks > nodes.csv
-     """
+    """
+    sort -u -T params.tmp_dir $chunks > nodes.csv
+    """
 }
 
 process collect_edges {
 
-     publishDir params.out_dir, mode: params.out_mode
+    container 'informaticsmatters/fragmentor:molport-04'
+    cpus params.cpus
+    publishDir params.out_dir, mode: params.out_mode
 
-     input:
-     file chunks from edge_chunks.collect()
+    input:
+    file chunks from edge_chunks.collect()
 
-     output:
-     file 'edges.csv'
+    output:
+    file 'edges.csv'
 
-     """
-     sort -u $chunks > edges.csv
-     """
+    """
+    sort -u -T params.tmp_dir $chunks > edges.csv
+    """
 }
 
 process collect_rejects {
 
-     publishDir params.out_dir, mode: params.out_mode
+    container 'informaticsmatters/fragmentor:molport-04'
+    cpus params.cpus
+    publishDir params.out_dir, mode: params.out_mode
 
-     input:
-     file chunks from rejects_chunks.collect()
+    input:
+    file chunks from rejects_chunks.collect()
 
-     output:
-     file 'rejects.smi'
+    output:
+    file 'rejects.smi'
 
-     """
-     sort -u $chunks > rejects.smi
-     """
+    """
+    sort -u -T params.tmp_dir $chunks > rejects.smi
+    """
 }

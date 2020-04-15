@@ -4,8 +4,8 @@
 # Purpose: Environment Parameters for Fragmentation Process
 #
 
-# Filename of file to standardise - will be a txt.gz file
-VENDOR='chemspace-bb'
+# Vendor
+VENDOR='chemspace_bb'
 SOURCEID=3
 
 # Standardisation Parameters
@@ -13,18 +13,9 @@ SOURCEID=3
 # Module to standardise the data
 STANDARDISER='frag.standardise.scripts.chemspace_bb.standardise_chemspace_bb_pricing_compounds'
 
-# Folder that contains the input data to standardise
-STANDDATADIR='run/data/chemspace_bb'
-
 # Filename of file to standardise - will be a txt.gz file
 STANDINPUTFILE='chemspace_bb.txt'
 
-# Folder that contains the standardised data
-STANDOUTPUTDIR='run/standardised-chemspace_bb'
-
-# Filenames for standardised data tab separated files
-STANDOUTPUTZIP='standardised-compounds.tab.gz'
-STANDOUTPUTFILE='standardised-compounds.tab'
-
-# Chunksize for loading standardised data tab separated files
-STANDCHUNK=25000
+# Chunksize for standardizing/loading standardised data tab separated files
+STANDCHUNKSIZE=1500
+STANDCHUNK=1000000

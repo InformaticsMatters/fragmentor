@@ -4,7 +4,7 @@
 # Purpose: Environment Parameters for Fragmentation Process
 #
 
-# Filename of file to standardise - will be a txt.gz file
+# Vendor
 VENDOR='dsip'
 SOURCEID=6
 
@@ -13,18 +13,9 @@ SOURCEID=6
 # Module to standardise the data
 STANDARDISER='frag.standardise.scripts.dsip.standardise_xchem_compounds'
 
-# Folder that contains the input data to standardise
-STANDDATADIR='run/data/dsip'
-
 # Filename of file to standardise - will be a txt.gz file
 STANDINPUTFILE='dsip.txt'
 
-# Folder that contains the standardised data
-STANDOUTPUTDIR='run/standardised-dsip'
-
-# Filenames for standardised data tab separated files
-STANDOUTPUTZIP='standardised-compounds.tab.gz'
-STANDOUTPUTFILE='standardised-compounds.tab'
-
-# Chunksize for loading standardised data tab separated files
-STANDCHUNK=25000
+# Chunksize for standardizing/loading standardised data tab separated files
+STANDCHUNKSIZE=250
+STANDCHUNK=1000000

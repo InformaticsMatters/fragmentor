@@ -22,7 +22,7 @@ psql \
     -X \
     -U postgres \
     -h $DBHOST \
-    -f p10_create_frag_database.sql \
+    -f sql/p10_create_frag_database.sql \
     --echo-all \
     --set AUTOCOMMIT=on \
     --set ON_ERROR_STOP=on \

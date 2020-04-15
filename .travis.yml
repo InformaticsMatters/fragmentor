@@ -1,12 +1,70 @@
 ---
-language: python
-python:
-- '3.8'
-install:
-- pip install -r build-requirements.txt
-- pip install -r requirements.txt
-script:
-- yamllint .
-- find . -type f -iname '*.yaml.j2' -exec yamllint {} \;
-- find . -type f -iname '*.yml.j2' -exec yamllint {} \;
-- ansible-lint
+
+# -----------------
+# Control variables (Travis Settings)
+# -----------------
+#
+# PUBLISH_IMAGES        Should be 'yes' to enable publishing to Docker Hub.
+#
+# If you set PUBLISH_IMAGES you must also set the following: -
+#
+# DOCKER_USERNAME       If PUBLISH_IMAGES is 'yes'
+# DOCKER_PASSWORD       If PUBLISH_IMAGES is 'yes'
+
+services:
+- docker
+
+stages:
+- name: test
+- name: publish latest
+  if: |
+    branch = master \
+    AND env(PUBLISH_IMAGES) = yes
+- name: publish tag
+  if: |
+    tag IS present \
+    AND env(PUBLISH_IMAGES) = yes
+- name: publish stable
+  if: |
+    tag IS present \
+    AND tag =~ ^([0-9]+\.){1,2}[0-9]+$ \
+    AND env(PUBLISH_IMAGES) = yes
+
+jobs:
+  include:
+
+  - stage: test
+    name: Static Analysis
+    language: python
+    python:
+    - '3.8'
+    script:
+    - pip install -r build-requirements.txt
+    - pip install -r requirements.txt
+    - yamllint .
+    - find . -type f -iname '*.yaml.j2' -exec yamllint {} \;
+    - find . -type f -iname '*.yml.j2' -exec yamllint {} \;
+    - ansible-lint
+
+  - stage: publish latest
+    name: Latest Image
+    script:
+    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    - docker build -t informaticsmatters/fragmentor:latest .
+    - docker push informaticsmatters/fragmentor:latest
+
+  - stage: publish tag
+    name: Tagged Image
+    script:
+    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    - docker build -t informaticsmatters/fragmentor:${TRAVIS_TAG} .
+    - docker push informaticsmatters/fragmentor:${TRAVIS_TAG}
+
+  - stage: publish stable
+    name: Stable Image
+    script:
+    # Pull the corresponding image tag and push it as 'stable'
+    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    - docker pull informaticsmatters/fragmentor:${TRAVIS_TAG}
+    - docker tag informaticsmatters/fragmentor:${TRAVIS_TAG} informaticsmatters/fragmentor:stable
+    - docker push informaticsmatters/fragmentor:stable

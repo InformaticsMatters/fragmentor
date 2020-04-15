@@ -24,7 +24,6 @@ CREATE TABLE i_mols_dsip (
   isosmiles TEXT,
   nonisosmiles TEXT,
   hac SMALLINT,
-  rac SMALLINT,
   cmpd_id TEXT,
   isomol_id INTEGER,
   nonisomol_id INTEGER

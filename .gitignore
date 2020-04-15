@@ -7,8 +7,4 @@ data/chemspace-*
 tmp
 .nextflow*
 work
-nodes.csv
-edges.csv
-rejects.smi
-standardised-compounds.tab
-standardised-chunk*.tab
+/testrun/

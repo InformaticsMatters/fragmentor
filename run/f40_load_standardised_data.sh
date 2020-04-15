@@ -22,64 +22,78 @@ echo $DATABASE
 echo $VENDORPATH
 source $REPPATH/$VENDORPATH/vendorparam.sh
 echo $STANDCHUNK
+echo $SOURCEID
 
-echo $REPPATH/$STANDOUTPUTDIR/$STANDOUTPUTFILE
+echo $STANDPATH/standardise
 
 export PGPASSFILE=fragpass
 
-head -1 $REPPATH/$STANDOUTPUTDIR/$STANDOUTPUTFILE > standardheader
-tail -n +2 $REPPATH/$STANDOUTPUTDIR/$STANDOUTPUTFILE | split -d -l $STANDCHUNK - chunk_
+echo "Load Standardisation Results Starting"
+TSTART=$(date +"%T")
+echo "Current time : $TSTART"
+
+read lines filename <<< $(wc -l $STANDPATH/standardise/standardised-compounds.tab)
+echo "lines=$lines filename=$filename"
+
+head -1 $STANDPATH/standardise/standardised-compounds.tab > standardheader
+tail -n +2 $STANDPATH/standardise/standardised-compounds.tab | split -d -l $STANDCHUNK - chunk_
 
 for f in chunk*; do
-  cat standardheader > $REPPATH/$STANDOUTPUTDIR/standardised$f.tab
-  cat $f >> $REPPATH/$STANDOUTPUTDIR/standardised$f.tab
+    cat standardheader > $STANDPATH/standardise/standardised$f.tab
+    cat $f >> $STANDPATH/standardise/standardised$f.tab
 
-  echo "Creating Standardisation tables"
+    echo "Processing Filename $f"
 
-  psql \
-      -X \
-      -U postgres \
-      -h $DBHOST \
-      -f $REPPATH/$VENDORPATH/f40_create_stand_database.sql \
-      --echo-all \
-      --set AUTOCOMMIT=on \
-      --set ON_ERROR_STOP=on \
-      $DATABASE
+    echo "Creating Standardisation tables"
 
-  if [ $? -ne 0 ]; then
-      echo "Create Standardisation tables failed, fault:" 1>&2
-      exit $?
-  fi
+    psql \
+        -X \
+        -U postgres \
+        -h $DBHOST \
+        -f $REPPATH/$VENDORPATH/f40_create_stand_database.sql \
+        --echo-all \
+        --set AUTOCOMMIT=on \
+        --set ON_ERROR_STOP=on \
+        $DATABASE
 
-  echo "Load Standardised Results Starting ..."
+    if [ $? -ne 0 ]; then
+        echo "Create Standardisation tables failed, fault:" 1>&2
+        exit $?
+    fi
 
-  #\COPY i_mols(osmiles, isosmiles, nonisosmiles, hac, cmpd_id) FROM '/data/xchem/standardised/standardised-compounds.tab' CSV DELIMITER E'\t' HEADER;
-  source $REPPATH/$VENDORPATH/f40_copy_standardised_data.sh
+    echo "Load Standardised Results Starting ..."
 
-  if [ $? -ne 0 ]; then
-      echo "Copy Standardised File failed, fault:" 1>&2
-      exit $?
-  fi
+    #\COPY i_mols(osmiles, isosmiles, nonisosmiles, hac, cmpd_id) FROM '/data/xchem/standardised/standardised-compounds.tab' CSV DELIMITER E'\t' HEADER;
+    source $REPPATH/$VENDORPATH/f40_copy_standardised_data.sh
 
-  psql \
-      -X \
-      -U postgres \
-      -h $DBHOST \
-      -f $REPPATH/$VENDORPATH/f40_load_standardised_data.sql \
-      --echo-all \
-      --set AUTOCOMMIT=off \
-      --set ON_ERROR_STOP=on \
-      $DATABASE
+    if [ $? -ne 0 ]; then
+        echo "Copy Standardised File failed, fault:" 1>&2
+        exit $?
+    fi
 
-  if [ $? -ne 0 ]; then
-      echo "Load Standardised File failed, fault:" 1>&2
-      exit $?
-  fi
+    psql \
+        -X \
+        -U postgres \
+        -h $DBHOST \
+        -v SOURCEID=$SOURCEID \
+        -f $REPPATH/$VENDORPATH/f40_load_standardised_data.sql \
+        --echo-all \
+        --set AUTOCOMMIT=off \
+        --set ON_ERROR_STOP=on \
+        $DATABASE
+
+    if [ $? -ne 0 ]; then
+        echo "Load Standardised File failed, fault:" 1>&2
+        exit $?
+    fi
 
 done
 
 rm standardheader
 rm chunk*
+rm $STANDPATH/standardise/standardisedchunk*
 
 echo "Load Standardised Results Successful"
+TEND=$(date +"%T")
+echo "Current time : $TEND"
 exit 0

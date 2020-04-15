@@ -14,20 +14,21 @@ set -e
 set -u
 
 source fragparam.sh
-echo $FRAGMENTOR
-echo $REPPATH/$FRAGBASEDIR/$FRAGSMIFILE
-echo $REPPATH/$FRAGBASEDIR
+echo $FRAGDATA/fragment/$FRAGSMIFILE
+echo $FRAGPATH
 echo $FRAGCHUNKSIZE
 
 export PGPASSFILE=fragpass
 echo $REPPATH
 
 echo "Fragmentation Starting ..."
+TSTART=$(date +"%T")
+echo "Current time : $TSTART"
 
-#time python -m $FRAGMENTOR --input $REPPATH/$FRAGBASEDIR/$FRAGSMIFILE --base_dir $REPPATH/$FRAGBASEDIR
+
 #time python -m frag.network.scripts.build_db_from_smiles --input /data/xchem/nonisomol.smi --base_dir /data/xchem/
-time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/fragmentation.nf -with-docker --input $REPPATH/$FRAGBASEDIR/$FRAGSMIFILE --out_dir $REPPATH/$FRAGBASEDIR --chunk_size $FRAGCHUNKSIZE $@
-
+time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/fragmentation.nf -with-report $FRAGPATH/fragment/frag_report.html -with-tower\
+    --input $FRAGDATA/fragment/$FRAGSMIFILE --out_dir $FRAGPATH/fragment --tmp_dir $FRAGPATH/fragment --chunk_size $FRAGCHUNKSIZE --max_hac $FRAGHAC --max_frag $FRAGMAXFRAGS $@
 
 
 if [ $? -ne 0 ]; then
@@ -36,6 +37,9 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Fragmentation Successful"
+TEND=$(date +"%T")
+echo "Current time : $TEND"
+
 exit 0
 
 
