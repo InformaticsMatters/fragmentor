@@ -5,8 +5,6 @@
 #
 # Less common variables can be found in vars/main.yaml
 
-standinputfile: SetMe
-standchunksize: 10
 
 reppath: "{{ role_path }}/../../.."
 

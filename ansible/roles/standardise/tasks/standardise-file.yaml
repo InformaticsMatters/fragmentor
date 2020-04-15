@@ -5,7 +5,7 @@
     that:
     - standchunksize|int > 0
 
-- name: Check fragpass
+- name: Check inputfile present
   stat:
     path: "{{ datapath }}/data/{{ vendor }}/{{ standinputfile }}"
   register: standinputfile_result
@@ -18,12 +18,12 @@
 - name: Set nextflow command
   set_fact:
     nextflow_cmd: >-
-      nextflow run -C {{ reppath }}/nextflow/nextflow.config
+      nextflow run -c {{ reppath }}/nextflow/nextflow.config
       {{ reppath }}/nextflow/standardizer.nf
       -with-report {{ standpath }}/standardise/standardise_report.html
       -with-tower
       --script {{ standardiser }}
-      --inputs "{{ datapath }}/data/{{ vendor }}/{{ standinputfile }}"
+      --inputs {{ datapath }}/data/{{ vendor }}/{{ standinputfile }}
       --out_dir {{ standpath }}/standardise
       --chunk_size {{ standchunksize }}
 
