@@ -561,5 +561,7 @@ insert into source (id, name, version, currency)
 values (6, 'dsip', '1','');
 insert into source (id, name, version, currency)
 values (7, 'molport', '2020-03','USD');
+insert into source (id, name, version, currency)
+values (8, 'enamine', '2019-06','');
 
 select * from source;

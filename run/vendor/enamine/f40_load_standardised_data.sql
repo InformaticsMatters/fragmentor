@@ -1,6 +1,6 @@
 /*
  * Load Standardised Data SQL Statements: 
- * Purpose: Loads standardised data into ISO database
+ * Purpose: Loads standardised data into frag database
  *
  * Called from p40_load_standardised_data.sh
  */
@@ -14,7 +14,7 @@ begin;
 SELECT clock_timestamp();
 
 INSERT INTO nonisomol (smiles, hac, rac, source_id)
-  SELECT nonisosmiles, hac, rac, :SOURCEID from i_mols_dsip
+  SELECT nonisosmiles, hac, rac, :SOURCEID from i_mols_enamine
   ON CONFLICT ON CONSTRAINT nonisomol_smiles_key DO NOTHING;
 commit;
 

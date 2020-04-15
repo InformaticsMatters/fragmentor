@@ -11,7 +11,7 @@
 #    molport
 #    enamine
 #
-VENDORPATH='run/vendor/dsip'
+VENDORPATH='run/vendor/enamine'
 
 # Database Parameters - Modify to correct values
 
@@ -42,7 +42,7 @@ export FRAGPATH='../testrun'
 FRAGSMIFILE='nonisomol.smi'
 
 # Chunk size for fragmentation processing
-FRAGCHUNKSIZE=200
+FRAGCHUNKSIZE=500
 # FRAGCHUNKSIZE=500000
 # Maximum heavy atom count for extraction/fragmentation processing
 FRAGHAC=36

@@ -6,12 +6,12 @@
 
 # Vendor
 VENDOR='enamine'
-SOURCEID=???
+SOURCEID=8
 
 # Standardisation Parameters
 
 # Module to standardise the data
-STANDARDISER='frag.standardise.scripts.dsip.standardise_xchem_compounds'
+STANDARDISER='frag.standardise.scripts.enamine.standardise_enamine_compounds'
 
 # Filename of file to standardise - will be a txt.gz file
 STANDINPUTFILE='enamine.txt'
