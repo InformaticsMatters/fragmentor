@@ -1,0 +1,7 @@
+---
+
+- name: Get raw data
+  copy:
+    src: "{{ item }}"
+    dest: "{{ datapath }}/data/{{ vendor }}/"
+  with_fileglob: "{{ role_path }}/../../../data/{{ vendor }}/*.txt"

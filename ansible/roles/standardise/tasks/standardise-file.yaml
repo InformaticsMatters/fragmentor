@@ -1,9 +1,19 @@
 ---
 
-- name: Varibale sanity-check
+- name: Variable sanity-check
   assert:
     that:
     - standchunksize|int > 0
+
+- name: Check fragpass
+  stat:
+    path: "{{ datapath }}/data/{{ vendor }}/{{ standinputfile }}"
+  register: standinputfile_result
+
+- name: Assert standinputfile
+  assert:
+    that:
+    - standinputfile_result.stat.exists
 
 - name: Set nextflow command
   set_fact:

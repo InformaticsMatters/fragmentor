@@ -5,4 +5,5 @@
     file: "{{ vendor }}-variables.yaml"
 
 - import_tasks: initialise-frag-process.yaml
+- import_tasks: get-raw-data.yaml
 - import_tasks: standardise-file.yaml

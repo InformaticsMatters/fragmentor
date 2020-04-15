@@ -8,9 +8,9 @@
 standinputfile: SetMe
 standchunksize: 10
 
+reppath: "{{ role_path }}/../../.."
+
 datapath: SetMe
-reppath: SetMe
-vendorpath: SetMe
 standpath: SetMe
 fragpath: SetMe
 

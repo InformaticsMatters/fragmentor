@@ -1,9 +1,12 @@
 ---
 
-- name: Check vendorpath
+- debug:
+    msg: "{{ reppath }}/run/vendor/{{ vendor }}"
+
+- name: Check vendor path
   stat:
-    path: "{{ reppath }}/{{ vendorpath }}"
-  register: vendorpath_result
+    path: "{{ reppath }}/run/vendor/{{ vendor }}"
+  register: vendor_path_result
 
 - name: Check run
   stat:
@@ -13,14 +16,15 @@
 - name: Assert expected directories
   assert:
     that:
-    - vendorpath_result.stat.isdir is defined
-    - vendorpath_result.stat.isdir
+    - vendor_path_result.stat.isdir is defined
+    - vendor_path_result.stat.isdir
     - run_result.stat.isdir is defined
     - run_result.stat.isdir
 
 - name: Create directories
   file:
     path: "{{ item }}"
+    state: directory
   loop:
   - "{{ datapath }}/data/{{ vendor }}"
   - "{{ fragpath }}/fragment"
