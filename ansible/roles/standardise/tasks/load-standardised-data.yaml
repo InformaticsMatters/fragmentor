@@ -5,12 +5,12 @@
 # for each file created to load into the database
 
 - name: Extract standard header
-  command: head -1 standardised-compounds.tab > standardheader
+  shell: head -1 standardised-compounds.tab > standardheader
   args:
     chdir: "{{ standpath }}/standardise"
 
 - name: Split standard file
-  command: >-
+  shell: >-
     tail -n +2 standardised-compounds.tab
     | split -d -l {{ standchunk }} - chunk_
   args:
