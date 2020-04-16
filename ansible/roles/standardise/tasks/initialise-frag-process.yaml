@@ -44,3 +44,24 @@
   file:
     path: "{{ reppath }}/run/fragpass"
     mode: "0600"
+
+- name: Insert run parameters
+  postgresql_query:
+    query: >-
+      insert into source (name, version, currency)
+      values ('{{ vendor }}', '{{ version }}','');
+    autocommit: yes
+
+- name: Retrieve source_id
+  postgresql_query:
+    query: select max(id) from source where name = '{{ vendor }}';
+    autocommit: yes
+  register: query_result
+
+- name: Set source_id
+  set_fact:
+    source_id: {{ query_result.query_result.max }}
+
+- name: Display source_id
+  debug:
+    vare: source_id

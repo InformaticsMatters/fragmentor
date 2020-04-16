@@ -4,4 +4,5 @@ standardiser: frag.standardise.scripts.dsip.standardise_xchem_compounds
 standchunksize: 250
 standinputfile: dsip.txt
 
-standardise_copy_cmd: i_mols_dsip(osmiles, isosmiles, nonisosmiles, hac, cmpd_id)
+standardise_copy_table: i_mols_dsip
+standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id

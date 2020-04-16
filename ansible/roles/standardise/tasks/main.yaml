@@ -1,10 +1,42 @@
 ---
 
+# Check that a version has been defined.
+# the most convenient way of doing this is via the command-line: -
+#
+#   ansible-playbook site-standardise \
+#     -e vendor=dsip
+#     -e version=123
+
+- name: Assert user-variable definitions
+  assert:
+    that:
+    - version|string|length > 0
+    - version|string != 'SetMe'
+    - vendor|string|length > 0
+    - vendor|string != 'SetMe'
+    fail_msg: You must provide a 'vendor' and a 'version'
+
 - name: Include vendor-specific varaibles
   include_vars:
     file: "{{ vendor }}-variables.yaml"
 
-- import_tasks: initialise-frag-process.yaml
-- import_tasks: get-raw-data.yaml
-- import_tasks: standardise-file.yaml
-- import_tasks: load-standardised-data.yaml
+- block:
+
+  - import_tasks: initialise-frag-process.yaml
+  - import_tasks: get-raw-data.yaml
+  - import_tasks: standardise-file.yaml
+  - import_tasks: load-standardised-data.yaml
+
+  module_defaults:
+    postgresql_query:
+      login_host: "{{ database[deployment].login_host }}"
+      port: "{{ database[deployment].port }}"
+      db: "{{ database[deployment].db }}"
+      login_user: "{{ database[deployment].login_user }}"
+      login_password: "{{ database[deployment].login_password }}"
+    postgresql_copy:
+      login_host: "{{ database[deployment].login_host }}"
+      port: "{{ database[deployment].port }}"
+      db: "{{ database[deployment].db }}"
+      login_user: "{{ database[deployment].login_user }}"
+      login_password: "{{ database[deployment].login_password }}"

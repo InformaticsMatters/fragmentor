@@ -1,0 +1,10 @@
+---
+
+- name: Create frag databsse
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/p10_create_frag_database.sql"
+    autocommit: yes
+  register: result
+
+- debug:
+    var: result

@@ -4,57 +4,34 @@
   debug:
     var: item
 
-#- name: Creating Standardisation tables
-#  postgresql_query:
-#    login_host: "{{ database[deployment].login_host }}"
-#    port: "{{ database[deployment].port }}"
-#    db: "{{ database[deployment].db }}"
-#    login_user: "{{ database[deployment].login_user }}"
-#    login_password: "{{ database[deployment].login_password }}"
-#    path_to_script: "{{ role_path }}/files/f40_create_stand_database.sql"
-#    autocommit: yes
-#  register: result
-#
-#- name: Display result
-#  debug:
-#    var: result
-#
-#- name: Extract standard header
-#  command: cat standardheader > standardised.tab
-#  args:
-#    chdir: "{{ standpath }}/standardise"
-#
-#- name: Extract standard header
-#  command: cat {{ item }} >> standardised.tab
-#  args:
-#    chdir: "{{ standpath }}/standardise"
-#
-## ???
-## psql \
-##     -c "\COPY i_mols_dsip(osmiles, isosmiles, nonisosmiles, hac, cmpd_id) FROM '$STANDPATH/standardise/standardised$f.tab' CSV DELIMITER E'\t' HEADER;" \
-#
-#- name: Copy chunk
-#  postgresql_copy:
-#    login_host: "{{ database[deployment].login_host }}"
-#    port: "{{ database[deployment].port }}"
-#    db: "{{ database[deployment].db }}"
-#    login_user: "{{ database[deployment].login_user }}"
-#    login_password: "{{ database[deployment].login_password }}"
-#    copy_from: "{{ standpath }}/standardise/standardised.tab"
-#    dst:
-#    options:
-#      delimiter: '\t'
-#    autocommit: yes
-#
-#- name: Load chunk
-#  postgresql_query:
-#    login_host: "{{ database[deployment].login_host }}"
-#    port: "{{ database[deployment].port }}"
-#    db: "{{ database[deployment].db }}"
-#    login_user: "{{ database[deployment].login_user }}"
-#    login_password: "{{ database[deployment].login_password }}"
-#    path_to_script: "{{ role_path }}/files/f40_load_standardised_data.sql"
-#    named_args:
-#      SOURCEID: "{{ source_id }}"
-#    autocommit: no
-#  register: result
+- name: Extract standard header
+  shell: cat standardheader > standardised.tab
+  args:
+    chdir: "{{ standpath }}/standardise"
+
+- name: Extract standard header
+  shell: cat {{ item }} >> standardised.tab
+  args:
+    chdir: "{{ standpath }}/standardise"
+
+- name: Creating Standardisation tables
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f40_create_stand_database.sql"
+    autocommit: yes
+
+- name: Copy chunk
+  postgresql_copy:
+    copy_from: "{{ standpath }}/standardise/standardised.tab"
+    dst: "{{ standardise_copy_table }}"
+    columns: "{{ standardise_copy_columns }}"
+    options:
+      delimiter: '\t'
+      header: yes
+    autocommit: yes
+
+- name: Load chunk
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f40_load_standardised_data.sql"
+    named_args:
+      SOURCEID: "{{ source_id }}"
+    autocommit: no

@@ -14,4 +14,6 @@ fragpath: SetMe
 
 # The following is used (amongst other things)
 # to load vendor-specific variables...
-vendor: dsip
+vendor: SetMe
+# The user is required tp specify the version on the command-line
+version: SetMe
