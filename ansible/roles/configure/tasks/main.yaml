@@ -4,9 +4,9 @@
   set_fact:
     run_path: ../run
 
-- name: Initialise
-  command: ./{{ item }}.sh
-  args:
-    chdir: "{{ run_path }}"
-  loop:
-  - f10_initialise_frag_process
+#- name: Initialise
+#  command: ./{{ item }}.sh
+#  args:
+#    chdir: "{{ run_path }}"
+#  loop:
+#  - f10_initialise_frag_process

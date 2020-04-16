@@ -12,3 +12,17 @@ deployment: development
 # Tye tag of the fragmentation container,
 # used for a number of jobs.
 nextflow_container_tag: molport-04
+
+database:
+  development:
+    hostname: localhost
+    port: 5432
+    databsse: mydatabase
+    username: postgres
+    password: 1234
+  production:
+    hostname: localhost
+    port: 5432
+    databsse: fairmolecules
+    username: postgres
+    password: hello
