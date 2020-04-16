@@ -17,14 +17,14 @@ nextflow_container_tag: molport-04
 # A map of variables based on deployment target.
 database:
   development:
-    hostname: localhost
+    login_host: localhost
     port: 5432
-    databsse: mydatabase
-    username: postgres
-    password: 1234
+    db: mydatabase
+    login_user: postgres
+    login_password: 1234
   production:
-    hostname: localhost
+    login_host: localhost
     port: 5432
-    databsse: fairmolecules
-    username: postgres
-    password: hello
+    db: fairmolecules
+    login_user: postgres
+    login_password: hello
