@@ -1,5 +1,13 @@
 ---
 
+# Provide some protection against accidental execution...
+
+- pause:
+    prompt: |-
+      Are you sure you want to configure the database?
+      This is destructive and cannot be undone.
+      Hit RETURN to continue or, to abort, press ctrl+c and then a.
+
 - block:
 
   - import_tasks: create-database.yaml
