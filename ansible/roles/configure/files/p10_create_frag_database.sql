@@ -547,21 +547,21 @@ alter table mol_source set (autovacuum_vacuum_cost_limit = 2000);
 -- Note that these values are fixed as they relate to the vendor parameter numbers.
 --
 
-insert into source (id, name, version, currency)
-values (1, 'chembl', '25','');
-insert into source (id, name, version, currency)
-values (2, 'chemspace-bb', '2019-07','');
-insert into source (id, name, version, currency)
-values (3, 'chemspace-bb', '2019-12','USD');
-insert into source (id, name, version, currency)
-values (4, 'molport', '2019-12','USD');
-insert into source (id, name, version, currency)
-values (5, 'molport', '2020-02','USD');
-insert into source (id, name, version, currency)
-values (6, 'dsip', '1','');
-insert into source (id, name, version, currency)
-values (7, 'molport', '2020-03','USD');
-insert into source (id, name, version, currency)
-values (8, 'enamine', '2019-06','');
+insert into source (name, version, currency)
+values ('chembl', '25','');
+insert into source (name, version, currency)
+values ('chemspace-bb', '2019-07','');
+insert into source (name, version, currency)
+values ('chemspace-bb', '2019-12','USD');
+insert into source (name, version, currency)
+values ('molport', '2019-12','USD');
+insert into source (name, version, currency)
+values ('molport', '2020-02','USD');
+insert into source (name, version, currency)
+values ('dsip', '1','');
+insert into source (name, version, currency)
+values ('molport', '2020-03','USD');
+insert into source (name, version, currency)
+values ('enamine', '2019-06','');
 
 select * from source;

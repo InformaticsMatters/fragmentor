@@ -7,5 +7,37 @@
     db: "{{ database[deployment].db }}"
     login_user: "{{ database[deployment].login_user }}"
     login_password: "{{ database[deployment].login_password }}"
-    path_to_script: p10_create_frag_database.sql
+    path_to_script: "{{ role_path }}/files/p10_create_frag_database.sql"
     autocommit: yes
+  register: result
+
+- debug:
+    var: result
+
+- name: Insert run parameters
+  postgresql_query:
+    login_host: "{{ database[deployment].login_host }}"
+    port: "{{ database[deployment].port }}"
+    db: "{{ database[deployment].db }}"
+    login_user: "{{ database[deployment].login_user }}"
+    login_password: "{{ database[deployment].login_password }}"
+    query: insert into source (name, version, currency) values ('dsip', '2','');
+    autocommit: yes
+  register: result
+
+- debug:
+    var: result
+
+- name: Retrieve source_id
+  postgresql_query:
+    login_host: "{{ database[deployment].login_host }}"
+    port: "{{ database[deployment].port }}"
+    db: "{{ database[deployment].db }}"
+    login_user: "{{ database[deployment].login_user }}"
+    login_password: "{{ database[deployment].login_password }}"
+    query: select max(id) from source where name = 'dsip';
+    autocommit: yes
+  register: result
+
+- debug:
+    var: result
