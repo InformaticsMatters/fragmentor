@@ -1,3 +1,14 @@
 ---
 
 # Variables shared with all roles
+
+# The deployment type.
+# This is used to select material based on whether
+# we're launching plays for: -
+# - development
+# - production
+deployment: development
+
+# Tye tag of the fragmentation container,
+# used for a number of jobs.
+nextflow_container_tag: molport-04

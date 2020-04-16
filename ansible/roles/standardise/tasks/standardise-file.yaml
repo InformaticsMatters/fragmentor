@@ -15,6 +15,17 @@
     that:
     - standinputfile_result.stat.exists
 
+# Move the nextflow workflow and config into place (from templates)
+# so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
+
+- name: Translate nextflow files
+  template:
+    src: "{{ item }}"
+    dest: "{{ reppath }}/nextflow/{{ item|regex_replace(deployment + '/')|regex_replace('.j2') }}"
+  loop:
+  - "standardizer.nf.j2"
+  - "{{ deployment }}/nextflow.config.j2"
+
 - name: Set nextflow command
   set_fact:
     nextflow_cmd: >-
