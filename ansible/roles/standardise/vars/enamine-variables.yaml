@@ -1,0 +1,6 @@
+---
+
+standardiser: frag.standardise.scripts.molport.standardise_molport_compounds
+standchunksize: 1500
+standinputfile: molport.*.txt
+

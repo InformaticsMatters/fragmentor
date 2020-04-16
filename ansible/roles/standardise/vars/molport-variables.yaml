@@ -1,0 +1,6 @@
+---
+
+standardiser: frag.standardise.scripts.dsip.standardise_xchem_compounds
+standchunksize: 250
+standinputfile: dsip.txt
+
