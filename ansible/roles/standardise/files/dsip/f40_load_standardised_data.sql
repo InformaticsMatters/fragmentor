@@ -8,13 +8,12 @@
 /*
  * Load nonisomol except where already exists 
  */
-\timing
 
 begin;
 SELECT clock_timestamp();
 
 INSERT INTO nonisomol (smiles, hac, source_id)
-  SELECT nonisosmiles, hac, :SOURCEID from i_mols_dsip
+  SELECT nonisosmiles, hac, %(SOURCEID)s from i_mols_dsip
   ON CONFLICT ON CONSTRAINT nonisomol_smiles_key DO NOTHING;
 commit;
 
@@ -38,7 +37,7 @@ begin;
 SELECT clock_timestamp();
 
 INSERT INTO isomol (smiles, nonisomol_id, source_id)
-  SELECT isosmiles, nonisomol_id, :SOURCEID from i_mols_dsip
+  SELECT isosmiles, nonisomol_id, %(SOURCEID)s from i_mols_dsip
   WHERE isosmiles != nonisosmiles
   ON CONFLICT ON CONSTRAINT isomol_smiles_key DO NOTHING;
 commit;
@@ -63,5 +62,5 @@ begin;
 SELECT clock_timestamp();
 
 INSERT INTO mol_source (smiles, code, source_id, lead_time, nonisomol_id, isomol_id)
-  (SELECT osmiles, cmpd_id, :SOURCEID, 0, nonisomol_id, isomol_id FROM i_mols_dsip);
+  (SELECT osmiles, cmpd_id, %(SOURCEID)s, 0, nonisomol_id, isomol_id FROM i_mols_dsip);
 commit;

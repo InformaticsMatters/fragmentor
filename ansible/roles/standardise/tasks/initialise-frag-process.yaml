@@ -58,10 +58,13 @@
     autocommit: yes
   register: query_result
 
+- debug:
+    var: query_result
+
 - name: Set source_id
   set_fact:
-    source_id: {{ query_result.query_result.max }}
+    source_id: "{{ query_result.query_result[0].max }}"
 
 - name: Display source_id
   debug:
-    vare: source_id
+    var: source_id
