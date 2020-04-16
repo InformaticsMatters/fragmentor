@@ -1,0 +1,22 @@
+---
+
+# Splits the standard file into 'chunks'
+# and then call on the 'chunk' loader
+# for each file created to load into the database
+
+- name: Extract standard header
+  command: head -1 standardised-compounds.tab > standardheader
+  args:
+    chdir: "{{ standpath }}/standardise"
+
+- name: Split standard file
+  command: >-
+    tail -n +2 standardised-compounds.tab
+    | split -d -l {{ standchunk }} - chunk_
+  args:
+    chdir: "{{ standpath }}/standardise"
+
+- name: Load chunk
+  include_tasks: load-standardised-data-chunk.yaml
+  with_fileglob:
+  - "{{ standpath }}/standardise/chunk_*"
