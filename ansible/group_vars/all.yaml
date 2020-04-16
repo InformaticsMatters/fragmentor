@@ -9,10 +9,12 @@
 # - production
 deployment: development
 
-# Tye tag of the fragmentation container,
-# used for a number of jobs.
+# The tag of the fragmentation container,
+# used for a number of nextflow workflows.
 nextflow_container_tag: molport-04
 
+# Database credentials.
+# A map of variables based on deployment target.
 database:
   development:
     hostname: localhost
