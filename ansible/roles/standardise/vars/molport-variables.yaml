@@ -1,6 +1,8 @@
 ---
 
-standardiser: frag.standardise.scripts.dsip.standardise_xchem_compounds
-standchunksize: 250
-standinputfile: dsip.txt
+standardiser: frag.standardise.scripts.molport.standardise_molport_compounds
+standchunksize: 1500
+standinputfile: molport.01.txt
 
+standardise_copy_table: i_mols_molport
+standardise_copy_columns: osmiles, isosmiles, nonisosmiles, hac, cmpd_id, price_1, price_5, price_50, lead_time

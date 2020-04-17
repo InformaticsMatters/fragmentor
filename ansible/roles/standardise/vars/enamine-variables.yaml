@@ -1,6 +1,9 @@
 ---
 
-standardiser: frag.standardise.scripts.molport.standardise_molport_compounds
+standardiser: frag.standardise.scripts.enamine.standardise_enamine_compounds
 standchunksize: 1500
-standinputfile: molport.*.txt
+standinputfile: enamine.01.txt
+
+standardise_copy_table: i_mols_enamine
+standardise_copy_columns: osmiles, isosmiles, nonisosmiles, hac, cmpd_id
 

@@ -1,5 +1,5 @@
 /*
- * Create Fragmentation Database SQL Statements for Vendor DSIP
+ * Create Fragmentation Database SQL Statements for Vendor Enamine
  * Purpose: Creates fragmentation company specific tables
  *
  * Author | Date    | Version
@@ -12,16 +12,17 @@
  * Drop all tables if they exist (NB Order because of table key constrants) 
  */
 
-DROP TABLE IF EXISTS i_mols_dsip;
+DROP TABLE IF EXISTS i_mols_enamine;
 
 /*
  * Create i_mols        
  */
-CREATE TABLE i_mols_dsip (
+CREATE TABLE i_mols_enamine (
   osmiles TEXT,
   isosmiles TEXT,
   nonisosmiles TEXT,
   hac SMALLINT,
+  rac SMALLINT,
   cmpd_id TEXT,
   isomol_id INTEGER,
   nonisomol_id INTEGER

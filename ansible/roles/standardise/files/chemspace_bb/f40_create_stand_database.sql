@@ -1,5 +1,5 @@
 /*
- * Create Fragmentation Database SQL Statements for Vendor DSIP
+ * Create Fragmentation Database SQL Statements for Vendor CHEMSPACE
  * Purpose: Creates fragmentation company specific tables
  *
  * Author | Date    | Version
@@ -12,17 +12,18 @@
  * Drop all tables if they exist (NB Order because of table key constrants) 
  */
 
-DROP TABLE IF EXISTS i_mols_dsip;
+DROP TABLE IF EXISTS i_mols_chemspace;
 
 /*
- * Create i_mols        
+ * Create i_mols_chemspace - has price, but no rac (in comparison to dsip)
  */
-CREATE TABLE i_mols_dsip (
+CREATE TABLE i_mols_chemspace (
   osmiles TEXT,
   isosmiles TEXT,
   nonisosmiles TEXT,
   hac SMALLINT,
   cmpd_id TEXT,
+  price INTEGER,
   isomol_id INTEGER,
   nonisomol_id INTEGER
 );

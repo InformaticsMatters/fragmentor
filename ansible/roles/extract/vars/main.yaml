@@ -1,0 +1,10 @@
+---
+
+# Variables that a user might want to change
+# through the command-line or a parameter file.
+
+# Neo4j Extract Parameters
+
+# Nodes and Edges Neo4j Files loaded from database.
+neonodefile: neo4jnodes.csv
+neoedgefile: neo4jedges.csv

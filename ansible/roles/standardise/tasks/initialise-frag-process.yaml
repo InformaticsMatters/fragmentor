@@ -55,7 +55,7 @@
 - name: Retrieve source_id
   postgresql_query:
     query: select max(id) from source where name = '{{ vendor }}';
-    autocommit: yes
+    autocommit: no
   register: query_result
 
 - debug:

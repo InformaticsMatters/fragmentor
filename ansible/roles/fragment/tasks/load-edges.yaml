@@ -1,0 +1,64 @@
+---
+
+# Splits the nodes file into 'chunks'
+# and then call on the 'chunk' loader
+# for each file created to load into the database
+
+- name: Variable sanity-check
+  assert:
+    that:
+    - edgechunk|int > 0
+    - edgeindexthreshold > 0
+
+- name: Check inputfile present
+  stat:
+    path: "{{ fragpath }}/fragment/{{ fragedgefile }}"
+  register: fragedgefile_result
+
+- name: Assert fragedgefile
+  assert:
+    that:
+    - fragedgefile_result.stat.exists
+
+- name: Count edges
+  shell: wc -l < {{ fragpath }}/fragment/{{ fragedgefile }}
+  register: edgecount_result
+
+- name: Set edge_count
+  set_fact:
+    edge_count: "{{ edgecount_result.stdout }}"
+
+- name: Display number of edges
+  debug:
+    var: edge_count
+
+- name: Split edge file
+  shell: >-
+    cat {{ fragedgefile }} | split -d -l {{ edgechunk }} - edgechunk_
+  args:
+    chdir: "{{ fragpath }}/fragment"
+
+- name: Extract edges for loading
+  include_tasks: load-extract-edges-chunk.yaml
+  with_fileglob:
+  - "{{ fragpath }}/fragment/edgechunk_*"
+
+- name: Drop indexes for speed
+  postgresql_query:
+    query: DROP INDEX IF EXISTS ix_edge_parent_id
+    autocommit: yes
+  when: edge_count|int > edgeindexthreshold
+
+
+- name: Load edges into database
+  include_tasks: load-edges-chunk.yaml
+  with_fileglob:
+  - "{{ fragpath }}/fragment/edgechunk_*.new"
+
+# Node that this may be moved to a clearup job as I don't think the indexes are required for the neo4j extract - to be tested.
+
+- name: Recreate indexes
+  postgresql_query:
+    query: CREATE INDEX ix_edge_parent_id ON public.edge USING btree (parent_id)
+    autocommit: yes
+  when: edge_count|int > edgeindexthreshold

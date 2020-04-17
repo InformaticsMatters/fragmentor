@@ -1,0 +1,27 @@
+---
+
+- name: Display chunk
+  debug:
+    var: item
+
+- name: (Re) create i_node table
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f80_create_i_nodes.sql"
+    autocommit: yes
+
+- name: Copy chunk to i_node
+  command: >-
+    psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
+     --set AUTOCOMMIT=on --set ON_ERROR_STOP=on
+     -c "\COPY i_node(smiles, hac, rac, ring_smiles, child_count, edge_count)
+         FROM '{{ item }}' DELIMITER ',' CSV;"
+    {{ database[deployment].db }}
+  environment:
+    PGPASSWORD: "{{ database[deployment].login_password }}"
+
+- name: Load node data
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f80_load_frag_nodes.sql"
+    named_args:
+      SOURCEID: "{{ source_id|int }}"
+    autocommit: no
