@@ -20,6 +20,10 @@
     name: db
   register: db_result
 
+- name: Display DB container info
+  debug:
+    var: db_result
+
 - block:
 
   # If the database is not running...
@@ -94,7 +98,7 @@
 
   when:
   - result.State is defined
-  - result.State.Running is define
+  - result.State.Running is defined
   - not result.State.Running
 
 # 4.
