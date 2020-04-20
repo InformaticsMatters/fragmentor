@@ -105,6 +105,11 @@
   docker_container:
     name: db
     image: "{{ db_container_image }}:{{ db_container_tag }}"
+    command: >-
+      -c 'shared buffers=4GB'
+      -c 'work_mem=128MB'
+      -c 'autovacuum_max_workers=6'
+    shm_size: 5G
     state: started
     env:
       PGDATA: /var/lib/postgresql/data/pgdata
