@@ -29,11 +29,11 @@ database:
     login_user: postgres
     login_password: 1234
   production:
-    login_host: localhost
+    login_host: 192.168.253.65
     port: 5432
     db: fairmolecules
-    login_user: postgres
-    login_password: hello
+    login_user: fragmentor
+    login_password: bullfinch
 
 # Chunk size to control size of transactions in uploading standardised file data to database,
 standchunk: 1000000

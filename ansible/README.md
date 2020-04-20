@@ -11,6 +11,11 @@ to the servers. If this works you should be OK to run the playbooks...
 
     $ ansible -m ping all
 
+You could configure the production database server (a destructive action)
+with something like: -
+
+    $ ansible-playbook site-configure.yaml -e deployment=production
+    
 Then, run a playbook with something like: -
 
     $ ansible-playbook site-standardise.yaml
