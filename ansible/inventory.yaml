@@ -1,10 +1,12 @@
 ---
 
-# Provide details of one of the compute cluster nodes
-# to act as the 'master'. Ansible will use this to
-# deploy the nextflow files...
-head:
-  hosts:
-    localhost:
-      ansible_connection: local
-      ansible_python_interpreter: /usr/bin/env python
+# Provide details of the compute cluster nodes.
+# It consists of a head node and database severs.
+all:
+  children:
+    head:
+      hosts:
+        localhost:
+    dbservers:
+      fragger_production_database:
+        192.168.253.65:

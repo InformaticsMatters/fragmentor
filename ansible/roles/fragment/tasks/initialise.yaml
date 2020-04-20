@@ -17,13 +17,15 @@
   debug:
     var: source_id
 
-- name: Check fragment path
-  stat:
+# Optionally erase and then create the fragmentation directory...
+
+- name: Erase fragment path
+  file:
     path: "{{ fragpath }}/fragment"
-  register: fragment_path_result
+    state: absent
+  when: clean_start|bool
 
-- name: Remove any previous data.
-  shell: rm -f *
-  args:
-    chdir: "{{ fragpath }}/fragment"
-
+- name: Create fragment path
+  file:
+    path: "{{ fragpath }}/fragment"
+    state: directory

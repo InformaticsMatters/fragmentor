@@ -1,6 +1,5 @@
 ---
 
-- hosts: localhost
-  tasks:
-  - include_role:
-      name: fragment
+- hosts: head
+  roles:
+  - fragment

@@ -10,6 +10,7 @@
 
 - block:
 
+  - import_tasks: create-server.yaml
   - import_tasks: create-database.yaml
 
   module_defaults:

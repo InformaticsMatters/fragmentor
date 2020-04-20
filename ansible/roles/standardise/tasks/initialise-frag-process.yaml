@@ -21,6 +21,18 @@
     - run_result.stat.isdir is defined
     - run_result.stat.isdir
 
+# Optionally erase and then create the working directories...
+
+- name: Erase directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - "{{ datapath }}/data/{{ vendor }}"
+  - "{{ fragpath }}/fragment"
+  - "{{ standpath }}/standardise"
+  when: clean_start|bool
+
 - name: Create directories
   file:
     path: "{{ item }}"
