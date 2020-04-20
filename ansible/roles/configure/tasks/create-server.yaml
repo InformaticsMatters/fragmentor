@@ -8,10 +8,10 @@
 #
 # 2. Create the database service account
 # 3. format and mount the DB and WAL volumes
-# 4. run the container image (always)
+# 4. run the container image (always) and wait for its port
 #
-# Our expectation here is that docker is installed on the server
-# a responsibility of the docker role we should have already applies.
+# Our expectation here is that docker is installed on the server -
+# a responsibility of the docker role we should have already applied.
 
 # 1.
 
@@ -19,10 +19,6 @@
   docker_container_info:
     name: db
   register: db_result
-
-- name: Display DB container info
-  debug:
-    var: db_result
 
 - block:
 
@@ -124,7 +120,7 @@
     network_mode: host
   become_user: "{{ db_user_account }}"
 
-- name: Wait for DB port
+- name: Wait for database port
   wait_for:
     port: "{{ database[deployment].port }}"
     delay: 10
