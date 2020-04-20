@@ -4,6 +4,7 @@
   postgresql_query:
     path_to_script: "{{ role_path }}/files/p10_create_frag_database.sql"
     autocommit: yes
+  delegate_to: 127.0.0.1
   register: result
 
 - debug:

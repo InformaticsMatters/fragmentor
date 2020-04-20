@@ -1,14 +1,30 @@
 ---
 
-# In order to create the server we need to mount the DB and WAL volumes
-# and mounts create a user, and run the container image. Out expectation here
-# is that docker is installed on the server.
+# In order to create the server we need to: -
+#
+# 1. Create the database service account
+# 2. format and mount the DB and WAL volumes
+# 3. run the container image.
+#
+# Our expectation here is that docker is installed on the server
+# a responsibility of the docker role we should have already applies.
+
+# 1.
 
 - name: Create database user account
   user:
     name: "{{ db_user_account }}"
     groups: docker
     append: yes
+
+- name: Crete remote tmp (for Ansible)
+  file:
+    path: `"{{ ansible_env.HOME }}/.ansible/tmp"
+    mode: '0700'
+    owner: "{{ db_user_account }}"
+  become_user: "{{ db_user_account }}"
+
+# 2.
 
 - name: Unount DB volume
   mount:
@@ -54,6 +70,8 @@
     fstype: ext4
     state: present
 
+# 3.
+
 - name: Start database container
   docker_container:
     name: db
@@ -70,4 +88,4 @@
     - /pgwal:/var/lib/postgresql/wal
     exposed_ports:
     - "{{ database[deployment].port }}:5432"
-    become_user: "{{ db_user_account }}"
+  become_user: "{{ db_user_account }}"
