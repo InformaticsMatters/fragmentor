@@ -123,4 +123,3 @@
 - name: Wait for database port
   wait_for:
     port: "{{ database[deployment].port }}"
-    delay: 10
