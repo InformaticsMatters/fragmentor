@@ -123,3 +123,8 @@
     - "{{ database[deployment].port }}:5432"
     network_mode: host
   become_user: "{{ db_user_account }}"
+
+- name: Wait for DB port
+  wait_for:
+    port: "{{ database[deployment].port }}"
+    delay: 10
