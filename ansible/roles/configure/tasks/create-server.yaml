@@ -9,14 +9,12 @@
     path: /pgdata
     src: "{{ db_db_volume }}"
     state: absent
-  become: yes
 
 - name: Unmount WAL volume
   mount:
     path: /pgwal
     src: "{{ db_wal_volume }}"
     state: absent
-  become: yes
 
 - name: Create ext4 filesystems volumes
   filesystem:
@@ -31,21 +29,18 @@
     path: /pgdata
     src: "{{ db_db_volume }}"
     state: present
-  become: yes
 
 - name: Mount WAL volume
   mount:
     path: /pgwal
     src: "{{ db_wal_volume }}"
     state: present
-  become: yes
 
 - name: Create database user account
   user:
     name: "{{ db_user_account }}"
     groups: docker
     append: yes
-  become: yes
 
 - name: Start database container
   docker_container:
@@ -63,5 +58,4 @@
     - /pgwal:/var/lib/postgresql/wal
     exposed_ports:
     - "{{ database[deployment].port }}:5432"
-    become: yes
     become_user: "{{ db_user_account }}"

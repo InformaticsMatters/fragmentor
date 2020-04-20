@@ -7,4 +7,4 @@
   roles:
   - { role: geerlingguy.pip, become: yes }
   - { role: geerlingguy.docker, become: yes }
-  - { role: configure }
+  - { role: configure, become: yes }
