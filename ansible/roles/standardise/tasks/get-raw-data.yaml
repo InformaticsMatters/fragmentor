@@ -13,6 +13,10 @@
   assert:
     that: raw_result.s3_keys|length > 0
 
+- name: Display raw file count
+  debug:
+    msg: Found {{ raw_result.s3_keys|length }} raw files
+
 - name: Get raw data
   aws_s3:
     bucket: "{{ bucket }}"
