@@ -8,5 +8,5 @@ all:
       hosts:
         localhost:
     dbservers:
-      fragger_production_database:
+      hosts:
         192.168.253.65:
