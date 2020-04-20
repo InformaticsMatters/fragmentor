@@ -1,7 +1,16 @@
 ---
 
+- name: List raw data
+  aws_s3:
+    bucket: "{{ bucket }}"
+    mode: list
+    prefix: /raw/vendor/{{ vendor }}/{{ version }}/
+  register: raw_result
+
 - name: Get raw data
-  copy:
-    src: "{{ item }}"
+  aws_s3:
+    bucket: "{{ bucket }}"
+    mode: get
+    object: "{{ item }}"
     dest: "{{ datapath }}/data/{{ vendor }}/"
-  with_fileglob: "{{ role_path }}/../../../data/{{ vendor }}/*.txt"
+  with_items: raw_result.s3_keys

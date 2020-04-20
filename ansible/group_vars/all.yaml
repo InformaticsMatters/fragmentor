@@ -37,5 +37,6 @@ database:
     login_user: fragmentor
     login_password: bullfinch
 
-# Chunk size to control size of transactions in uploading standardised file data to database,
+# Chunk size to control size of transactions in
+# uploading standardised file data to database
 standchunk: 1000000

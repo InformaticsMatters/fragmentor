@@ -1,11 +1,24 @@
 ---
 
 # Check that a version has been defined.
-# the most convenient way of doing this is via the command-line: -
+# The most convenient way of doing this is via the command-line: -
 #
 #   ansible-playbook site-standardise \
 #     -e vendor=dsip
 #     -e version=123
+#     -e deployment=production
+#
+# Th euser is also expected to have defined the environment variables: -
+#
+# - AWS_ACCESS_KEY_ID
+# - AWS_SECRET_ACCESS_KEY
+
+- name: Assert AWS credentials
+  assert:
+    that:
+    - aws_access_key|string|length > 0
+    - aws_secret_key|string|length > 0
+    fail_msg: You must define 'AWS_ACCESS_KEY_ID' and 'AWS_SECRET_ACCESS_KEY'
 
 - name: Assert user-variable definitions
   assert:
