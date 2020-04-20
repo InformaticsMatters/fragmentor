@@ -39,4 +39,4 @@
     dest: "{{ datapath }}/data/{{ vendor }}/"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
-  with_items: raw_result.s3_keys
+  loop: "{{ raw_result.s3_keys[1:] }}"
