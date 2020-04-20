@@ -4,6 +4,12 @@
 # and mounts create a user, and run the container image. Out expectation here
 # is that docker is installed on the server.
 
+- name: Create database user account
+  user:
+    name: "{{ db_user_account }}"
+    groups: docker
+    append: yes
+
 - name: Unount DB volume
   mount:
     path: /pgdata
@@ -16,7 +22,17 @@
     src: "{{ db_wal_volume }}"
     state: absent
 
-- name: Create ext4 filesystems volumes
+- name: Ensure mount paths
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0744'
+    owner: "{{ db_user_account }}"
+  loop:
+  - /pgdata
+  - /pgwal
+
+- name: Create ext4 filesystem
   filesystem:
     fstype: ext4
     dev: "{{ item }}"
@@ -28,19 +44,15 @@
   mount:
     path: /pgdata
     src: "{{ db_db_volume }}"
+    fstype: ext4
     state: present
 
 - name: Mount WAL volume
   mount:
     path: /pgwal
     src: "{{ db_wal_volume }}"
+    fstype: ext4
     state: present
-
-- name: Create database user account
-  user:
-    name: "{{ db_user_account }}"
-    groups: docker
-    append: yes
 
 - name: Start database container
   docker_container:
