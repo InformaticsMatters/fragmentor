@@ -97,9 +97,10 @@
       state: present
 
   when:
-  - result.State is defined
-  - result.State.Running is defined
-  - not result.State.Running
+  - result.container is defined
+  - result.container.State is defined
+  - result.container.State.Running is defined
+  - not result.container.State.Running
 
 # 4.
 
