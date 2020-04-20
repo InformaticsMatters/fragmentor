@@ -1,5 +1,7 @@
 ---
 
+# Gets 'raw' data from an AWS S3 path
+
 - name: Set raw path
   set_fact:
     raw_path: raw/vendor/{{ bucket_raw_path }}/
