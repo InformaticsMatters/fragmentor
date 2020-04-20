@@ -47,7 +47,7 @@
 
   # 3.
 
-  - name: Unount DB volume
+  - name: Unmount DB volume
     mount:
       path: /pgdata
       src: "{{ db_db_volume }}"
