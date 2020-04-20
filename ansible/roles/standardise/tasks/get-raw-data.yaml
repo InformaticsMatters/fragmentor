@@ -6,14 +6,18 @@
 
 - name: Display raw path
   debug:
-    var: raw_path
+    msg: bucket={{ bucket }} raw_path={{ raw path }}
 
 - name: List raw data
   aws_s3:
     bucket: "{{ bucket }}"
     mode: list
-    prefix: /raw/vendor/{{ bucket_raw_path }}/
+    prefix: "{{ raw_path }}"
   register: raw_result
+
+- name: Display result
+  debug:
+    var: raw_result
 
 # There has to be at least one key in the result....
 
