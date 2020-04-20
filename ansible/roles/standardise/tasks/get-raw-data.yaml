@@ -21,22 +21,29 @@
   debug:
     var: raw_result
 
-# There has to be at least one key in the result....
+# There has to be at least two keys in the result...
+# The first key is always the directory the files are in,
+# e.g.: "s3_keys": [
+#           "raw/vendor/xchem/v1/",
+#           "raw/vendor/xchem/v1/dsip.txt.gz"
+#        ]
 
 - name: Check raw data
   assert:
-    that: raw_result.s3_keys|length > 0
+    that: raw_result.s3_keys|length > 1
 
 - name: Display raw file count
   debug:
-    msg: Found {{ raw_result.s3_keys|length }} raw files
+    msg: Found {{ raw_result.s3_keys|length - 1 }} raw files
+
+# Get the files, ignoring the first entry in the list (always a directory)...
 
 - name: Get raw data
   aws_s3:
     bucket: "{{ bucket }}"
     mode: get
     object: "{{ item }}"
-    dest: "{{ datapath }}/data/{{ vendor }}/"
+    dest: "{{ datapath }}/data/{{ vendor }}/{{ item|basename }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
   loop: "{{ raw_result.s3_keys[1:] }}"
