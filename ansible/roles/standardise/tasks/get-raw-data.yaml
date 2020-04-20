@@ -13,6 +13,8 @@
     bucket: "{{ bucket }}"
     mode: list
     prefix: "{{ raw_path }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
   register: raw_result
 
 - name: Display result
@@ -35,4 +37,6 @@
     mode: get
     object: "{{ item }}"
     dest: "{{ datapath }}/data/{{ vendor }}/"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
   with_items: raw_result.s3_keys
