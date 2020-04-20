@@ -4,8 +4,14 @@
   aws_s3:
     bucket: "{{ bucket }}"
     mode: list
-    prefix: /raw/vendor/{{ vendor }}/{{ version }}/
+    prefix: /raw/vendor/{{ bucket_raw_path }}/
   register: raw_result
+
+# There has to be at least one key in the result....
+
+- name: Check raw data
+  assert:
+    that: raw_result.s3_keys|length > 0
 
 - name: Get raw data
   aws_s3:

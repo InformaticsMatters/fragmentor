@@ -23,13 +23,11 @@ with something like: -
 
 You can run fragmentation plays from the head node with something like: -
 
-    $ ansible-playbook site-standardise.yaml
+    $ ansible-playbook site-standardise.yaml \
+        -e deployment=production \
+        -e vendor=dsip \
+        -e version=v1
     
-And pass variables in directly or via a file: -
-
-    $ ansible-playbook site-standardise.yaml -e x=42
-    $ ansible-playbook site-standardise.yaml -e @parameters
-
 ## Variable locations
 -   Role-specific variables that a user might change often in the corresponding
     `defaults/main.yaml`
