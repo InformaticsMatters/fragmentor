@@ -5,6 +5,6 @@
     pip_install_packages:
     - name: docker
   roles:
-  - geerlingguy.pip
-  - geerlingguy.docker
-  - configure
+  - { role: geerlingguy.pip, become: yes }
+  - { role: geerlingguy.docker, become: yes }
+  - { role: configure }

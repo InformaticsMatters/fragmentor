@@ -1,4 +1,61 @@
 ---
 
-# In order to create the server we need to create a user,
-# install docker and run the container image.
+# In order to create the server we need to mount the DB and WAL volumes
+# and mounts create a user, and run the container image. Out expectation here
+# is that docker is installed on the server.
+
+- name: Unount DB volume
+    path: /pgdata
+    src: "{{ db_db_volume }}"
+    state: absent
+  become: yes
+
+- name: Unmount WAL volume
+    path: /pgwal
+    src: "{{ db_wal_volume }}"
+    state: absent
+  become: yes
+
+- name: Create ext4 filesystems volumes
+  filesystem:
+    fstype: ext4
+    dev: "{{ item }}"
+  loop:
+  - /dev/vdb
+  - /dev/vdc
+
+- name: Mount DB volume
+    path: /pgdata
+    src: "{{ db_db_volume }}"
+    state: present
+  become: yes
+
+- name: Mount WAL volume
+    path: /pgwal
+    src: "{{ db_wal_volume }}"
+    state: present
+  become: yes
+
+- name: Create database user account
+  user:
+    name: "{{ db_user_account }}"
+    groups: docker
+    append: yes
+  become: yes
+
+- name: Start database container
+  docker_container:
+    name: db
+    image: "{{ db_container_image }}:{{ db_container_tag }}"
+    state: started
+    env:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: "{{ database[deployment].login_user }}"
+      POSTGRES_PASSWORD: "{{ database[deployment].login_password }}"
+      POSTGRES_DB: "{{ database[deployment].db }}"
+      POSTGRES_INITDB_WALDIR: /var/lib/postgresql/wal
+    volumes:
+    - /pgdata:/var/lib/postgresql/data
+    - /pgwal:/var/lib/postgresql/wal
+    exposed_ports:
+    - "{{ database[deployment].port }}:5432"

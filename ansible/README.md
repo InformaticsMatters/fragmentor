@@ -4,7 +4,14 @@ Install requirements: -
     $ pip install -r ../requirements.txt
     $ ansible-galaxy install -r ../requirements.yaml
     
-Run with something like: -
+You will need to provide an OS_USERNAME (expected by host_vars)
+for the DB server configuration. You will also need to ensure that the
+user's ~/.ssh/id_rsa is set correctly so that Ansible can ssh
+to the servers. If this works you should be OK to run the playbooks...
+
+    $ ansible -m ping all
+
+Then, run a playbook with something like: -
 
     $ ansible-playbook site-standardise.yaml
     
