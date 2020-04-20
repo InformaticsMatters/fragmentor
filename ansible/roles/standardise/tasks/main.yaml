@@ -37,10 +37,10 @@
 
 - block:
 
-  - import_tasks: initialise-frag-process.yaml
+#  - import_tasks: initialise-frag-process.yaml
   - import_tasks: get-raw-data.yaml
-  - import_tasks: standardise-file.yaml
-  - import_tasks: load-standardised-data.yaml
+#  - import_tasks: standardise-file.yaml
+#  - import_tasks: load-standardised-data.yaml
 
   module_defaults:
     postgresql_query:
