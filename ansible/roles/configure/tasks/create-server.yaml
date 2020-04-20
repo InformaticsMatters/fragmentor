@@ -8,7 +8,7 @@
 #
 # 2. Create the database service account
 # 3. format and mount the DB and WAL volumes
-# 4. run the container image.
+# 4. run the container image (always)
 #
 # Our expectation here is that docker is installed on the server
 # a responsibility of the docker role we should have already applies.
@@ -91,26 +91,28 @@
       fstype: ext4
       state: present
 
-  # 4.
-
-  - name: Start database container
-    docker_container:
-      name: db
-      image: "{{ db_container_image }}:{{ db_container_tag }}"
-      state: started
-      env:
-        PGDATA: /var/lib/postgresql/data/pgdata
-        POSTGRES_USER: "{{ database[deployment].login_user }}"
-        POSTGRES_PASSWORD: "{{ database[deployment].login_password }}"
-        POSTGRES_DB: "{{ database[deployment].db }}"
-        POSTGRES_INITDB_WALDIR: /var/lib/postgresql/wal
-      volumes:
-      - /pgdata:/var/lib/postgresql/data
-      - /pgwal:/var/lib/postgresql/wal
-      exposed_ports:
-      - "{{ database[deployment].port }}:5432"
-    become_user: "{{ db_user_account }}"
 
   when:
   - result.exists is defined
   - not result.exists
+
+# 4.
+
+- name: Start database container (always)
+  docker_container:
+    name: db
+    image: "{{ db_container_image }}:{{ db_container_tag }}"
+    state: started
+    env:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: "{{ database[deployment].login_user }}"
+      POSTGRES_PASSWORD: "{{ database[deployment].login_password }}"
+      POSTGRES_DB: "{{ database[deployment].db }}"
+      POSTGRES_INITDB_WALDIR: /var/lib/postgresql/wal
+    volumes:
+    - /pgdata:/var/lib/postgresql/data
+    - /pgwal:/var/lib/postgresql/wal
+    exposed_ports:
+    - "{{ database[deployment].port }}:5432"
+    network_mode: host
+  become_user: "{{ db_user_account }}"
