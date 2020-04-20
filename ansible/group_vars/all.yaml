@@ -7,7 +7,9 @@
 # we're launching plays for: -
 # - development
 # - production
-deployment: development
+#
+# The deployment value should be an entry in the database map (see below)
+deployment: SetMe
 
 # Erase any files/content generated in a prior run?
 # If set to yes this tends to remove temporary data directories,

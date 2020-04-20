@@ -10,11 +10,13 @@
 - name: Assert user-variable definitions
   assert:
     that:
+    - deployment|string|length > 0
+    - deployment|string != 'SetMe'
     - version|string|length > 0
     - version|string != 'SetMe'
     - vendor|string|length > 0
     - vendor|string != 'SetMe'
-    fail_msg: You must provide a 'vendor' and a 'version' to extract.
+    fail_msg: You must provide a 'deployment', 'vendor' and a 'version' to extract.
 
 - block:
 
