@@ -527,6 +527,22 @@ create view v_edge as
 INNER JOIN nonisomol p ON e.parent_id = p.id
 INNER JOIN nonisomol c ON e.child_id = c.id;
 
+create view v_edge_node as
+    SELECT e.id, e.parent_id, e.child_id,
+           p.smiles as parent_smiles,
+           c.smiles as child_smiles,
+           p.hac as hac,
+           p.rac as rac,
+           p.ring_smiles as ring_smiles,
+           c.hac as child_hac,
+           c.rac as child_rac,
+           c.ring_smiles as child_ring_smiles,
+           c.child_count as child_child_count,
+           e.label
+      FROM edge e
+INNER JOIN nonisomol p ON e.parent_id = p.id
+INNER JOIN nonisomol c ON e.child_id = c.id;
+
 
 --
 -- Tuning Parameters
