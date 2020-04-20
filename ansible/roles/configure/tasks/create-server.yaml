@@ -5,12 +5,14 @@
 # is that docker is installed on the server.
 
 - name: Unount DB volume
+  mount:
     path: /pgdata
     src: "{{ db_db_volume }}"
     state: absent
   become: yes
 
 - name: Unmount WAL volume
+  mount:
     path: /pgwal
     src: "{{ db_wal_volume }}"
     state: absent
@@ -25,12 +27,14 @@
   - /dev/vdc
 
 - name: Mount DB volume
+  mount:
     path: /pgdata
     src: "{{ db_db_volume }}"
     state: present
   become: yes
 
 - name: Mount WAL volume
+  mount:
     path: /pgwal
     src: "{{ db_wal_volume }}"
     state: present
@@ -59,3 +63,5 @@
     - /pgwal:/var/lib/postgresql/wal
     exposed_ports:
     - "{{ database[deployment].port }}:5432"
+    become: yes
+    become_user: "{{ db_user_account }}"
