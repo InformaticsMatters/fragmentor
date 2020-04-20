@@ -19,7 +19,7 @@
 
 - name: Crete remote tmp (for Ansible)
   file:
-    path: `"{{ ansible_env.HOME }}/.ansible/tmp"
+    path: "{{ ansible_env.HOME }}/.ansible/tmp"
     mode: '0700'
     owner: "{{ db_user_account }}"
   become_user: "{{ db_user_account }}"

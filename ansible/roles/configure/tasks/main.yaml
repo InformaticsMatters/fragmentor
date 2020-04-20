@@ -8,9 +8,10 @@
       This is destructive and cannot be undone.
       Hit RETURN to continue or, to abort, press ctrl+c and then a.
 
+- import_tasks: create-server.yaml
+
 - block:
 
-  - import_tasks: create-server.yaml
   - import_tasks: create-database.yaml
 
   module_defaults:
