@@ -92,10 +92,10 @@
       fstype: ext4
       state: present
 
-
   when:
-  - result.exists is defined
-  - not result.exists
+  - result.State is defined
+  - result.State.Running is define
+  - not result.State.Running
 
 # 4.
 
