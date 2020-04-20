@@ -18,12 +18,12 @@ rules:
     - 'false'
   new-lines:
     type: unix
-  new-line-at-end-of-file: enable
+  new-line-at-end-of-file: disable
   key-duplicates: {}
   hyphens:
     max-spaces-after: 1
   empty-lines:
-    max: 1
+    max: 2
   document-start:
     present: yes
   document-end:

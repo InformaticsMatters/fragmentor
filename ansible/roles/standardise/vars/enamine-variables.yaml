@@ -5,5 +5,4 @@ standchunksize: 1500
 standinputfile: enamine.01.txt
 
 standardise_copy_table: i_mols_enamine
-standardise_copy_columns: osmiles, isosmiles, nonisosmiles, hac, cmpd_id
-
+standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id
