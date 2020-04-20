@@ -2,96 +2,115 @@
 
 # In order to create the server we need to: -
 #
-# 1. Create the database service account
-# 2. format and mount the DB and WAL volumes
-# 3. run the container image.
+# 1. Check running container
+#
+# Then, if the container is not running...
+#
+# 2. Create the database service account
+# 3. format and mount the DB and WAL volumes
+# 4. run the container image.
 #
 # Our expectation here is that docker is installed on the server
 # a responsibility of the docker role we should have already applies.
 
 # 1.
 
-- name: Create database user account
-  user:
-    name: "{{ db_user_account }}"
-    groups: docker
-    append: yes
-
-- name: Get database user's home directory
-  shell: >-
-    getent passwd "{{ db_user_account }}" | awk -F: '{ print $6 }'
-  changed_when: false
-  register: user_home
-
-- name: Crete database user tmp (for Ansible)
-  file:
-    path: "{{ user_home.stdout }}/.ansible/tmp"
-    mode: '0700'
-    owner: "{{ db_user_account }}"
-  become_user: "{{ db_user_account }}"
-
-# 2.
-
-- name: Unount DB volume
-  mount:
-    path: /pgdata
-    src: "{{ db_db_volume }}"
-    state: absent
-
-- name: Unmount WAL volume
-  mount:
-    path: /pgwal
-    src: "{{ db_wal_volume }}"
-    state: absent
-
-- name: Ensure mount paths
-  file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0744'
-    owner: "{{ db_user_account }}"
-  loop:
-  - /pgdata
-  - /pgwal
-
-- name: Create ext4 filesystem
-  filesystem:
-    fstype: ext4
-    dev: "{{ item }}"
-  loop:
-  - /dev/vdb
-  - /dev/vdc
-
-- name: Mount DB volume
-  mount:
-    path: /pgdata
-    src: "{{ db_db_volume }}"
-    fstype: ext4
-    state: present
-
-- name: Mount WAL volume
-  mount:
-    path: /pgwal
-    src: "{{ db_wal_volume }}"
-    fstype: ext4
-    state: present
-
-# 3.
-
-- name: Start database container
-  docker_container:
+- name: Check DB container
+  docker_container_info:
     name: db
-    image: "{{ db_container_image }}:{{ db_container_tag }}"
-    state: started
-    env:
-      PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_USER: "{{ database[deployment].login_user }}"
-      POSTGRES_PASSWORD: "{{ database[deployment].login_password }}"
-      POSTGRES_DB: "{{ database[deployment].db }}"
-      POSTGRES_INITDB_WALDIR: /var/lib/postgresql/wal
-    volumes:
-    - /pgdata:/var/lib/postgresql/data
-    - /pgwal:/var/lib/postgresql/wal
-    exposed_ports:
-    - "{{ database[deployment].port }}:5432"
-  become_user: "{{ db_user_account }}"
+  register: db_result
+
+- block:
+
+  # If the database is not running...
+
+  # 2.
+
+  - name: Create database user account
+    user:
+      name: "{{ db_user_account }}"
+      groups: docker
+      append: yes
+
+  - name: Get database user's home directory
+    shell: >-
+      getent passwd "{{ db_user_account }}" | awk -F: '{ print $6 }'
+    changed_when: false
+    register: user_home
+
+  - name: Crete database user tmp (for Ansible)
+    file:
+      path: "{{ user_home.stdout }}/.ansible/tmp"
+      mode: '0700'
+      owner: "{{ db_user_account }}"
+    become_user: "{{ db_user_account }}"
+
+  # 3.
+
+  - name: Unount DB volume
+    mount:
+      path: /pgdata
+      src: "{{ db_db_volume }}"
+      state: absent
+
+  - name: Unmount WAL volume
+    mount:
+      path: /pgwal
+      src: "{{ db_wal_volume }}"
+      state: absent
+
+  - name: Ensure mount paths
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: '0744'
+      owner: "{{ db_user_account }}"
+    loop:
+    - /pgdata
+    - /pgwal
+
+  - name: Create ext4 filesystem
+    filesystem:
+      fstype: ext4
+      dev: "{{ item }}"
+    loop:
+    - /dev/vdb
+    - /dev/vdc
+
+  - name: Mount DB volume
+    mount:
+      path: /pgdata
+      src: "{{ db_db_volume }}"
+      fstype: ext4
+      state: present
+
+  - name: Mount WAL volume
+    mount:
+      path: /pgwal
+      src: "{{ db_wal_volume }}"
+      fstype: ext4
+      state: present
+
+  # 4.
+
+  - name: Start database container
+    docker_container:
+      name: db
+      image: "{{ db_container_image }}:{{ db_container_tag }}"
+      state: started
+      env:
+        PGDATA: /var/lib/postgresql/data/pgdata
+        POSTGRES_USER: "{{ database[deployment].login_user }}"
+        POSTGRES_PASSWORD: "{{ database[deployment].login_password }}"
+        POSTGRES_DB: "{{ database[deployment].db }}"
+        POSTGRES_INITDB_WALDIR: /var/lib/postgresql/wal
+      volumes:
+      - /pgdata:/var/lib/postgresql/data
+      - /pgwal:/var/lib/postgresql/wal
+      exposed_ports:
+      - "{{ database[deployment].port }}:5432"
+    become_user: "{{ db_user_account }}"
+
+  when:
+  - result.exists is defined
+  - not result.exists
