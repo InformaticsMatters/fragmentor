@@ -63,8 +63,9 @@
     file:
       path: "{{ item }}"
       state: directory
-      mode: '0744'
+      mode: '0777'
       owner: "{{ db_user_account }}"
+      group: "{{ db_user_account }}"
     loop:
     - /pgdata
     - /pgwal
