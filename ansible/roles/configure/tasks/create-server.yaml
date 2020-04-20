@@ -70,6 +70,7 @@
       mode: '0777'
       owner: "{{ db_user_account }}"
       group: "{{ db_user_account }}"
+      recurse: yes
     loop:
     - /pgdata
     - /pgwal
@@ -97,10 +98,10 @@
       state: present
 
   when:
-  - result.container is defined
-  - result.container.State is defined
-  - result.container.State.Running is defined
-  - not result.container.State.Running
+  - db_result.container is defined
+  - db_result.container.State is defined
+  - db_result.container.State.Running is defined
+  - not db_result.container.State.Running
 
 # 4.
 
