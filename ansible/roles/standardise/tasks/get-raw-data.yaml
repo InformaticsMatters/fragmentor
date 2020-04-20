@@ -6,7 +6,7 @@
 
 - name: Display raw path
   debug:
-    msg: bucket={{ bucket }} raw_path={{ raw path }}
+    msg: bucket={{ bucket }} raw_path={{ raw_path }}
 
 - name: List raw data
   aws_s3:
