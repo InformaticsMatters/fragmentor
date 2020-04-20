@@ -2,7 +2,7 @@
 
 - name: Set raw path
   set_fact:
-    raw_path: /raw/vendor/{{ bucket_raw_path }}/
+    raw_path: raw/vendor/{{ bucket_raw_path }}/
 
 - name: Display raw path
   debug:
