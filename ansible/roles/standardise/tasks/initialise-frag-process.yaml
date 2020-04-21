@@ -3,24 +3,6 @@
 - debug:
     msg: "{{ reppath }}/run/vendor/{{ vendor }}"
 
-- name: Check vendor path
-  stat:
-    path: "{{ reppath }}/run/vendor/{{ vendor }}"
-  register: vendor_path_result
-
-- name: Check run
-  stat:
-    path: "{{ reppath }}/run"
-  register: run_result
-
-- name: Assert expected directories
-  assert:
-    that:
-    - vendor_path_result.stat.isdir is defined
-    - vendor_path_result.stat.isdir
-    - run_result.stat.isdir is defined
-    - run_result.stat.isdir
-
 # Optionally erase and then create the working directories...
 
 - name: Erase directories
