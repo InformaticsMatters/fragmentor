@@ -11,6 +11,7 @@
 
 - name: Normalise filename
   command: mv {{ item }} {{ destination }}/chemspace_bb.txt
+  args:
     creates: "{{ destination }}/chemspace_bb.txt"
   with_fileglob:
   - "{{ destination }}/*.txt"
