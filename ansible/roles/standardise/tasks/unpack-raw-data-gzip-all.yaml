@@ -17,6 +17,6 @@
     copy: no
     creates: "{{ item|regex_replace('.gz') }}"
     src: "{{ item }}"
-    dest: "{{ item|regex_replace('.gz') }}"
+    dest: "{{ destination }}"
   with_fileglob:
   - "{{ destination }}/*.gz"
