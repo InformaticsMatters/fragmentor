@@ -1,7 +1,8 @@
 ---
 
-# Invoked from get-raw-data.yaml and the
-# expectation is that 'destination' is where the (unpacked) data is stored.
+# Invoked from some vendor-specific unpack logic to decompress
+# all .gz files in the directory. The expectation is that 'destination'
+# is where the (unpacked) data is stored.
 
 - name: Assert destination
   assert:
@@ -9,12 +10,11 @@
     - destination is defined
     - destination|string|length > 0
 
-# Unpack logic...
+# Unpack all '.gz' files...
 
 - name: Unpack the single file
   unarchive:
     copy: no
-    remote_src: yes
     creates: "{{ item|regex_replace('.gz') }}"
     src: "{{ item }}"
     dest: "{{ item|regex_replace('.gz') }}"
