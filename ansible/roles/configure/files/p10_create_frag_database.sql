@@ -22,7 +22,9 @@
 
 drop view IF EXISTS v_edge;
 
-drop table IF EXISTS EDGE;
+drop view IF EXISTS v_edge_node;
+
+drop table IF EXISTS edge;
 
 drop table IF EXISTS price;
 
@@ -543,7 +545,6 @@ create view v_edge_node as
 INNER JOIN nonisomol p ON e.parent_id = p.id
 INNER JOIN nonisomol c ON e.child_id = c.id;
 
-
 --
 -- Tuning Parameters
 --
@@ -556,28 +557,3 @@ alter table edge set (autovacuum_vacuum_scale_factor = 0.01);
 alter table edge set (autovacuum_vacuum_cost_limit = 2000);
 alter table mol_source set (autovacuum_vacuum_scale_factor = 0.01);
 alter table mol_source set (autovacuum_vacuum_cost_limit = 2000);
-
---
--- Table: Source data load.
---
--- Note that these values are fixed as they relate to the vendor parameter numbers.
---
-
-insert into source (name, version, currency)
-values ('chembl', '25','');
-insert into source (name, version, currency)
-values ('chemspace-bb', '2019-07','');
-insert into source (name, version, currency)
-values ('chemspace-bb', '2019-12','USD');
-insert into source (name, version, currency)
-values ('molport', '2019-12','USD');
-insert into source (name, version, currency)
-values ('molport', '2020-02','USD');
-insert into source (name, version, currency)
-values ('dsip', '1','');
-insert into source (name, version, currency)
-values ('molport', '2020-03','USD');
-insert into source (name, version, currency)
-values ('enamine', '2019-06','');
-
-select * from source;
