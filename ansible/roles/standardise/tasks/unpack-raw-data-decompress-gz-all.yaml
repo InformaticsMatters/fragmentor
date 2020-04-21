@@ -12,11 +12,14 @@
 
 # Unpack all '.gz' files...
 
-- name: Unpack the single file
-  unarchive:
-    copy: no
+- name: Install package
+  package:
+    name: gzip
+  become: yes
+
+- name: Unpack all .gz files
+  command: gzip -d {{ item }}
+  args:
     creates: "{{ item|regex_replace('.gz') }}"
-    src: "{{ item }}"
-    dest: "{{ destination }}"
   with_fileglob:
   - "{{ destination }}/*.gz"
