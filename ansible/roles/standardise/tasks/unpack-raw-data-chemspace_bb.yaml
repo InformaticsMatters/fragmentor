@@ -5,7 +5,7 @@
 
 # Generic unpacking...
 
-- include_tasks: unpack-raw-data-gzip-all.yaml
+- include_tasks: unpack-raw-data-decompress-gz-all.yaml
 
 # We need to change the filename...
 
