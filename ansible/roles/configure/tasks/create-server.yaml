@@ -94,6 +94,9 @@
       -c 'shared_buffers=32GB'
       -c 'work_mem=128MB'
       -c 'autovacuum_max_workers=24'
+      -c 'max_worker_processes=24'
+      -c 'max_parallel_workers=24'
+      -c 'max_parallel_workers_per_gather=6'
     shm_size: 5G
     state: started
     env:
