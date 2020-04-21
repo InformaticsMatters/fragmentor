@@ -53,12 +53,6 @@
       src: "{{ db_db_volume }}"
       state: absent
 
-  - name: Unmount WAL volume
-    mount:
-      path: /pgwal
-      src: "{{ db_wal_volume }}"
-      state: absent
-
   - name: Ensure mount paths
     file:
       path: "{{ item }}"
@@ -69,27 +63,18 @@
       recurse: yes
     loop:
     - /pgdata
-    - /pgwal
 
   - name: Create ext4 filesystem
     filesystem:
       fstype: ext4
       dev: "{{ item }}"
     loop:
-    - /dev/vdb
-    - /dev/vdc
+    - "{{ db_db_volume }}"
 
   - name: Mount DB volume
     mount:
       path: /pgdata
       src: "{{ db_db_volume }}"
-      fstype: ext4
-      state: present
-
-  - name: Mount WAL volume
-    mount:
-      path: /pgwal
-      src: "{{ db_wal_volume }}"
       fstype: ext4
       state: present
 
@@ -106,9 +91,9 @@
     name: db
     image: "{{ db_container_image }}:{{ db_container_tag }}"
     command: >-
-      -c 'shared_buffers=4GB'
+      -c 'shared_buffers=32GB'
       -c 'work_mem=128MB'
-      -c 'autovacuum_max_workers=6'
+      -c 'autovacuum_max_workers=24'
     shm_size: 5G
     state: started
     env:
