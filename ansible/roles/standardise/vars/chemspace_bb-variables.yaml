@@ -1,8 +1,8 @@
 ---
 
 standardiser: frag.standardise.scripts.chemspace_bb.standardise_chemspace_bb_pricing_compounds
-standchunksize: 1500
+standchunksize: 24000
 standinputfile: chemspace_bb.txt
 
 standardise_copy_table: i_mols_chemspace
-standardise_copy_columns: osmiles, isosmiles, nonisosmiles, hac, cmpd_id, price
+standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id,price

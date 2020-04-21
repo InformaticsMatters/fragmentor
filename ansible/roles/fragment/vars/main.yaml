@@ -5,10 +5,12 @@
 
 # Fragmentation Parameters
 
-# Fragmentation Nextflow timeouts - note that on production a clean run for molport may take 16 hours on the cluster.
+# Fragmentation Nextflow timeouts -
+# note that on production a clean run for molport
+# may take 16 hours on the cluster.
 
-nextflow_timeout_minutes: 60
-nextflow_poll_period_minutes: 1
+nextflow_timeout_minutes: 480
+nextflow_poll_period_minutes: 10
 
 
 # Filename of standardised SMILES extracted from i_mols for fragmentation
@@ -17,7 +19,7 @@ fragsmifile: nonisomol.smi
 
 # Chunk size for fragmentation processing
 
-fragchunksize: 500
+fragchunksize: 30000
 
 # Maximum heavy atom count for extraction/fragmentation processing
 
@@ -34,10 +36,11 @@ fragedgefile: edges.csv
 
 # Chunk size for loading edges and nodes
 
-nodechunk: 100000
-edgechunk: 250000
+nodechunk: 1000000
+edgechunk: 2500000
 
-# This is the threshold at which point it is sensible to drop and recreate the indexes on the edge table
+# This is the threshold at which point it is sensible to drop and recreate
+# the indexes on the edge table
 # (This takes about an hour and a quarter on production)
 
-edgeindexthreshold: 25000000
+edgeindexthreshold: 50000000
