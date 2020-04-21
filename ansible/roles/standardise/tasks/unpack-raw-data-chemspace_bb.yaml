@@ -1,0 +1,16 @@
+---
+
+# Invoked from get-raw-data.yaml and the
+# expectation is that 'destination' is where the (unpacked) data is stored.
+
+# Generic unpacking...
+
+- include_tasks: unpack-raw-data-gzip-all.yaml
+
+# We need to change the filename...
+
+- name: Normalise filename
+  command: mv {{ item }} {{ destination }}/chemspace_bb.txt
+    creates: "{{ destination }}/chemspace_bb.txt"
+  with_fileglob:
+  - "{{ destination }}/*.txt"

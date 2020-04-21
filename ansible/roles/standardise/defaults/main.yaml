@@ -12,8 +12,8 @@ datapath: SetMe
 standpath: SetMe
 fragpath: SetMe
 
-# The following is used (amongst other things)
-# to load vendor-specific variables...
+# The vendor. Typically a vendor and collection,
+# like 'chemspace_bb' or 'xchem_dsip'.
 vendor: SetMe
 # The user is required tp specify the version on the command-line
 version: SetMe

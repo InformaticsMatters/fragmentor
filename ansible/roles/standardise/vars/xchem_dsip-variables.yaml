@@ -6,7 +6,3 @@ standinputfile: dsip.txt
 
 standardise_copy_table: i_mols_dsip
 standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id
-
-# This should really be constructed from vendor and version.
-# We hard-code it for now just to test.
-bucket_raw_path: xchem/v1

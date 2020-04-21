@@ -4,7 +4,7 @@
 
 - name: Set raw path
   set_fact:
-    raw_path: raw/vendor/{{ bucket_raw_path }}/
+    raw_path: raw/vendor/{{ vendor|replace('_','/') }}/{{ version }}
 
 - name: Display raw path
   debug:
@@ -40,12 +40,22 @@
 
 # Get the files, ignoring the first entry in the list (always a directory)...
 
+- name: Set detination path
+  set_fact:
+    destination: "{{ datapath }}/data/{{ vendor }}"
+
 - name: Get raw data
   aws_s3:
     bucket: "{{ bucket }}"
     mode: get
     object: "{{ item }}"
-    dest: "{{ datapath }}/data/{{ vendor }}/{{ item|basename }}"
+    dest: "{{ destination }}/{{ item|basename }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
   loop: "{{ raw_result.s3_keys[1:] }}"
+
+# Now hand over the get logic to vendor-specific
+# un-packing code. It may need to do nothing but
+# this is where we do vendor-specific presentation...
+
+- include_tasks: unpack-raw-data-{{ vendor }}.yaml

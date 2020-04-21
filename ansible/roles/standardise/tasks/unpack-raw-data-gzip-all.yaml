@@ -1,0 +1,22 @@
+---
+
+# Invoked from get-raw-data.yaml and the
+# expectation is that 'destination' is where the (unpacked) data is stored.
+
+- name: Assert destination
+  assert:
+    that:
+    - destination is defined
+    - destination|string|length > 0
+
+# Unpack logic...
+
+- name: Unpack the single file
+  unarchive:
+    copy: no
+    remote_src: yes
+    creates: "{{ item|replace('.gz') }}"
+    src: "{{ item }}"
+    dest: "{{ item|replace('.gz') }}"
+  with_fileglob:
+  - "{{ destination }}/*.gz"
