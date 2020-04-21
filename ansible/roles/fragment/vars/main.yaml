@@ -36,8 +36,8 @@ fragedgefile: edges.csv
 
 # Chunk size for loading edges and nodes
 
-nodechunk: 1000000
-edgechunk: 2500000
+nodechunk: 2000000
+edgechunk: 10000000
 
 # This is the threshold at which point it is sensible to drop and recreate
 # the indexes on the edge table
