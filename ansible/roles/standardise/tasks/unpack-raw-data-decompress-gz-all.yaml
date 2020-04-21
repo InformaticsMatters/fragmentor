@@ -12,11 +12,6 @@
 
 # Unpack all '.gz' files...
 
-- name: Install package
-  package:
-    name: gzip
-  become: yes
-
 - name: Unpack all .gz files
   command: gzip -d {{ item }}
   args:
