@@ -15,8 +15,8 @@
   unarchive:
     copy: no
     remote_src: yes
-    creates: "{{ item|replace('.gz') }}"
+    creates: "{{ item|regex_replace('.gz') }}"
     src: "{{ item }}"
-    dest: "{{ item|replace('.gz') }}"
+    dest: "{{ item|regex_replace('.gz') }}"
   with_fileglob:
   - "{{ destination }}/*.gz"

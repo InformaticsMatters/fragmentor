@@ -4,7 +4,7 @@
 
 - name: Set raw path
   set_fact:
-    raw_path: raw/vendor/{{ vendor|replace('_','/') }}/{{ version }}
+    raw_path: raw/vendor/{{ vendor|regex_replace('_', '/') }}/{{ version }}
 
 - name: Display raw path
   debug:
