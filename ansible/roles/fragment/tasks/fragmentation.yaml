@@ -37,11 +37,9 @@
        -with-tower
        --input {{ fragpath }}/fragment/{{ fragsmifile }}
        --out_dir {{ fragpath }}/fragment
-       --tmp_dir {{ fragpath }}/fragment
        --chunk_size {{ fragchunksize }}
        --max_hac {{ fraghac }}
        --max_frag {{ fragmaxfrags }}
-
 
 #time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/fragmentation.nf -with-report $FRAGPATH/fragment/frag_report.html -with-tower\
 #    --input $FRAGDATA/fragment/$FRAGSMIFILE --out_dir $FRAGPATH/fragment --tmp_dir $FRAGPATH/fragment --chunk_size $FRAGCHUNKSIZE --max_hac $FRAGHAC --max_frag $FRAGMAXFRAGS $@

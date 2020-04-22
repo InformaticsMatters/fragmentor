@@ -55,7 +55,7 @@ process collect_nodes {
     file 'nodes.csv'
 
     """
-    sort -u -T params.tmp_dir $chunks > nodes.csv
+    sort -u -T . $chunks > nodes.csv
     """
 }
 
@@ -72,7 +72,7 @@ process collect_edges {
     file 'edges.csv'
 
     """
-    sort -u -T params.tmp_dir $chunks > edges.csv
+    sort -u -T . $chunks > edges.csv
     """
 }
 
@@ -89,6 +89,6 @@ process collect_rejects {
     file 'rejects.smi'
 
     """
-    sort -u -T params.tmp_dir $chunks > rejects.smi
+    sort -u -T . $chunks > rejects.smi
     """
 }
