@@ -2,7 +2,7 @@
 
 - name: Check fragment path
   stat:
-    path: "{{ fragpath }}/fragment"
+    path: "{{ neo4jpath }}/neo4jextract"
   register: fragment_path_result
 
 - name: Extract NEO4J node information for this source_id to neonodefile
@@ -23,7 +23,7 @@
                   select f2.child_smiles, f2.child_hac, f2.child_rac, f2.child_ring_smiles, NULL, 'F2'
                  from fragments f2
                 where  f2.child_child_count = 0)
-                 TO '{{ fragpath }}/fragment/{{ neonodefile }}' DELIMITER ',' CSV"
+                 TO '{{ neo4jpath }}/neo4jextract/{{ neonodefile }}' DELIMITER ',' CSV"
     {{ database[deployment].db }}
   environment:
     PGPASSWORD: "{{ database[deployment].login_password }}"
@@ -41,7 +41,7 @@
                 from v_edge c
                inner join fragments p on c.parent_id = p.child_id
             ) select parent_smiles, child_smiles, label, 'FRAG' from fragments)
-            TO '{{ fragpath }}/fragment/{{ neoedgefile }}' DELIMITER ',' CSV"
+            TO '{{ neo4jpath }}/neo4jextract/{{ neoedgefile }}' DELIMITER ',' CSV"
     {{ database[deployment].db }}
   environment:
     PGPASSWORD: "{{ database[deployment].login_password }}"
