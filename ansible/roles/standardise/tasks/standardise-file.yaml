@@ -5,16 +5,6 @@
     that:
     - standchunksize|int > 0
 
-- name: Check inputfile present
-  stat:
-    path: "{{ datapath }}/data/{{ vendor }}/{{ standinputfile }}"
-  register: standinputfile_result
-
-- name: Assert standinputfile
-  assert:
-    that:
-    - standinputfile_result.stat.exists
-
 # Move the nextflow workflow and config into place (from templates)
 # so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
 
@@ -34,7 +24,7 @@
       -with-report {{ standpath }}/standardise/standardise_report.html
       -with-tower
       --script {{ standardiser }}
-      --inputs {{ datapath }}/data/{{ vendor }}/{{ standinputfile }}
+      --inputs {{ datapath }}/data/{{ vendor }}/"{{ standinputfile }}"
       --out_dir {{ standpath }}/standardise
       --chunk_size {{ standchunksize }}
 

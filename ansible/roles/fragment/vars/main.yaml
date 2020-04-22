@@ -9,8 +9,8 @@
 # note that on production a clean run for molport
 # may take 16 hours on the cluster.
 
-nextflow_timeout_minutes: 480
-nextflow_poll_period_minutes: 10
+nextflow_timeout_minutes: 4320
+nextflow_poll_period_minutes: 30
 
 
 # Filename of standardised SMILES extracted from i_mols for fragmentation
@@ -36,8 +36,8 @@ fragedgefile: edges.csv
 
 # Chunk size for loading edges and nodes
 
-nodechunk: 2000000
-edgechunk: 10000000
+nodechunk: 5000000
+edgechunk: 20000000
 
 # This is the threshold at which point it is sensible to drop and recreate
 # the indexes on the edge table
