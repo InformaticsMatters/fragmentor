@@ -2,26 +2,5 @@
 
 # Provide some protection against accidental execution...
 
-- pause:
-    prompt: |-
-      Are you sure you want to configure the database?
-      This is destructive and cannot be undone.
-      Hit RETURN to continue or, to abort, press ctrl+c and then a.
-  tags: always
-
 - import_tasks: create-server.yaml
-  tags:
-  - create
-  - container
-
-- block:
-
-  - import_tasks: create-database.yaml
-
-  module_defaults:
-    postgresql_query:
-      login_host: "{{ database[deployment].login_host }}"
-      port: "{{ database[deployment].port }}"
-      db: "{{ database[deployment].db }}"
-      login_user: "{{ database[deployment].login_user }}"
-      login_password: "{{ database[deployment].login_password }}"
+- import_tasks: create-database.yaml

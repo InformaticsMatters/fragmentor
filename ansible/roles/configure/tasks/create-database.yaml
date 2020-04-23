@@ -1,7 +1,19 @@
 ---
 
+- pause:
+    prompt: |-
+      Are you sure you want to configure the database?
+      This is destructive and cannot be undone.
+      Hit RETURN to continue or, to abort, press ctrl+c and then a.
+  tags: always
+
 - name: Create frag databsse
   postgresql_query:
     path_to_script: "{{ role_path }}/files/p10_create_frag_database.sql"
     autocommit: yes
+    login_host: "{{ database[deployment].login_host }}"
+    port: "{{ database[deployment].port }}"
+    db: "{{ database[deployment].db }}"
+    login_user: "{{ database[deployment].login_user }}"
+    login_password: "{{ database[deployment].login_password }}"
   delegate_to: 127.0.0.1
