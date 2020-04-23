@@ -2,7 +2,7 @@
 
 # Creates (resets) the database
 # by just running the appropriate play in the configure role.
-#
+
 - hosts: localhost
   tasks:
   - include_role:
