@@ -10,7 +10,9 @@
   tags: always
 
 - import_tasks: create-server.yaml
-  tags: always
+  tags:
+  - create
+  - container
 
 - block:
 

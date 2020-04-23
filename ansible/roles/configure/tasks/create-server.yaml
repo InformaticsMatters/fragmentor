@@ -19,6 +19,7 @@
   docker_container_info:
     name: db
   register: db_result
+  tags: create
 
 - block:
 
@@ -83,6 +84,7 @@
   - db_result.container.State is defined
   - db_result.container.State.Running is defined
   - not db_result.container.State.Running
+  tags: create
 
 # 4.
 
