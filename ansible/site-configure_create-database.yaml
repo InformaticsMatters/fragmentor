@@ -7,4 +7,4 @@
   tasks:
   - include_role:
       name: configure
-      tasks_from: configure-database.yaml
+      tasks_from: create-database.yaml
