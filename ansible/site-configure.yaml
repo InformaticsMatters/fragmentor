@@ -1,10 +1,22 @@
 ---
 
+# You can use tags to restart the database server
+# assuming everything else has been setup: -
+#
+# $ ansible-playbook site-configure.yaml \
+#    -e deployment=production \
+#    --tags container
+
 - hosts: dbservers
   vars:
     pip_install_packages:
     - name: docker
   roles:
-  - { role: geerlingguy.pip, become: yes }
-  - { role: geerlingguy.docker, become: yes }
-  - { role: configure, become: yes }
+  - role: geerlingguy.pip
+    become: yes
+  - role: geerlingguy.docker
+    become: yes
+  - role: configure
+    become: yes
+    tags:
+    - always
