@@ -91,13 +91,13 @@
     name: db
     image: "{{ db_container_image }}:{{ db_container_tag }}"
     command: >-
-      -c 'shared_buffers=32GB'
-      -c 'work_mem=128MB'
+      -c 'shared_buffers={{ db_shared_buffers_g }}GB'
+      -c 'work_mem={{ db_work_mem_m }}MB'
       -c 'autovacuum_max_workers=24'
       -c 'max_worker_processes=24'
       -c 'max_parallel_workers=24'
       -c 'max_parallel_workers_per_gather=6'
-    shm_size: 5G
+    shm_size: "{{ db_shared_buffers_g|int * 2 }}G"
     state: started
     env:
       PGDATA: /var/lib/postgresql/data/pgdata

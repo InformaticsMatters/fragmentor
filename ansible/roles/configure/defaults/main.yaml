@@ -3,4 +3,11 @@
 db_user_account: fragmentor
 db_container_image: informaticsmatters/rdkit-cartridge-debian
 db_container_tag: Release_2020_03
+
+# The DB server's database volume device
 db_db_volume: /dev/vdb
+# The DB shared_buffers size (Gi)
+# The deployment sets the container shm_mem to twice this value
+db_shared_buffers_g: 32
+# The DB work_mem (Mi)
+db_work_mem_m: 128
