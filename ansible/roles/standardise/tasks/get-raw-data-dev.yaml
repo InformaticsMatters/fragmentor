@@ -1,0 +1,26 @@
+---
+
+# Gets 'raw' data from data path in repository by vendor
+
+- name: Set raw path
+  set_fact:
+    raw_path: ../data/{{ vendor|regex_replace('_', '/') }}/{{ version }}
+
+- name: Display raw path
+  debug:
+    msg: raw_path={{ raw_path }}
+
+- name: Set destination path
+  set_fact:
+    destination: "{{ datapath }}/data/{{ vendor }}"
+
+- name: Get raw data
+  command: cp {{ item }} {{ destination }}
+  with_fileglob:
+  - "{{ raw_path }}/*.gz"
+
+# Now hand over the get logic to vendor-specific
+# un-packing code. It may need to do nothing but
+# this is where we do vendor-specific presentation...
+
+- include_tasks: unpack-raw-data-{{ vendor }}.yaml

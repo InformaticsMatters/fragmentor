@@ -8,17 +8,6 @@
 #     -e version=123
 #     -e deployment=production
 #
-# The user is also expected to have defined the environment variables: -
-#
-# - AWS_ACCESS_KEY_ID
-# - AWS_SECRET_ACCESS_KEY
-
-- name: Assert AWS credentials
-  assert:
-    that:
-    - aws_access_key|string|length > 0
-    - aws_secret_key|string|length > 0
-    fail_msg: You must define 'AWS_ACCESS_KEY_ID' and 'AWS_SECRET_ACCESS_KEY'
 
 - name: Assert user-variable definitions
   assert:
@@ -35,10 +24,30 @@
   include_vars:
     file: "{{ vendor }}-variables.yaml"
 
+# The user is also expected to have defined the environment variables: -
+#
+# - AWS_ACCESS_KEY_ID
+# - AWS_SECRET_ACCESS_KEY
+
+- name: Assert AWS credentials
+  assert:
+    that:
+    - aws_access_key|string|length > 0
+    - aws_secret_key|string|length > 0
+    fail_msg: You must define 'AWS_ACCESS_KEY_ID' and 'AWS_SECRET_ACCESS_KEY'
+  when: deployment=="production"
+
+
 - block:
 
   - import_tasks: initialise-frag-process.yaml
-  - import_tasks: get-raw-data.yaml
+
+  - import_tasks: get-raw-data-prod.yaml
+    when: deployment=="production"
+
+  - import_tasks: get-raw-data-dev.yaml
+    when: deployment=="development"
+
   - import_tasks: standardise-file.yaml
   - import_tasks: load-standardised-data.yaml
 

@@ -38,11 +38,11 @@
   debug:
     msg: Found {{ raw_result.s3_keys|length - 1 }} raw files
 
-# Get the files, ignoring the first entry in the list (always a directory)...
-
-- name: Set detination path
+- name: Set destination path
   set_fact:
     destination: "{{ datapath }}/data/{{ vendor }}"
+
+# Get the files, ignoring the first entry in the list (always a directory)...
 
 - name: Get raw data
   aws_s3:

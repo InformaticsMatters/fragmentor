@@ -2,7 +2,7 @@
 
 standardiser: frag.standardise.scripts.enamine.standardise_enamine_compounds
 standchunksize: 1500
-standinputfile: enamine.01.txt
+standinputfile: j*.smi
 
 standardise_copy_table: i_mols_enamine
 standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id
