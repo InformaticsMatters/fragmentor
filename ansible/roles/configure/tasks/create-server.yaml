@@ -80,7 +80,7 @@
     path: /pgdata-backup
     src: "{{ db_backup_volume }}"
     fstype: ext4
-    state: present
+    state: mounted
   when: db_backup_volume not in mounted_devices
 
 - block:
@@ -133,7 +133,7 @@
       path: /pgdata
       src: "{{ db_db_volume }}"
       fstype: ext4
-      state: present
+      state: mounted
     when: db_db_volume not in mounted_devices
 
   - name: Create DB pgcopy volume ext4 filesystem
@@ -147,7 +147,7 @@
       path: /pgcopy
       src: "{{ db_db_pgcopy_volume }}"
       fstype: ext4
-      state: present
+      state: mounted
     when: db_db_pgcopy_volume not in mounted_devices
 
   when:
