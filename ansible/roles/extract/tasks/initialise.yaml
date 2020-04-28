@@ -1,20 +1,5 @@
 ---
 
-- name: Erase copy directory
-  file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-  - "{{ copy_root }}/neo4jextract"
-  when: clean_start|bool
-
-- name: Create copy directory
-  file:
-    path: "{{ item }}"
-    state: directory
-  loop:
-  - "{{ copy_root }}/neo4jextract"
-
 - name: Retrieve source_id
   postgresql_query:
     query: select max(id) from source where name = '{{ vendor }}' and version = '{{ version }}';

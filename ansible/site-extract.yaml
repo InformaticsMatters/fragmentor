@@ -1,5 +1,5 @@
 ---
 
-- hosts: dbservers[0]
+- hosts: head
   roles:
   - extract
