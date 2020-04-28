@@ -22,9 +22,28 @@
   register: db_result
   tags: create
 
+#
+# "ansible_mounts": [
+#        {
+#            "block_available": 0,
+#            "block_size": 2048,
+#            "block_total": 236,
+#            "block_used": 236,
+#            "device": "/dev/sr0",
+#            "fstype": "iso9660",
+#            "inode_available": 0,
+#            "inode_total": 0,
+#            "inode_used": 0,
+#            "mount": "/mnt/context",
+#            "options": "ro,relatime",
+#            "size_available": 0,
+#            "size_total": 483328,
+#            "uuid": "2020-04-20-10-00-40-00"
+#        }
+#      ]
 - name: Get list of devices mounted
   set_fact:
-    mounted_devices: "{{ ansible_mounts[*].device|flatten }}"
+    mounted_devices: "{{ ansible_mounts|json_query('[*].device')|flatten }}"
 
 - debug:
     var: mounted_devices
