@@ -47,6 +47,10 @@
   set_fact:
     mounted_devices: "{{ ansible_mounts|json_query('[*].device')|flatten }}"
 
+- name: Display mounts
+  debug:
+    var: mounted_paths
+
 # 2.
 
 - name: Ensure DB backup volume mount path
