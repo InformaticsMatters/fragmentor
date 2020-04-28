@@ -82,11 +82,11 @@
 
   # 4.
 
-  - name: Unmount DB volume
-    mount:
-      path: /pgdata
-      src: "{{ db_db_volume }}"
-      state: absent
+#  - name: Unmount DB volume
+#    mount:
+#      path: /pgdata
+#      src: "{{ db_db_volume }}"
+#      state: absent
 
   - name: Ensure mount paths
     file:
@@ -105,12 +105,20 @@
       fstype: ext4
       dev: "{{ item }}"
     loop:
-    - "{{ db_db_volume }}"
+#    - "{{ db_db_volume }}"
+    - "{{ db_db_pgcopy_volume }}"
 
   - name: Mount DB data volume
     mount:
       path: /pgdata
       src: "{{ db_db_volume }}"
+      fstype: ext4
+      state: present
+
+  - name: Mount DB pgcopy volume
+    mount:
+      path: /pgcopy
+      src: "{{ db_db_pgcopy_volume }}"
       fstype: ext4
       state: present
 
