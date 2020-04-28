@@ -22,6 +22,8 @@
   register: db_result
   tags: create
 
+# Get the list of exiting mounts, present in the built-in 'ansible_mounts'
+# variable, which looks little like this...
 #
 # "ansible_mounts": [
 #        {
@@ -45,19 +47,7 @@
   set_fact:
     mounted_devices: "{{ ansible_mounts|json_query('[*].device')|flatten }}"
 
-- debug:
-    var: mounted_devices
-
-- assert:
-    that: 1 == 2
-
 # 2.
-
-- name: Unmount DB backup volume
-  mount:
-    path: /pgdata-backup
-    src: "{{ db_backup_volume }}"
-    state: absent
 
 - name: Ensure DB backup volume mount path
   file:
@@ -76,6 +66,7 @@
     dev: "{{ item }}"
   loop:
   - "{{ db_backup_volume }}"
+  when: db_backup_volume not in mounted_devices
 
 - name: Mount DB backup volume
   mount:
@@ -83,6 +74,7 @@
     src: "{{ db_backup_volume }}"
     fstype: ext4
     state: present
+  when: db_backup_volume not in mounted_devices
 
 - block:
 
@@ -111,18 +103,6 @@
 
   # 4.
 
-  - name: Unmount DB volume
-    mount:
-      path: /pgdata
-      src: "{{ db_db_volume }}"
-      state: absent
-
-  - name: Unmount DB copy volume
-    mount:
-      path: /pgcopy
-      src: "{{ db_db_pgcopy_volume }}"
-      state: absent
-
   - name: Ensure mount paths
     file:
       path: "{{ item }}"
@@ -135,13 +115,11 @@
     - /pgdata
     - /pgcopy
 
-  - name: Create ext4 filesystem
+  - name: Create DB data volume ext4 filesystem
     filesystem:
       fstype: ext4
-      dev: "{{ item }}"
-    loop:
-    - "{{ db_db_volume }}"
-    - "{{ db_db_pgcopy_volume }}"
+      dev: "{{ db_db_volume }}"
+    when: db_db_volume not in mounted_devices
 
   - name: Mount DB data volume
     mount:
@@ -149,6 +127,13 @@
       src: "{{ db_db_volume }}"
       fstype: ext4
       state: present
+    when: db_db_volume not in mounted_devices
+
+  - name: Create DB pgcopy volume ext4 filesystem
+    filesystem:
+      fstype: ext4
+      dev: "{{ db_db_pgcopy_volume }}"
+    when: db_db_pgcopy_volume not in mounted_devices
 
   - name: Mount DB pgcopy volume
     mount:
@@ -156,6 +141,7 @@
       src: "{{ db_db_pgcopy_volume }}"
       fstype: ext4
       state: present
+    when: db_db_pgcopy_volume not in mounted_devices
 
   when:
   - db_result.container is not defined
