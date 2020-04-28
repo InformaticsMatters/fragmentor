@@ -24,7 +24,7 @@
 
 - name: Get list of devices mounted
   set_fact:
-    mounted_devices: "{ ansible_mounts[*].device|flatten }}"
+    mounted_devices: "{{ ansible_mounts[*].device|flatten }}"
 
 - debug:
     var: mounted_devices
