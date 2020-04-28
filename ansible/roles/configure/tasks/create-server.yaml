@@ -22,6 +22,14 @@
   register: db_result
   tags: create
 
+- name: Display DB container result
+  debug:
+    var: db_result
+
+- name: Stop
+  assert:
+    that: 1 == 2
+    
 # 2.
 
 - name: Unmount DB backup volume
@@ -127,7 +135,6 @@
   - db_result.container.State is defined
   - db_result.container.State.Running is defined
   - not db_result.container.State.Running
-  tags: create
 
 # 5.
 
