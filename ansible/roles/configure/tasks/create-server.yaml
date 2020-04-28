@@ -22,13 +22,16 @@
   register: db_result
   tags: create
 
-- name:
-  debug:
-    var: ansible_mounts
+- name: Get list of devices mounted
+  set_fact:
+    mounted_devices: "{ ansible_mounts[*].device|flatten }}"
+
+- debug:
+    var: mounted_devices
 
 - assert:
     that: 1 == 2
-    
+
 # 2.
 
 - name: Unmount DB backup volume
