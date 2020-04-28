@@ -12,5 +12,5 @@ neoedgefile: neo4jedges.csv
 # The database server's pgcopy directory.
 # This *MUST* match the directory
 # mapped into the PostgreSQL container.
-copy_root: /pgdata
+copy_root: /pgcopy
 #copy_root: /var/lib/postgresql/data/
