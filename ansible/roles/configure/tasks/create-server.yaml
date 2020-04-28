@@ -20,7 +20,10 @@
   docker_container_info:
     name: db
   register: db_result
-  tags: create
+
+- name: Display DB container state
+  debug:
+    var: db_result
 
 # Get the list of exiting mounts, present in the built-in 'ansible_mounts'
 # variable, which looks little like this...
@@ -49,7 +52,7 @@
 
 - name: Display mounts
   debug:
-    var: mounted_paths
+    var: mounted_devices
 
 # 2.
 
@@ -148,7 +151,6 @@
     when: db_db_pgcopy_volume not in mounted_devices
 
   when:
-  - db_result.container is not defined
   - db_result.container.State is not defined
 
 # 5.
@@ -180,9 +182,7 @@
     - "{{ database[deployment].port }}:5432"
     network_mode: host
   become_user: "{{ db_user_account }}"
-  tags: container
 
 - name: Wait for database port
   wait_for:
     port: "{{ database[deployment].port }}"
-  tags: container
