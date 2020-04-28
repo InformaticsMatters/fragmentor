@@ -1,20 +1,19 @@
 ---
 
-- name: Erase directories
+- name: Erase copy directory
   file:
     path: "{{ item }}"
     state: absent
   loop:
-  - "{{ neo4jpath }}/neo4jextract"
+  - "{{ copy_root }}/neo4jextract"
   when: clean_start|bool
 
-- name: Create directories
+- name: Create copy directory
   file:
     path: "{{ item }}"
     state: directory
   loop:
-  - "{{ neo4jpath }}/neo4jextract"
-
+  - "{{ copy_root }}/neo4jextract"
 
 - name: Retrieve source_id
   postgresql_query:

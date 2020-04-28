@@ -6,9 +6,10 @@
 #
 # Then, if the container is not running...
 #
-# 2. Create the database service account
-# 3. format and mount the DB and WAL volumes
-# 4. run the container image (always) and wait for its port
+# 2. format and mount the backup volume
+# 3. Create the database service account
+# 4. format and mount the DB and WAL volumes
+# 5. run the container image (always) and wait for its port
 #
 # Our expectation here is that docker is installed on the server -
 # a responsibility of the docker role we should have already applied.
@@ -21,11 +22,44 @@
   register: db_result
   tags: create
 
+# 2.
+
+- name: Unmount DB backup volume
+  mount:
+    path: /pgdata-backup
+    src: "{{ db_backup_volume }}"
+    state: absent
+
+- name: Ensure DB backup volume mount path
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0777'
+    owner: "{{ db_user_account }}"
+    group: "{{ db_user_account }}"
+    recurse: yes
+  loop:
+  - /pgdata-backup
+
+- name: Create DB backup volume ext4 filesystem
+  filesystem:
+    fstype: ext4
+    dev: "{{ item }}"
+  loop:
+  - "{{ db_backup_volume }}"
+
+- name: Mount DB backup volume
+  mount:
+    path: /pgdata-backup
+    src: "{{ db_backup_volume }}"
+    fstype: ext4
+    state: present
+
 - block:
 
   # If the database is not running...
 
-  # 2.
+  # 3.
 
   - name: Create database user account
     user:
@@ -46,7 +80,7 @@
       owner: "{{ db_user_account }}"
     become_user: "{{ db_user_account }}"
 
-  # 3.
+  # 4.
 
   - name: Unmount DB volume
     mount:
@@ -64,6 +98,7 @@
       recurse: yes
     loop:
     - /pgdata
+    - /pgcopy
 
   - name: Create ext4 filesystem
     filesystem:
@@ -72,7 +107,7 @@
     loop:
     - "{{ db_db_volume }}"
 
-  - name: Mount DB volume
+  - name: Mount DB data volume
     mount:
       path: /pgdata
       src: "{{ db_db_volume }}"
@@ -86,7 +121,7 @@
   - not db_result.container.State.Running
   tags: create
 
-# 4.
+# 5.
 
 - name: Start database container (always)
   docker_container:
@@ -110,6 +145,7 @@
     volumes:
     - /pgdata:/var/lib/postgresql/data
     - /pgwal:/var/lib/postgresql/wal
+    - /pgcopy:/pgcopy
     exposed_ports:
     - "{{ database[deployment].port }}:5432"
     network_mode: host

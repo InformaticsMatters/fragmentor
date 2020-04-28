@@ -2,7 +2,7 @@
 
 - name: Check fragment path
   stat:
-    path: "{{ neo4jpath }}/neo4jextract"
+    path: "{{ copy_root }}/neo4jextract"
   register: fragment_path_result
 
 - name: Extract NEO4J node information for this source_id to neonodefile

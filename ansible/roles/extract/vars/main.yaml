@@ -8,3 +8,8 @@
 # Nodes and Edges Neo4j Files loaded from database.
 neonodefile: neo4jnodes.csv
 neoedgefile: neo4jedges.csv
+
+# The database server's pgcopy directory.
+# This *MUST* match the directory
+# mapped into the PostgreSQL container.
+copy_root: /pgdata

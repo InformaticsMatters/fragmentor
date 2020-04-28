@@ -8,8 +8,6 @@
 
 reppath: "{{ role_path }}/../../.."
 
-neo4jpath: SetMe
-
 # The following is used (amongst other things)
 # to load vendor-specific variables...
 vendor: SetMe
