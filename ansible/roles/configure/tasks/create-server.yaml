@@ -22,14 +22,6 @@
   register: db_result
   tags: create
 
-- name: Display DB container result
-  debug:
-    var: db_result
-
-- name: Stop
-  assert:
-    that: 1 == 2
-    
 # 2.
 
 - name: Unmount DB backup volume
@@ -90,11 +82,17 @@
 
   # 4.
 
-#  - name: Unmount DB volume
-#    mount:
-#      path: /pgdata
-#      src: "{{ db_db_volume }}"
-#      state: absent
+  - name: Unmount DB volume
+    mount:
+      path: /pgdata
+      src: "{{ db_db_volume }}"
+      state: absent
+
+  - name: Unmount DB copy volume
+    mount:
+      path: /pgcopy
+      src: "{{ db_db_pgcopy_volume }}"
+      state: absent
 
   - name: Ensure mount paths
     file:
@@ -113,7 +111,7 @@
       fstype: ext4
       dev: "{{ item }}"
     loop:
-#    - "{{ db_db_volume }}"
+    - "{{ db_db_volume }}"
     - "{{ db_db_pgcopy_volume }}"
 
   - name: Mount DB data volume
@@ -131,10 +129,8 @@
       state: present
 
   when:
-  - db_result.container is defined
-  - db_result.container.State is defined
-  - db_result.container.State.Running is defined
-  - not db_result.container.State.Running
+  - db_result.container is not defined
+  - db_result.container.State is not defined
 
 # 5.
 
