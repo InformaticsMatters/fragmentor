@@ -15,6 +15,3 @@ db_db_pgcopy_volume: /dev/vdd
 db_shared_buffers_g: 32
 # The DB work_mem (Mi)
 db_work_mem_m: 256
-
-# Also create (potentially resetting) the database
-db_create_database: no

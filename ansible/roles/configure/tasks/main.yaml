@@ -1,7 +1,3 @@
 ---
 
-# Provide some protection against accidental execution...
-
 - import_tasks: create-server.yaml
-- import_tasks: create-database.yaml
-  when: db_create_database|bool

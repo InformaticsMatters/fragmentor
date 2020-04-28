@@ -18,5 +18,3 @@
     become: yes
   - role: configure
     become: yes
-    tags:
-    - always
