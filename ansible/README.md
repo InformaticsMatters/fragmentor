@@ -27,6 +27,12 @@ You can run fragmentation plays from the head node with something like: -
         -e deployment=production \
         -e vendor=dsip \
         -e version=v1
+
+A simple backup play can be used to copy the database files to the
+backup volume in the DB server. It stops the database, copies the files
+and then restarts the database: -
+
+    $ ansible-playbook site-backup.yaml -e deployment=production
     
 ## Variable locations
 -   Role-specific variables that a user might change often in the corresponding
