@@ -8,4 +8,5 @@
   docker_container:
     name: db
     state: stopped
+  become: yes
   become_user: "{{ db_user_account }}"
