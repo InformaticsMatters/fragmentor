@@ -8,3 +8,4 @@
     cp --force --recursive --archive
     {{ db_root }}/pgdata
     {{ db_backup_root }}
+  become: yes

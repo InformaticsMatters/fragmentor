@@ -6,18 +6,9 @@
   - include_role:
       name: configure
       tasks_from: stop-database.yaml
-      args:
-        apply:
-          become: yes
 
   - include_role: backup
-      args:
-        apply:
-          become: yes
 
   - include_role:
       name: configure
       tasks_from: start-database.yaml
-      args:
-        apply:
-          become: yes
