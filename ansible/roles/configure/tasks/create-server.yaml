@@ -14,6 +14,12 @@
 # Our expectation here is that docker is installed on the server -
 # a responsibility of the docker role we should have already applied.
 
+- name: Create database user account
+  user:
+    name: "{{ db_user_account }}"
+    groups: docker
+    append: yes
+
 # 1.
 
 - name: Check DB container
@@ -89,12 +95,6 @@
 
   # 3.
 
-  - name: Create database user account
-    user:
-      name: "{{ db_user_account }}"
-      groups: docker
-      append: yes
-
   - name: Get database user's home directory
     shell: >-
       getent passwd "{{ db_user_account }}" | awk -F: '{ print $6 }'
@@ -122,11 +122,11 @@
     - /pgdata
     - /pgcopy
 
-  - name: Create DB data volume ext4 filesystem
-    filesystem:
-      fstype: ext4
-      dev: "{{ db_db_volume }}"
-    when: db_db_volume not in mounted_devices
+#  - name: Create DB data volume ext4 filesystem
+#    filesystem:
+#      fstype: ext4
+#      dev: "{{ db_db_volume }}"
+#    when: db_db_volume not in mounted_devices
 
   - name: Mount DB data volume
     mount:
@@ -136,11 +136,11 @@
       state: mounted
     when: db_db_volume not in mounted_devices
 
-  - name: Create DB pgcopy volume ext4 filesystem
-    filesystem:
-      fstype: ext4
-      dev: "{{ db_db_pgcopy_volume }}"
-    when: db_db_pgcopy_volume not in mounted_devices
+#  - name: Create DB pgcopy volume ext4 filesystem
+#    filesystem:
+#      fstype: ext4
+#      dev: "{{ db_db_pgcopy_volume }}"
+#    when: db_db_pgcopy_volume not in mounted_devices
 
   - name: Mount DB pgcopy volume
     mount:
