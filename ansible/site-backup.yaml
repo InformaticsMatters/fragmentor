@@ -1,0 +1,17 @@
+---
+
+- hosts: dbservers[0]
+  tasks:
+
+  - include_role:
+      name: configure
+      tasks_from: stop-database.yaml
+    become: yes
+
+  - include_role: backup
+    become: yes
+
+  - include_role:
+      name: configure
+      tasks_from: start-database.yaml
+    become: yes

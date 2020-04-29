@@ -1,10 +1,5 @@
 ---
 
-# You can use tags to restart the database server
-# assuming everything else has been setup: -
-#
-#   ansible-playbook site-configure.yaml -e deployment=production
-
 - hosts: dbservers[0]
   vars:
     pip_install_packages:

@@ -1,0 +1,7 @@
+---
+
+- name: Stop database container
+  docker_container:
+    name: db
+    state: stopped
+  become_user: "{{ db_user_account }}"

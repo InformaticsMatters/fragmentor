@@ -1,3 +1,4 @@
 ---
 
 - import_tasks: create-server.yaml
+- import_tasks: start-database.yaml

@@ -9,7 +9,6 @@
 # 2. format and mount the backup volume
 # 3. Create the database service account
 # 4. format and mount the DB and WAL volumes
-# 5. run the container image (always) and wait for its port
 #
 # Our expectation here is that docker is installed on the server -
 # a responsibility of the docker role we should have already applied.
@@ -152,37 +151,3 @@
 
   when:
   - db_result.container.State is not defined
-
-# 5.
-
-- name: Start database container (always)
-  docker_container:
-    name: db
-    image: "{{ db_container_image }}:{{ db_container_tag }}"
-    command: >-
-      -c 'shared_buffers={{ db_shared_buffers_g }}GB'
-      -c 'work_mem={{ db_work_mem_m }}MB'
-      -c 'autovacuum_max_workers=24'
-      -c 'max_worker_processes=24'
-      -c 'max_parallel_workers=24'
-      -c 'max_parallel_workers_per_gather=8'
-    shm_size: "{{ db_shared_buffers_g|int * 2 }}G"
-    state: started
-    env:
-      PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_USER: "{{ database[deployment].login_user }}"
-      POSTGRES_PASSWORD: "{{ database[deployment].login_password }}"
-      POSTGRES_DB: "{{ database[deployment].db }}"
-      POSTGRES_INITDB_WALDIR: /var/lib/postgresql/wal
-    volumes:
-    - /pgdata:/var/lib/postgresql/data
-    - /pgwal:/var/lib/postgresql/wal
-    - /pgcopy:/pgcopy
-    exposed_ports:
-    - "{{ database[deployment].port }}:5432"
-    network_mode: host
-  become_user: "{{ db_user_account }}"
-
-- name: Wait for database port
-  wait_for:
-    port: "{{ database[deployment].port }}"
