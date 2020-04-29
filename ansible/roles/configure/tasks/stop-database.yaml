@@ -1,5 +1,9 @@
 ---
 
+- name: Check deployment definition
+  assert:
+    that: deployment|string != 'SetMe'
+
 - name: Stop database container
   docker_container:
     name: db
