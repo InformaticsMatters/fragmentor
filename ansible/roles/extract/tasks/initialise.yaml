@@ -25,6 +25,7 @@
     state: absent
     owner: "{{ db_user_account }}"
     group: "{{ db_user_account }}"
+  become: yes
 
 - name: Ensure extract path
   file:
@@ -32,3 +33,4 @@
     state: directory
     owner: "{{ db_user_account }}"
     group: "{{ db_user_account }}"
+  become: yes
