@@ -122,8 +122,8 @@
 
 # Synchronise the extract to S3
 
-#- name: Synchronise extract to S3
-#  s3_sync:
-#    bucket: "{{ bucket }}"
-#    key_prefix: extract/{{ vendor }}/{{ version }}
-#    file_root: "{{ copy_root }}/extract"
+- name: Synchronise extract to S3
+  s3_sync:
+    bucket: "{{ bucket }}"
+    key_prefix: extract/{{ vendor }}/{{ version }}
+    file_root: "{{ copy_root }}/extract"
