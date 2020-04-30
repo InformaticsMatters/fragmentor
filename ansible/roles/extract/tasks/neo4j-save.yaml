@@ -122,6 +122,12 @@
 
 # Synchronise the extract to S3
 
+- name: Install S3 requirements
+  pip:
+    name:
+    - dateutil
+  become: yes
+
 - name: Synchronise extract to S3
   s3_sync:
     bucket: "{{ bucket }}"
