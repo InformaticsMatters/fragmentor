@@ -6,8 +6,8 @@
 # Neo4j Extract Parameters
 
 # Nodes and Edges Neo4j Files loaded from database.
-neonodefile: neo4jnodes.csv
-neoedgefile: neo4jedges.csv
+neonodefile: nodes.csv
+neoedgefile: edges.csv
 
 # The database server's pgcopy directory.
 # This *MUST* match the directory
