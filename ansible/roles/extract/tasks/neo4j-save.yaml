@@ -130,3 +130,5 @@
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
+  become: yes
+  delegate_to: "{{ groups['dbservers'][0] }}"
