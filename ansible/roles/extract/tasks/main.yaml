@@ -36,3 +36,5 @@
       db: "{{ database[deployment].db }}"
       login_user: "{{ database[deployment].login_user }}"
       login_password: "{{ database[deployment].login_password }}"
+
+- import_tasks: neo4j-save.yaml
