@@ -25,6 +25,7 @@
     state: absent
     owner: "{{ db_user_account }}"
     group: "{{ db_user_account }}"
+  delegate_to: dbservers[0]
   become: yes
 
 - name: Ensure extract path
@@ -33,4 +34,5 @@
     state: directory
     owner: "{{ db_user_account }}"
     group: "{{ db_user_account }}"
+  delegate_to: dbservers[0]
   become: yes

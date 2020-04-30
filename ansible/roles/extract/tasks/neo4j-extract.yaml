@@ -21,6 +21,6 @@
   command: gzip -1 {{ item }}
   become: yes
   become_user: "{{ db_user_account }}"
+  delegate_to: dbservers[0]
   with_fileglob:
   - "{{ copy_root }}/extract/*"
-

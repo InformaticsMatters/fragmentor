@@ -5,3 +5,11 @@
 
 nextflow_timeout_minutes: 60
 nextflow_poll_period_minutes: 1
+
+# The (AWS S3) location of vendor RAW data
+# a source for standardisation.
+bucket: im-fragnet
+
+# AWS credentials for bucket access
+aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"

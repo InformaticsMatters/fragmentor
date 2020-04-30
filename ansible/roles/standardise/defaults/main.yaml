@@ -17,11 +17,3 @@ fragpath: SetMe
 vendor: SetMe
 # The user is required tp specify the version on the command-line
 version: SetMe
-
-# The (AWS S3) location of vendor RAW data
-# a source for standardisation.
-bucket: im-fragnet
-
-# AWS credentials for bucket access
-aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"

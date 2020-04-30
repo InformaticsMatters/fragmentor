@@ -13,4 +13,11 @@ neoedgefile: neo4jedges.csv
 # This *MUST* match the directory
 # mapped into the PostgreSQL container.
 copy_root: /pgcopy
-#copy_root: /var/lib/postgresql/data/
+
+# The (AWS S3) location of vendor RAW data
+# a source for standardisation.
+bucket: im-fragnet
+
+# AWS credentials for bucket access
+aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"

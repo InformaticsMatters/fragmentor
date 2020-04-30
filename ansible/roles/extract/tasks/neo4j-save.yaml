@@ -2,12 +2,12 @@
 
 # The assumption here is that an extract has been done and
 # a number of compressed (.gz) node and edge (relationship) files exist
-# in the {{ copy_root }} directory. The numner of files will be dependent
+# in the {{ copy_root }} directory. The number of files will be dependent
 # on the extract - the actual number is unimportant - the essential
 # property of the extracted files is that their file-names contain the text
 # 'nodes' or 'edges' (but not both) and they end '.gz'.
 #
-# The following tasks are responsible for: -
+# The tasks in this play are responsible for: -
 #
 # 1. templating the loader script (load-neo4j.sh) based on the files found
 # 2. installing the graph header files (located in the role's 'files')
@@ -111,9 +111,10 @@
   with_fileglob:
   - header-*
 
-# Synchronise to S3
+# Synchronise the extract to S3
 
-- name: Synchronise with S3
+- name: Synchronise extract to S3
   s3_sync:
-    bucket: "{{ }}"
+    bucket: "{{ bucket }}"
     file_root: "{{ copy_root }}/extract"
+    key_prefix: extract/{{ vendor }}/{{ version }}
