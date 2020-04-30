@@ -24,7 +24,6 @@
   shell: gzip *.csv
   args:
     chdir: "{{ copy_root }}/extract"
-  become: yes
   become_user: "{{ db_user_account }}"
 
 # List all the node files into ' node-files.txt'.
@@ -34,7 +33,6 @@
   shell: ls -1 *nodes*.gz > node-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
-  become: yes
   become_user: "{{ db_user_account }}"
 
 # Create the 'node_text' variable that will be used when templating
@@ -60,7 +58,6 @@
   register: node_result
   args:
     chdir: "{{ copy_root }}/extract"
-  become: yes
   become_user: "{{ db_user_account }}"
 
 - name: Set node_text
@@ -74,7 +71,6 @@
   shell: ls -1 *edges*.gz > edge-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
-  become: yes
   become_user: "{{ db_user_account }}"
 
 - name: Form relationship_result
@@ -87,7 +83,6 @@
   register: relationship_result
   args:
     chdir: "{{ copy_root }}/extract"
-  become: yes
   become_user: "{{ db_user_account }}"
 
 - name: Set relationship_text
@@ -105,7 +100,6 @@
     mode: 0555
     owner: "{{ db_user_account }}"
     group: "{{ db_user_account }}"
-  become: yes
 
 - name: Copy header files
   copy:
@@ -122,7 +116,6 @@
   command: rm node-files.txt edge-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
-  become: yes
   become_user: "{{ db_user_account }}"
   delegate_to: "{{ groups['dbservers'][0] }}"
 
@@ -130,14 +123,12 @@
 
 - name: Upgrade PIP
   command: pip install --upgrade pip
-  become: yes
 
 - name: Install S3 requirements
   pip:
     name:
     - python-dateutil==2.8.1
     - boto3==1.12.49
-  become: yes
 
 - name: Synchronise extract to S3
   s3_sync:
@@ -147,4 +138,3 @@
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
-  become: yes

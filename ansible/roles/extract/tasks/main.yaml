@@ -49,4 +49,5 @@
 
 - import_tasks: neo4j-save.yaml
   delegate_to: "{{ groups['dbservers'][0] }}"
+  become: yes
   when: save_extract|bool
