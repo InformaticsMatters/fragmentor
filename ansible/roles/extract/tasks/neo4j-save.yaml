@@ -112,6 +112,14 @@
   become: yes
   delegate_to: "{{ groups['dbservers'][0] }}"
 
+- name: Remove node and edge text files
+  command: rm node-files.txt edge-files.txt
+  args:
+    chdir: "{{ copy_root }}/extract"
+  become: yes
+  become_user: "{{ db_user_account }}"
+  delegate_to: "{{ groups['dbservers'][0] }}"
+
 # Synchronise the extract to S3
 
 #- name: Synchronise extract to S3
