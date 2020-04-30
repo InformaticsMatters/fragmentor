@@ -130,7 +130,7 @@
 - name: Install S3 requirements
   pip:
     name:
-    - dateutil
+    - python-dateutil==2.8.1
   become: yes
   delegate_to: "{{ groups['dbservers'][0] }}"
 
