@@ -127,6 +127,7 @@
     name:
     - dateutil
   become: yes
+  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Synchronise extract to S3
   s3_sync:
