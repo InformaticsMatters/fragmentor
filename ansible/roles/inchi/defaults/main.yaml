@@ -1,0 +1,24 @@
+---
+
+# Variables that a user might want to change
+# through the command-line or a parameter file.
+#
+# Less common variables can be found in vars/main.yaml
+reppath: "{{ role_path }}/../../.."
+
+# The following is used is store extract files. It is common with the fragment play (at least for now) because
+# the inchi processing can be driven from nodes.csv (output from fragmentation step).
+fragpath: SetMe
+
+# The following is used (amongst other things)
+# to load vendor-specific variables...
+vendor: SetMe
+# The user is required tp specify the version on the command-line
+version: SetMe
+
+# The user is required tp specify if the nonisomols to be updated are extracted from the database or nodes.csv
+# Nodes.csv will normally be present as part of a fragmentation process, but for initial loading/speed issues these
+# maybe added at a later date.
+nodefile: no
+
+

@@ -5,7 +5,7 @@
     path_to_script: "{{ role_path }}/files/f100_neo4j_nodes_extract.sql"
     named_args:
       SOURCEID: "{{ source_id|int }}"
-      OUTFILE: "{{ copy_root }}/{{ neonodefile }}"
+      OUTFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
     autocommit: no
 
 - name: Extract NEO4J edge information for this source_id to neoedgefile
@@ -13,5 +13,14 @@
     path_to_script: "{{ role_path }}/files/f100_neo4j_edges_extract.sql"
     named_args:
       SOURCEID: "{{ source_id|int }}"
-      OUTFILE: "{{ copy_root }}/{{ neoedgefile }}"
+      OUTFILE: "{{ copy_root }}/extract/{{ neoedgefile }}"
     autocommit: no
+
+# Pack all files to '.gz' files -1 should compress more quickly.
+- name: gzip extract directory for upload
+  command: gzip -1 {{ item }}
+    owner: "{{ db_user_account }}"
+    group: "{{ db_user_account }}"
+  with_fileglob:
+  - "{{ copy_root }}/extract/*.gz"
+

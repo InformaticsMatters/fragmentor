@@ -1,0 +1,16 @@
+---
+
+# Variables that a user might want to change
+# through the command-line or a parameter file.
+
+# Module to add the inchi key - creates inchi.tab from nodes.csv.
+fragnodefile: inchi.csv
+inchifile: inchi.csv
+inchitab: inchi.tab
+isoinchifile: isoinchi.csv
+isoinchitab: isoinchi.tab
+
+# Chunk size for loading inchis
+inchichunk: 1000000
+
+

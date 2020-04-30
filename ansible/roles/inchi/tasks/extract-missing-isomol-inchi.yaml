@@ -1,0 +1,16 @@
+---
+
+- name: Extract isomol smiles for this source_id with missing inchi information to isoinchfile
+  command: >-
+    psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
+     --set AUTOCOMMIT=off --set ON_ERROR_STOP=on
+     -c "\COPY (SELECT iso.smiles FROM isomol iso\
+                 WHERE iso.inchis IS NULL
+                   AND EXISTS (SELECT 1 FROM mol_source m WHERE iso.id = m.isomol_id
+                   AND m.source_id = {{ source_id }}))
+                    TO '{{ fragpath }}/fragment/{{ isoinchifile }}'"
+    {{ database[deployment].db }}
+  environment:
+    PGPASSWORD: "{{ database[deployment].login_password }}"
+
+

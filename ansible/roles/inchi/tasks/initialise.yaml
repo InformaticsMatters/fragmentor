@@ -1,0 +1,18 @@
+---
+
+- name: Retrieve source_id
+  postgresql_query:
+    query: select max(id) from source where name = '{{ vendor }}' and version = '{{ version }}';
+    autocommit: no
+  register: query_result
+
+- debug:
+    var: query_result
+
+- name: Set source_id
+  set_fact:
+    source_id: "{{ query_result.query_result[0].max }}"
+
+- name: Display source_id
+  debug:
+    var: source_id

@@ -1,0 +1,31 @@
+---
+
+# Splits the nodes file into 'chunks'
+# and then call on the 'chunk' loader
+# for each file created to load into the database
+
+- name: Variable sanity-check
+  assert:
+    that:
+    - inchichunk|int > 0
+
+- name: Check inputfile present
+  stat:
+    path: "{{ fragpath }}/fragment/{{ fragnodefile }}"
+  register: fragnodefile_result
+
+- name: Assert fragnodefile
+  assert:
+    that:
+    - fragnodefile_result.stat.exists
+
+- name: Split nodes file
+  shell: >-
+    cat {{ fragnodefile }} | split -d -l {{ nodechunk }} - nodechunk_
+  args:
+    chdir: "{{ fragpath }}/fragment"
+
+- name: Load chunk
+  include_tasks: load-nodes-chunk.yaml
+  with_fileglob:
+  - "{{ fragpath }}/fragment/nodechunk_*"
