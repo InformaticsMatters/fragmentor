@@ -8,7 +8,8 @@
 # 'nodes' or 'edges' (but not both) and they end '.gz'.
 #
 # Importantly, every '.gz' file we expect to find must have a corresponding
-# 'header-' file in the role's 'files' directory.
+# 'header-' file in the role's 'files' directory. So, if there's an 'x.csv.gz'
+# in the extract there must be a 'header-x.csv' in 'files'.
 #
 # The tasks in this play are responsible for: -
 #
