@@ -7,6 +7,9 @@
 # property of the extracted files is that their file-names contain the text
 # 'nodes' or 'edges' (but not both) and they end '.gz'.
 #
+# Importantly, every '.gz' file we expect to find must have a corresponding
+# 'header-' file in the role's 'files' directory.
+#
 # The tasks in this play are responsible for: -
 #
 # 1. templating the loader script (load-neo4j.sh) based on the files found
