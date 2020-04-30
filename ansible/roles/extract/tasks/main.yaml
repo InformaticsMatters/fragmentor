@@ -18,6 +18,15 @@
     - vendor|string != 'SetMe'
     fail_msg: You must provide a 'deployment', 'vendor' and a 'version' to extract.
 
+# We need AWS credentials
+
+- name: Check credentials
+  assert:
+    that:
+    - aws_access_key|string|length > 0
+    - aws_secret_key|string|length > 0
+    fail_msg: You must provide AWS credentias so that I can save the data
+
 - block:
 
   - import_tasks: initialise.yaml
@@ -37,4 +46,5 @@
       login_user: "{{ database[deployment].login_user }}"
       login_password: "{{ database[deployment].login_password }}"
 
-#- import_tasks: neo4j-save.yaml
+- import_tasks: neo4j-save.yaml
+

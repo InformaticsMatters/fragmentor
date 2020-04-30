@@ -2,8 +2,8 @@
 
 # The assumption here is that an extract has been done and
 # a number of compressed (.gz) node and edge (relationship) files exist
-# in the {{ copy_root }} directory. The number of files will be dependent
-# on the extract - the actual number is unimportant - the essential
+# in the {{ copy_root }}/extract directory. The number of files will be
+# dependent on the extract - the actual number is unimportant - the essential
 # property of the extracted files is that their file-names contain the text
 # 'nodes' or 'edges' (but not both) and they end '.gz'.
 #
@@ -13,14 +13,6 @@
 # 2. installing the graph header files (located in the role's 'files')
 # 3. synchronising the files to AWS S3
 
-# We need AWS credentials
-
-- name: Check credentials
-  assret:
-    that:
-    - aws_access_key|string|length > 0
-    - aws_secret_key|string|length > 0
-
 # List all the node files into ' node-files.txt'.
 # This is a 1-file-per-line list of extracted nodes.
 
@@ -28,6 +20,9 @@
   shell: ls -1 *nodes*.gz > node-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
+  become: yes
+  become_user: "{{ db_user_account }}"
+  delegate_to: "{{ groups['dbservers'][0] }}"
 
 # Create the 'node_text' variable that will be used when templating
 # the loader script. This is essentially a '--nodes' directive for
@@ -52,33 +47,24 @@
   register: node_result
   args:
     chdir: "{{ copy_root }}/extract"
+  become: yes
+  become_user: "{{ db_user_account }}"
+  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Set node_text
   set_fact:
     node_text: "{{ node_result.stdout }}"
 
-# List all the edge files into ' edge-files.txt'.
+# List all the edge files into 'edge-files.txt'.
 # This is a 1-file-per-line list of extracted edges.
 
 - name: Collect edge files
   shell: ls -1 *edges*.gz > edge-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
-
-# Create the 'relationship_text' variable that will be used when templating
-# the loader script. This is essentially a '--relationships' directive for
-# each line in 'edge-files.txt'. If 'edge-files.txt'
-# is: -
-#
-#    edges.csv.gz
-#    isomol-suppliermol-edges.csv.gz
-#
-# Then the 'relationship_text' variable should look like this
-# (with each line indented by 8 spaces)
-# (note also that the last line does not end '\'...
-#
-#    --relationships "header-edges.csv,edges.csv.gz" \
-#    --relationships "header-suppliermol-edges.csv,isomol-suppliermol-edges.csv.gz"
+  become: yes
+  become_user: "{{ db_user_account }}"
+  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Form relationship_result
   shell: >-
@@ -89,6 +75,9 @@
   register: relationship_result
   args:
     chdir: "{{ copy_root }}/extract"
+  become: yes
+  become_user: "{{ db_user_account }}"
+  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Set relationship_text
   set_fact:
@@ -98,23 +87,32 @@
 # and copy all the header files we have
 # (some may not be used - just copy them all anyway)...
 
-- name: Template loader script
+- name: Install the loader script
   template:
     src: load-neo4j.sh.j2
     dest: "{{ copy_root }}/extract/load-neo4j.sh"
-    mode: 0655
+    mode: 0555
+    owner: "{{ db_user_account }}"
+    group: "{{ db_user_account }}"
+  become: yes
+  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Copy header files
-  src: "{{ item }}"
-  dest: "{{ copy_root }}/extract/{{ item|basename }}"
-  mode: 0444
+  copy:
+    src: "{{ item }}"
+    dest: "{{ copy_root }}/extract/{{ item|basename }}"
+    mode: 0444
+    owner: "{{ db_user_account }}"
+    group: "{{ db_user_account }}"
   with_fileglob:
   - header-*
+  become: yes
+  delegate_to: "{{ groups['dbservers'][0] }}"
 
 # Synchronise the extract to S3
 
-- name: Synchronise extract to S3
-  s3_sync:
-    bucket: "{{ bucket }}"
-    file_root: "{{ copy_root }}/extract"
-    key_prefix: extract/{{ vendor }}/{{ version }}
+#- name: Synchronise extract to S3
+#  s3_sync:
+#    bucket: "{{ bucket }}"
+#    key_prefix: extract/{{ vendor }}/{{ version }}
+#    file_root: "{{ copy_root }}/extract"
