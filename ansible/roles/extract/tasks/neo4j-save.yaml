@@ -127,3 +127,6 @@
     bucket: "{{ bucket }}"
     key_prefix: extract/{{ vendor }}/{{ version }}
     file_root: "{{ copy_root }}/extract"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
