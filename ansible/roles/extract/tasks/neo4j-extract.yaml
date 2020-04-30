@@ -20,7 +20,7 @@
 # We run this on (delegate to) the DB server...
 
 - name: gzip extract directory for upload
-  command: gzip -1 *.csv
+  shell: gzip -1 *.csv
   args:
     chdir: "{{ copy_root }}/extract"
   become: yes
