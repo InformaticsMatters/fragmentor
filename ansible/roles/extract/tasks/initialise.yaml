@@ -32,6 +32,7 @@
   file:
     path: "{{ copy_root }}/extract"
     state: directory
+    mode: 0777
     owner: "{{ db_user_account }}"
     group: "{{ db_user_account }}"
   delegate_to: "{{ groups['dbservers'][0] }}"
