@@ -1,6 +1,5 @@
 ---
 
-db_user_account: fragmentor
 db_container_image: informaticsmatters/rdkit-cartridge-debian
 db_container_tag: Release_2020_03
 
