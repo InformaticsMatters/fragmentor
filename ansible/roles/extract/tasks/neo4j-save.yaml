@@ -12,9 +12,20 @@
 #
 # The tasks in this play are responsible for: -
 #
-# 1. templating the loader script (load-neo4j.sh) based on the files found
-# 2. installing the graph header files (located in the role's 'files')
-# 3. synchronising the files to AWS S3
+# 1. compressing the extract
+# 2. templating the loader script (load-neo4j.sh) based on the files found
+# 3. installing the graph header files (located in the role's 'files')
+# 4. synchronising the files to AWS S3
+
+# Pack all files to '.gz' files -1 should compress more quickly.
+# We run this on (delegate to) the DB server...
+
+- name: Compress extracted csv files
+  shell: gzip *.csv
+  args:
+    chdir: "{{ copy_root }}/extract"
+  become: yes
+  become_user: "{{ db_user_account }}"
 
 # List all the node files into ' node-files.txt'.
 # This is a 1-file-per-line list of extracted nodes.
@@ -25,7 +36,6 @@
     chdir: "{{ copy_root }}/extract"
   become: yes
   become_user: "{{ db_user_account }}"
-  delegate_to: "{{ groups['dbservers'][0] }}"
 
 # Create the 'node_text' variable that will be used when templating
 # the loader script. This is essentially a '--nodes' directive for
@@ -52,7 +62,6 @@
     chdir: "{{ copy_root }}/extract"
   become: yes
   become_user: "{{ db_user_account }}"
-  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Set node_text
   set_fact:
@@ -67,11 +76,11 @@
     chdir: "{{ copy_root }}/extract"
   become: yes
   become_user: "{{ db_user_account }}"
-  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Form relationship_result
   shell: >-
     paste -d , edge-files.txt edge-files.txt
+    | sed 's/.gz,/,/g'
     | sed 's/^/        --relationships "header-/g'
     | sed 's/$/" \\/g'
     | sed '$ s/.$//'
@@ -80,7 +89,6 @@
     chdir: "{{ copy_root }}/extract"
   become: yes
   become_user: "{{ db_user_account }}"
-  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Set relationship_text
   set_fact:
@@ -98,7 +106,6 @@
     owner: "{{ db_user_account }}"
     group: "{{ db_user_account }}"
   become: yes
-  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Copy header files
   copy:
@@ -110,7 +117,6 @@
   with_fileglob:
   - header-*
   become: yes
-  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Remove node and edge text files
   command: rm node-files.txt edge-files.txt
@@ -125,7 +131,6 @@
 - name: Upgrade PIP
   command: pip install --upgrade pip
   become: yes
-  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Install S3 requirements
   pip:
@@ -133,7 +138,6 @@
     - python-dateutil==2.8.1
     - boto3==1.12.49
   become: yes
-  delegate_to: "{{ groups['dbservers'][0] }}"
 
 - name: Synchronise extract to S3
   s3_sync:
@@ -144,4 +148,3 @@
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
   become: yes
-  delegate_to: "{{ groups['dbservers'][0] }}"

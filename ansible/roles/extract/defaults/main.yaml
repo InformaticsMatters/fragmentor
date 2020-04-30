@@ -5,7 +5,6 @@
 #
 # Less common variables can be found in vars/main.yaml
 
-
 reppath: "{{ role_path }}/../../.."
 
 # The following is used (amongst other things)
@@ -13,3 +12,7 @@ reppath: "{{ role_path }}/../../.."
 vendor: SetMe
 # The user is required tp specify the version on the command-line
 version: SetMe
+
+# Save the extract
+# (typically compressing and saving to S3)
+save_extract: yes
