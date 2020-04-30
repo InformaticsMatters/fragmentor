@@ -19,8 +19,8 @@
 # Pack all files to '.gz' files -1 should compress more quickly.
 - name: gzip extract directory for upload
   command: gzip -1 {{ item }}
-    owner: "{{ db_user_account }}"
-    group: "{{ db_user_account }}"
+  become: yes
+  become_user: "{{ db_user_account }}"
   with_fileglob:
-  - "{{ copy_root }}/extract/*.gz"
+  - "{{ copy_root }}/extract/*"
 

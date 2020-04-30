@@ -19,14 +19,14 @@
 
 # Erase and create the neo4j extract directory...
 
-- name: Ensure DB backup volume mount path
+- name: Remove extract path
   file:
     path: "{{ copy_root }}/extract"
     state: absent
     owner: "{{ db_user_account }}"
     group: "{{ db_user_account }}"
 
-- name: Ensure DB backup volume mount path
+- name: Ensure extract path
   file:
     path: "{{ copy_root }}/extract"
     state: directory

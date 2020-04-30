@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+ME=load-neo4j.sh
+
+echo "($ME) $(date) Starting (from $IMPORT_DIRECTORY)..."
+echo "($ME) $(date) Importing to database $IMPORT_TO"
+echo "($ME) $(date) Database root is $NEO4J_dbms_directories_data"
+
+# If the destination database exists
+# then do nothing...
+if [ ! -d $NEO4J_dbms_directories_data/databases/$IMPORT_TO.db ]
+then
+    echo "Running as $(id)"
+    echo "($ME) $(date) Importing into '$NEO4J_dbms_directories_data/databases/$IMPORT_TO.db'..."
+
+    cd $IMPORT_DIRECTORY
+    /var/lib/neo4j/bin/neo4j-admin import \
+        --database $IMPORT_TO.db \
+        --ignore-missing-nodes \
+{{ node_text }}
+{{ relationship_text }}
+
+    echo "($ME) $(date) Imported."
+else
+    echo "($ME) $(date) Database '$IMPORT_TO' already exists."
+fi
+
+echo "($ME) $(date) Finished."

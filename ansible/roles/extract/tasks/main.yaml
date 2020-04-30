@@ -4,7 +4,7 @@
 # the most convenient way of doing this is via the command-line: -
 #
 #   ansible-playbook site-standardise \
-#     -e vendor=dsip
+#     -e vendor=dsip \
 #     -e version=123
 
 - name: Assert user-variable definitions
@@ -37,4 +37,4 @@
       login_user: "{{ database[deployment].login_user }}"
       login_password: "{{ database[deployment].login_password }}"
 
-- import_tasks: neo4j-save.yaml
+#- import_tasks: neo4j-save.yaml
