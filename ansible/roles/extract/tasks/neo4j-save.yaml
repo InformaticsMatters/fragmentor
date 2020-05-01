@@ -25,7 +25,7 @@
   shell: gzip *.csv
   args:
     chdir: "{{ copy_root }}/extract"
-  become_user: "{{ db_user_account }}"
+  become_user: "{{ database[deployment].db_user_account }}"
 
 # List all the node files into ' node-files.txt'.
 # This is a 1-file-per-line list of extracted nodes.
@@ -34,7 +34,7 @@
   shell: ls -1 *nodes*.gz > node-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
-  become_user: "{{ db_user_account }}"
+  become_user: "{{ database[deployment].db_user_account }}"
 
 # Create the 'node_text' variable that will be used when templating
 # the loader script. This is essentially a '--nodes' directive for
@@ -59,7 +59,7 @@
   register: node_result
   args:
     chdir: "{{ copy_root }}/extract"
-  become_user: "{{ db_user_account }}"
+  become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Set node_text
   set_fact:
@@ -72,7 +72,7 @@
   shell: ls -1 *edges*.gz > edge-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
-  become_user: "{{ db_user_account }}"
+  become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Form relationship_result
   shell: >-
@@ -84,7 +84,7 @@
   register: relationship_result
   args:
     chdir: "{{ copy_root }}/extract"
-  become_user: "{{ db_user_account }}"
+  become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Set relationship_text
   set_fact:
@@ -99,16 +99,16 @@
     src: load-neo4j.sh.j2
     dest: "{{ copy_root }}/extract/load-neo4j.sh"
     mode: 0555
-    owner: "{{ db_user_account }}"
-    group: "{{ db_user_account }}"
+    owner: "{{ database[deployment].db_user_account }}"
+    group: "{{ database[deployment].db_user_account }}"
 
 - name: Copy header files
   copy:
     src: "{{ item }}"
     dest: "{{ copy_root }}/extract/{{ item|basename }}"
     mode: 0444
-    owner: "{{ db_user_account }}"
-    group: "{{ db_user_account }}"
+    owner: "{{ database[deployment].db_user_account }}"
+    group: "{{ database[deployment].db_user_account }}"
   with_fileglob:
   - header-*
   become: yes
@@ -117,7 +117,7 @@
   command: rm node-files.txt edge-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
-  become_user: "{{ db_user_account }}"
+  become_user: "{{ database[deployment].db_user_account }}"
   delegate_to: "{{ groups['dbservers'][0] }}"
 
 # Synchronise the extract to S3
