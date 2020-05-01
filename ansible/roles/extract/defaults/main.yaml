@@ -15,4 +15,4 @@ version: SetMe
 
 # Save the extract
 # (typically compressing and saving to S3)
-save_extract: no
+save_extract: yes
