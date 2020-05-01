@@ -6,17 +6,25 @@
 # Neo4j Extract Parameters
 
 # Nodes and Edges Neo4j Files loaded from database.
-neonodefile: nodes.csv
 neoedgefile: edges.csv
-
-# The database server's pgcopy directory.
-# This *MUST* match the directory
-# mapped into the PostgreSQL container.
-copy_root: /pgcopy
+isomoledgefile: isomol-molecule-edges.csv
+isomolnodefile: isomol-nodes.csv
+isosupmoledgefile: isomol-suppliermol-edges.csv
+molsupmoledgefile: molecule-suppliermol-edges.csv
+neonodefile: nodes.csv
+supnodefile: supplier-nodes.csv
+supmolnodefile: suppliermol-nodes.csv
+supmolsupedgefile: suppliermol-supplier-edges.csv
 
 # The (AWS S3) location of vendor RAW data
 # a source for standardisation.
 bucket: im-fragnet
+
+# The database server's pgcopy directory.
+# This *MUST* match the directory
+# mapped into the PostgreSQL container.
+# copy_root: /pgcopy
+copy_root: "{{ database[deployment].copy_directory }}"
 
 # AWS credentials for bucket access
 aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"

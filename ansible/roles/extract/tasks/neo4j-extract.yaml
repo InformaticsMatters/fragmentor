@@ -5,7 +5,7 @@
     path_to_script: "{{ role_path }}/files/f100_neo4j_nodes_extract.sql"
     named_args:
       SOURCEID: "{{ source_id|int }}"
-      OUTFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
+      NEONODEFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
     autocommit: no
 
 - name: Extract NEO4J edge information for this source_id to neoedgefile
@@ -13,5 +13,21 @@
     path_to_script: "{{ role_path }}/files/f100_neo4j_edges_extract.sql"
     named_args:
       SOURCEID: "{{ source_id|int }}"
-      OUTFILE: "{{ copy_root }}/extract/{{ neoedgefile }}"
+      NEOEDGEFILE: "{{ copy_root }}/extract/{{ neoedgefile }}"
     autocommit: no
+
+- name: Extract supporting information for this source_id / extract to various files
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f100_neo4j_supporting_info_extract.sql"
+    named_args:
+      SOURCEID: "{{ source_id|int }}"
+      ISOMOLEDGEFILE: "{{ copy_root }}/extract/{{ isomoledgefile }}"
+      ISOMOLNODEFILE: "{{ copy_root }}/extract/{{ isomolnodefile }}"
+      ISOSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ isosupmoledgefile }}"
+      MOLSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ molsupmoledgefile }}"
+      SUPNODEFILE: "{{ copy_root }}/extract/{{ supnodefile }}"
+      SUPMOLNODEFILE: "{{ copy_root }}/extract/{{ supmolnodefile }}"
+      SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
+    autocommit: no
+
+

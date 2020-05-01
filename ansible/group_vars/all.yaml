@@ -30,16 +30,20 @@ database:
     db: mydatabase
     login_user: postgres
     login_password: 1234
+    copy_directory: /var/lib/postgresql/data
+    db_user_account: postgres
   production:
     login_host: 192.168.253.51
     port: 5432
     db: fairmolecules
     login_user: fragmentor
     login_password: bullfinch
+    copy_directory: /pgcopy
+    db_user_account: fragmentor
 
 # Chunk size to control size of transactions in
 # uploading standardised file data to database
 standchunk: 1000000
 
 # The database server user account
-db_user_account: fragmentor
+#db_user_account: fragmentor

@@ -23,17 +23,21 @@
   file:
     path: "{{ copy_root }}/extract"
     state: absent
-    owner: "{{ db_user_account }}"
-    group: "{{ db_user_account }}"
+    owner: "{{ database[deployment].db_user_account }}"
+    group: "{{ database[deployment].db_user_account }}"
   delegate_to: "{{ groups['dbservers'][0] }}"
   become: yes
+  when: deployment=="production"
 
 - name: Ensure extract path
   file:
     path: "{{ copy_root }}/extract"
     state: directory
     mode: 0777
-    owner: "{{ db_user_account }}"
-    group: "{{ db_user_account }}"
+    owner: "{{ database[deployment].db_user_account }}"
+    group: "{{ database[deployment].db_user_account }}"
   delegate_to: "{{ groups['dbservers'][0] }}"
   become: yes
+  when: deployment=="production"
+
+

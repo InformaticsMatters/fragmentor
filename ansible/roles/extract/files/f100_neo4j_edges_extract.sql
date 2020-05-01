@@ -3,6 +3,11 @@
  * Purpose: Extract Neo4j Edge data into CSV file on database server
  */
 
+--
+-- Edges.csv
+-- :START_ID(F2),:END_ID(F2),label,:TYPE
+--
+
 COPY (with RECURSIVE fragments AS (
        select parent_smiles, child_smiles, label, 'FRAG', parent_id, child_id
          from v_edge e
@@ -12,4 +17,4 @@ COPY (with RECURSIVE fragments AS (
              from v_edge c
              inner join fragments p on c.parent_id = p.child_id
         ) select parent_smiles, child_smiles, label, 'FRAG' from fragments)
-        TO %(OUTFILE)s DELIMITER ',' CSV;
+        TO %(NEOEDGEFILE)s DELIMITER ',' CSV;
