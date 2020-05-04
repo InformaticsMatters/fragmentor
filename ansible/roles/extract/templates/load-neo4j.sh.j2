@@ -2,15 +2,26 @@
 
 ME=load-neo4j.sh
 
+# Some entry diagnostics.
+# Display key variables and the database and import directories...
+echo "($ME) $(date) Running as $(id)"
 echo "($ME) $(date) Starting (from $IMPORT_DIRECTORY)..."
 echo "($ME) $(date) Importing to database $IMPORT_TO"
 echo "($ME) $(date) Database root is $NEO4J_dbms_directories_data"
+echo "($ME) $(date) Database root content is..."
+ls -l $NEO4J_dbms_directories_data
+if [ -d $NEO4J_dbms_directories_data/databases ]
+then
+    echo "($ME) $(date) Database root databases content is..."
+    ls -l $NEO4J_dbms_directories_data/databases
+fi
+echo "($ME) $(date) Import content is..."
+ls -l $IMPORT_DIRECTORY
 
 # If the destination database exists
 # then do nothing...
 if [ ! -d $NEO4J_dbms_directories_data/databases/$IMPORT_TO.db ]
 then
-    echo "Running as $(id)"
     echo "($ME) $(date) Importing into '$NEO4J_dbms_directories_data/databases/$IMPORT_TO.db'..."
 
     cd $IMPORT_DIRECTORY
