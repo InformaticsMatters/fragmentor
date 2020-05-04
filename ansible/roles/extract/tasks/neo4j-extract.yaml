@@ -29,6 +29,13 @@
       MOLSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ molsupmoledgefile }}"
       SUPNODEFILE: "{{ copy_root }}/extract/{{ supnodefile }}"
       SUPMOLNODEFILE: "{{ copy_root }}/extract/{{ supmolnodefile }}"
+    autocommit: no
+
+- name: Extract vendor specific supporting information for this source_id / extract
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f100-neo4j-vendor-{{ vendor }}.sql"
+    named_args:
+      SOURCEID: "{{ source_id|int }}"
       SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
     autocommit: no
 

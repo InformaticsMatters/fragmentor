@@ -4,7 +4,6 @@
  *     Fills the following files with the relevant information from the database
  *     supnodefile: supplier-nodes.csv
  *     supmolnodefile: suppliermol-nodes.csv
- *     supmolsupedgefile: suppliermol-supplier-edges.csv
  *     molsupmoledgefile: molecule-suppliermol-edges.csv
  *     isosupmoledgefile: isomol-suppliermol-edges.csv
  *     isomoledgefile: isomol-molecule-edges.csv
@@ -32,15 +31,6 @@ COPY (select code, smiles, 'Available'
         from mol_source ms
        where ms.source_id = %(SOURCEID)s)
           to %(SUPMOLNODEFILE)s DELIMITER ',' CSV;
-
---
--- suppliermol-supplier-edges.csv
--- :START_ID(SM),:END_ID(S),:TYPE
---
-COPY (select code, 'Xchem', 'Availability'
-        from mol_source ms
-       where ms.source_id = %(SOURCEID)s)
-          to %(SUPMOLSUPEDGEFILE)s DELIMITER ',' CSV;
 
 --
 -- molecule-suppliermol-edges.csv
@@ -78,8 +68,10 @@ COPY (select iso.smiles, non.smiles, 'NonIso'
 -- isomolnodefile: isomol-nodes.csv
 -- smiles:ID(ISOMOL),cmpd_ids:STRING[],:LABEL
 --
-COPY (select iso.smiles, ms.code, 'CanSmi;Mol;XChem'
+COPY (select iso.smiles, ms.code, 'CanSmi;Mol;' || v.supplier_node_name
         from mol_source ms
+        join source s on s.id = ms.source_id
+        join vendor_name v on s.name = v.vendor_name
         join isomol iso on iso.id = ms.isomol_id
          and ms.source_id = %(SOURCEID)s)
           to %(ISOMOLNODEFILE)s DELIMITER ',' CSV;
