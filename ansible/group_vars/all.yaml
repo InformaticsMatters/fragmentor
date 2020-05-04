@@ -55,18 +55,23 @@ vendors:
     fraghac: 36
     # Maximum frag cycles for fragmentation processing
     fragmaxfrags: 12
+    # Limit for partial fragmentation processing (not operational)
+    fraglimit: 0
   chemspace_bb:
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
+    fraglimit: 0
   molport:
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
+    fraglimit: 0
   enamine_ro5:
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
+    fraglimit: 0
 
 # The tag of the fragmentation container,
 neo4j_graph_version: 2019-12-18.2

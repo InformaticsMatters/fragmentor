@@ -244,6 +244,7 @@ create TABLE public.source (
     id integer NOT NULL,
     name text NOT NULL,
     version text NOT NULL,
+    frag_limit integer,
     min_hac integer,
     max_hac integer,
     max_frags integer,

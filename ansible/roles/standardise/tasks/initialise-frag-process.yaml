@@ -10,6 +10,7 @@
     - "{{ vendors[vendor].fraghac|int }} > 0"
     - "{{ vendors[vendor].fragminhac|int }} >= 0"
     - "{{ vendors[vendor].fragmaxfrags|int }} > 0"
+    - "{{ vendors[vendor].fraglimit|int }} >= 0"
 
 - name: check vendor_name
   postgresql_query:
@@ -35,9 +36,9 @@
 - name: Insert run parameters
   postgresql_query:
     query: >-
-      insert into source (name, version, min_hac, max_hac, max_frags, start_datetime )
-      values ('{{ vendor }}', '{{ version }}','{{ vendors[vendor].fragminhac|int }}',
-              '{{ vendors[vendor].fraghac|int }}','{{ vendors[vendor].fragmaxfrags|int }}', now())
+      insert into source (name, version, min_hac, max_hac, max_frags, frag_limit, start_datetime )
+      values ('{{ vendor }}', '{{ version }}',{{ vendors[vendor].fragminhac|int }},
+              {{ vendors[vendor].fraghac|int }},{{ vendors[vendor].fragmaxfrags|int }}, {{ vendors[vendor].fraglimit|int }}, now())
       returning id;
     autocommit: yes
   register: query_result
