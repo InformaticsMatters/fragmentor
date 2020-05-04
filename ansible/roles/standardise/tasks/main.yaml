@@ -42,12 +42,7 @@
 
   - import_tasks: initialise-frag-process.yaml
 
-  - import_tasks: get-raw-data-prod.yaml
-    when: deployment=="production"
-
-  - import_tasks: get-raw-data-dev.yaml
-    when: deployment=="development"
-
+  - import_tasks: get-raw-data-{{ deployment }}.yaml
   - import_tasks: standardise-file.yaml
   - import_tasks: load-standardised-data.yaml
 

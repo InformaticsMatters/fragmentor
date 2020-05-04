@@ -21,6 +21,10 @@ clean_start: yes
 # used for a number of nextflow workflows.
 nextflow_container_tag: molport-04
 
+# The process id is the commit id of the fragmentation container,
+# Used in the extract file
+process_id: Fragmentor-a9ac622
+
 # Database credentials.
 # A map of variables based on deployment target.
 database:
@@ -41,9 +45,33 @@ database:
     copy_directory: /pgcopy
     db_user_account: fragmentor
 
+# Vendor defaults.
+# A map of deafults based on the vendor and library.
+vendors:
+  xchem_dsip:
+    # Minimum heavy atom count for extraction/fragmentation processing
+    fragminhac: 0
+    # Maximum heavy atom count for extraction/fragmentation processing
+    fraghac: 36
+    # Maximum frag cycles for fragmentation processing
+    fragmaxfrags: 12
+  chemspace_bb:
+    fragminhac: 0
+    fraghac: 36
+    fragmaxfrags: 12
+  molport:
+    fragminhac: 0
+    fraghac: 36
+    fragmaxfrags: 12
+  enamine_ro5:
+    fragminhac: 0
+    fraghac: 36
+    fragmaxfrags: 12
+
+# The tag of the fragmentation container,
+neo4j_graph_version: 2019-12-18.2
+
 # Chunk size to control size of transactions in
 # uploading standardised file data to database
 standchunk: 1000000
 
-# The database server user account
-#db_user_account: fragmentor

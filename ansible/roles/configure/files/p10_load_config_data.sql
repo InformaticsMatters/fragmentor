@@ -1,0 +1,13 @@
+/*
+ * Load configuration data SQL Statements:
+ * Purpose: Initialises venfor information
+ *
+ * Author | Date    | Version
+ * Duncan | 05/2020 | Initial Version
+ *
+ */
+
+insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_dsip', NULL, 'Xchem','V_XCHEM');
+insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('chemspace_bb', 'USD', 'ChemSpace-BB','V_CS_BB');
+insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('molport', 'USD', 'MolPort','V_MP');
+insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('enamine_r05', NULL, 'REAL','V_REAL');

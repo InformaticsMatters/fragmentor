@@ -21,14 +21,6 @@ fragsmifile: nonisomol.smi
 
 fragchunksize: 30000
 
-# Maximum heavy atom count for extraction/fragmentation processing
-
-fraghac: 36
-
-# Maximum frag cycles for fragmentation processing
-
-fragmaxfrags: 12
-
 # Nodes and Edges Files produced by fragmentation..
 
 fragnodefile: nodes.csv

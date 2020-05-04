@@ -244,7 +244,9 @@ create TABLE public.source (
     id integer NOT NULL,
     name text NOT NULL,
     version text NOT NULL,
-    currency text,
+    min_hac integer,
+    max_hac integer,
+    max_frags integer,
     start_datetime timestamp,
     run_summary_log BYTEA
 );
@@ -266,6 +268,18 @@ create sequence public.source_id_seq
 --
 
 alter sequence public.source_id_seq OWNED BY public.source.id;
+
+--
+-- Name: vendor_version; Type: TABLE; Schema: public; Owner: postgres
+--
+
+create TABLE public.vendor_name (
+    vendor_name text NOT NULL,
+    currency text,
+    supplier_node_name text,
+    supplier_node_label text,
+    PRIMARY KEY (vendor_name)
+);
 
 --
 -- Name: edge id; Type: DEFAULT; Schema: public; Owner: postgres

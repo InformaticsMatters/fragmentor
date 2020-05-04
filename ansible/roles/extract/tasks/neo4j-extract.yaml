@@ -21,6 +21,8 @@
     path_to_script: "{{ role_path }}/files/f100_neo4j_supporting_info_extract.sql"
     named_args:
       SOURCEID: "{{ source_id|int }}"
+      GRAPHVERSION: "{{ neo4j_graph_version }}"
+      PROCESSID: "{{ process_id }}"
       ISOMOLEDGEFILE: "{{ copy_root }}/extract/{{ isomoledgefile }}"
       ISOMOLNODEFILE: "{{ copy_root }}/extract/{{ isomolnodefile }}"
       ISOSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ isosupmoledgefile }}"

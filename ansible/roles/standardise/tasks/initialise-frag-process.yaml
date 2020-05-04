@@ -3,6 +3,57 @@
 - debug:
     msg: "{{ reppath }}/run/vendor/{{ vendor }}"
 
+
+- name: Variable sanity-check
+  assert:
+    that:
+    - "{{ vendors[vendor].fraghac|int }} > 0"
+    - "{{ vendors[vendor].fragminhac|int }} >= 0"
+    - "{{ vendors[vendor].fragmaxfrags|int }} > 0"
+
+- name: check vendor_name
+  postgresql_query:
+    query: >-
+      select * from vendor_name
+      where vendor_name = '{{ vendor }}';
+    autocommit: no
+
+- name: check if previous version
+  postgresql_query:
+    query: select id from source where name = '{{ vendor }}' and version = '{{ version }}';
+    autocommit: no
+  register: query_result
+
+- debug:
+    var: query_result
+
+- name: version already processed sanity-check
+  assert:
+    that:
+    - "{{ query_result.rowcount|int }} == 0"
+
+- name: Insert run parameters
+  postgresql_query:
+    query: >-
+      insert into source (name, version, min_hac, max_hac, max_frags, start_datetime )
+      values ('{{ vendor }}', '{{ version }}','{{ vendors[vendor].fragminhac|int }}',
+              '{{ vendors[vendor].fraghac|int }}','{{ vendors[vendor].fragmaxfrags|int }}', now())
+      returning id;
+    autocommit: yes
+  register: query_result
+
+- debug:
+    var: query_result
+
+- name: Set source_id
+  set_fact:
+    source_id: "{{ query_result.query_result[0].id }}"
+
+- name: Display source_id
+  debug:
+    var: source_id
+
+
 # Optionally erase and then create the working directories...
 
 - name: Erase directories
@@ -24,41 +75,4 @@
   - "{{ fragpath }}/fragment"
   - "{{ standpath }}/standardise"
 
-- name: Check fragpass
-  stat:
-    path: "{{ reppath }}/run/fragpass"
-  register: fragpass_result
 
-- name: Assert fragpass
-  assert:
-    that:
-    - fragpass_result.stat.exists
-
-- name: Set fragpass state
-  file:
-    path: "{{ reppath }}/run/fragpass"
-    mode: "0600"
-
-- name: Insert run parameters
-  postgresql_query:
-    query: >-
-      insert into source (name, version, currency)
-      values ('{{ vendor }}', '{{ version }}','');
-    autocommit: yes
-
-- name: Retrieve source_id
-  postgresql_query:
-    query: select max(id) from source where name = '{{ vendor }}';
-    autocommit: no
-  register: query_result
-
-- debug:
-    var: query_result
-
-- name: Set source_id
-  set_fact:
-    source_id: "{{ query_result.query_result[0].max }}"
-
-- name: Display source_id
-  debug:
-    var: source_id

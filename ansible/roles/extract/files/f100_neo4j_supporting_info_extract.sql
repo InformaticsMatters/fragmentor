@@ -17,8 +17,10 @@
 -- name:ID(S),graph_version,processing_version,process_id,build_number:int,limit:int,min_hac:int,max_hac:int,build_datetime:datetime,label,:LABEL
 -- NB - suggest these values are ultimately added to "Vendor_name" and Source.
 --
-COPY (select 'Xchem', '2019-12-18.2' ,s.name || '/' || s.version, 'Fragmentor : a9ac622', 1, 0, 32, s.start_datetime, 'V_XCHEM','Supplier'
+COPY (select v.supplier_node_name, %(GRAPHVERSION)s ,s.name || '/' || s.version, %(PROCESSID)s, 1,
+             0, s.min_hac, s.max_hac, s.start_datetime, v.supplier_node_label, 'Supplier'
         from source s
+        join vendor_name v on s.name = v.vendor_name
        where s.id = %(SOURCEID)s)
           to %(SUPNODEFILE)s DELIMITER ',' CSV;
 

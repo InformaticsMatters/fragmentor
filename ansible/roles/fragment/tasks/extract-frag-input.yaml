@@ -8,7 +8,7 @@
          WHERE NOT EXISTS (SELECT 1 FROM edge e WHERE e.parent_id = n.id)
          AND EXISTS (SELECT 1 FROM mol_source m WHERE n.id = m.nonisomol_id
          AND m.source_id = {{ source_id }})
-         AND n.hac <= {{ fraghac }} ) TO '{{ fragpath }}/fragment/{{ fragsmifile }}'"
+         AND n.hac <= {{ vendors[vendor].fraghac }} ) TO '{{ fragpath }}/fragment/{{ fragsmifile }}'"
     {{ database[deployment].db }}
   environment:
     PGPASSWORD: "{{ database[deployment].login_password }}"
