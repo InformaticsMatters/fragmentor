@@ -16,3 +16,10 @@ version: SetMe
 # Save the extract
 # (typically compressing and saving to S3)
 save_extract: yes
+
+# Whether an index or recursive extract is to be used.
+# The recursive sql statements are not safe for larger vendors.
+extract: index
+# Whether to load or use an existing index.
+load_index: yes
+
