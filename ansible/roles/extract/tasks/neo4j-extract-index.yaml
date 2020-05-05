@@ -4,7 +4,7 @@
 #  postgresql_query:
 #    path_to_script: "{{ role_path }}/files/f100_create_o_source_edge.sql"
 #    autocommit: yes
-#
+
 #- name: Load o_source_edge table
 #  postgresql_query:
 #    query: >-

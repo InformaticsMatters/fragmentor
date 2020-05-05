@@ -17,11 +17,13 @@ COPY (WITH RECURSIVE fragments AS (
            from v_edge_node c
           inner join fragments p on c.parent_id = p.child_id
         ) select f1.parent_smiles, f1.hac, f1.rac, f1.ring_smiles, ms.code as cmpd,
-            (case when ms.code notnull then 'F2;CanSmi;Mol;V_XCHEM'
+            (case when ms.code notnull then 'F2;CanSmi;Mol;' || v.supplier_node_name
                   else 'F2'
              end) as label
          from fragments f1
          left join mol_source ms on f1.parent_id = ms.nonisomol_id and ms.source_id = %(SOURCEID)s
+         left join source s on s.id = ms.source_id
+         left join vendor_name v on s.name = v.vendor_name
         union
           select f2.child_smiles, f2.child_hac, f2.child_rac, f2.child_ring_smiles, NULL, 'F2'
          from fragments f2
