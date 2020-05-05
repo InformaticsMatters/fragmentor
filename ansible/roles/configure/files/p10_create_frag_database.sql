@@ -5,8 +5,6 @@
  * Create Statements originally generated from fairmolecules and dumped 
  * from database version 12.2 by pg_dump version 12.2 (Ubuntu 12.2-2.pgdg18.04+1)
  *
- * Called from p10_create_frag_database.sh
- * 
  * NOTE: All tables are created under the public owner. If access permissions 
  * are required, then these will have to be set.
  * 

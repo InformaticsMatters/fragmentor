@@ -1,0 +1,31 @@
+---
+
+# Splits the nodes file into 'chunks'
+# and then call on the 'chunk' loader
+# for each file created to load into the database
+
+- name: Variable sanity-check
+  assert:
+    that:
+    - inchichunk|int > 0
+
+- name: Check inputfile present
+  stat:
+    path: "{{ fragpath }}/fragment/{{ isoinchitab }}"
+  register: isoinchitab_result
+
+- name: Assert isoinchitab
+  assert:
+    that:
+    - isoinchitab_result.stat.exists
+
+- name: Split iso inchtab file
+  shell: >-
+    cat {{ isoinchitab }} | split -d -l {{ inchichunk }} - isoinchichunk_
+  args:
+    chdir: "{{ fragpath }}/fragment"
+
+- name: Load isoinchichunk
+  include_tasks: load-isomol-chunk.yaml
+  with_fileglob:
+  - "{{ fragpath }}/fragment/isoinchichunk_*"

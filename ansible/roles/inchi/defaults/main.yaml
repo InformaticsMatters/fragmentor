@@ -16,9 +16,9 @@ vendor: SetMe
 # The user is required tp specify the version on the command-line
 version: SetMe
 
-# The user is required tp specify if the nonisomols to be updated are extracted from the database or nodes.csv
+# The user is required tp specify if the nonisomols to be updated are extracted from the database or nodes files
 # Nodes.csv will normally be present as part of a fragmentation process, but for initial loading/speed issues these
 # maybe added at a later date.
-nodefile: no
+inchifrom: database
 
 

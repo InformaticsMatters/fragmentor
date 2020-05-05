@@ -11,21 +11,21 @@
 
 - name: Check inputfile present
   stat:
-    path: "{{ fragpath }}/fragment/{{ fragnodefile }}"
-  register: fragnodefile_result
+    path: "{{ fragpath }}/fragment/{{ inchitab }}"
+  register: inchitab_result
 
-- name: Assert fragnodefile
+- name: Assert inchitab
   assert:
     that:
-    - fragnodefile_result.stat.exists
+    - inchitab_result.stat.exists
 
-- name: Split nodes file
+- name: Split inchtab file
   shell: >-
-    cat {{ fragnodefile }} | split -d -l {{ nodechunk }} - nodechunk_
+    cat {{ inchitab }} | split -d -l {{ inchichunk }} - inchichunk_
   args:
     chdir: "{{ fragpath }}/fragment"
 
-- name: Load chunk
-  include_tasks: load-nodes-chunk.yaml
+- name: Load inchichunk
+  include_tasks: load-nonisomol-chunk.yaml
   with_fileglob:
-  - "{{ fragpath }}/fragment/nodechunk_*"
+  - "{{ fragpath }}/fragment/inchichunk_*"

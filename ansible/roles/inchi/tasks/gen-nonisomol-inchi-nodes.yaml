@@ -1,10 +1,5 @@
 ---
 
-- name: Variable sanity-check
-  assert:
-    that:
-    - inchichunk|int > 0
-
 - name: Check inputfile present
   stat:
     path: "{{ fragpath }}/fragment/{{ fragnodefile }}"
@@ -14,16 +9,11 @@
   assert:
     that:
     - nodesfile.stat.exists
-
-- name: run python generate_inchi
-
 #
 # python -m frag.network.scripts.generate_inchi -i $FRAGPATH/fragment/$FRAGNODEFILE -o $FRAGPATH/fragment/$INCHITAB -n -s -node
 #
-
 - name: Run python generate_inchi
-  script: frag.network.scripts.generate_inchi.py
-  args:
-    executable: python3
+  script: generate_inchi.py -i {{ fragpath }}/fragment/{{ fragnodefile }} -o {{ fragpath }}/fragment/{{ inchitab }} -n -s -node
+
 
 

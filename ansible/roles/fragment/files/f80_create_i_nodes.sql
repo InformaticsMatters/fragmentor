@@ -2,8 +2,6 @@
  * Create Fragmentation i_node Table SQL Statements :
  * Purpose: Creates fragmentation specific i_node table
  *
- * Called from p80_load_nodes.sh
- *
  * Author | Date    | Version
  * Duncan | 03/2020 | Initial Version
  *

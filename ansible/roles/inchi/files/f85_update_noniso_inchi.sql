@@ -2,14 +2,10 @@
  * Load Nonisomol Inchi Results SQL Statements:
  * Purpose: Loads Inchi key data into Frag database
  *
- * Called from f85_load_noniso_inchi.sh
- *
  * Author | Date    | Version
  * Duncan | 03/2020 | Initial Version
  *
  */
-
-\timing
 
 /*
  * Insert INCHI tables.

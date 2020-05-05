@@ -4,7 +4,7 @@
 # through the command-line or a parameter file.
 
 # Module to add the inchi key - creates inchi.tab from nodes.csv.
-fragnodefile: inchi.csv
+fragnodefile: nodes.csv
 inchifile: inchi.csv
 inchitab: inchi.tab
 isoinchifile: isoinchi.csv

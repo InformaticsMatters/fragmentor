@@ -2,8 +2,6 @@
  * Create Fragmentation Database SQL Statements: 
  * Purpose: Creates fragmentation company specific tables
  *
- * Called from p80_load_edges.sh
- *
  * Author | Date    | Version
  * Duncan | 03/2020 | Initial Version
  *

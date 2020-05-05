@@ -17,6 +17,11 @@
   debug:
     var: source_id
 
+- name: Variable sanity-check
+  assert:
+    that:
+    - source_id|int > 0
+
 # Erase and create the neo4j extract directory...
 
 - name: Remove extract path

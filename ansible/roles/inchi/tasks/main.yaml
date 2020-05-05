@@ -12,23 +12,12 @@
     that:
     - deployment|string|length > 0
     - deployment|string != 'SetMe'
-    - version|string|length > 0
-    - version|string != 'SetMe'
-    - vendor|string|length > 0
-    - vendor|string != 'SetMe'
-    fail_msg: You must provide a 'deployment', 'vendor' and a 'version' to extract.
+    fail_msg: You must provide a 'deployment' to update inchi data.
 
 - block:
-
-  - import_tasks: initialise.yaml
-
-  - import_tasks: extract-missing-nonisomol-inch.yaml
-    when: nodefile=="no"
-
-  - import_tasks: gen-nonisomol-inchi.yaml
+  - import_tasks: gen-nonisomol-inchi-{{ inchifrom }}.yaml
   - import_tasks: load-nonisomol-inchi.yaml
-  - import_tasks: extract-missing-isomol-inch.yaml
-  - import_tasks: gen-isomol-inchi.yaml
+  - import_tasks: gen-isomol-inchi-database.yaml
   - import_tasks: load-isomol-inchi.yaml
 
   module_defaults:
