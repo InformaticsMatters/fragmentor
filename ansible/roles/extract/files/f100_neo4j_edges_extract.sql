@@ -8,13 +8,9 @@
 -- :START_ID(F2),:END_ID(F2),label,:TYPE
 --
 
-COPY (with RECURSIVE fragments AS (
-       select parent_smiles, child_smiles, label, 'FRAG', parent_id, child_id
-         from v_edge e
-         inner join mol_source ms on e.parent_id = ms.nonisomol_id and ms.source_id = %(SOURCEID)s
-         union
-            select c.parent_smiles, c.child_smiles, c.label, 'FRAG', c.parent_id, c.child_id
-             from v_edge c
-             inner join fragments p on c.parent_id = p.child_id
-        ) select parent_smiles, child_smiles, label, 'FRAG' from fragments)
-        TO %(NEOEDGEFILE)s DELIMITER ',' CSV;
+COPY (select np.smiles, nc.smiles, label, 'FRAG'
+        from o_source_edge os
+        join nonisomol np ON np.id = os.parent_id
+        join nonisomol nc ON nc.id = os.child_id)
+  TO %(NEOEDGEFILE)s DELIMITER ',' CSV;
+

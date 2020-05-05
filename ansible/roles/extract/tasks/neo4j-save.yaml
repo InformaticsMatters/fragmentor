@@ -113,6 +113,18 @@
   - header-*
   become: yes
 
+- name: Copy suppliermol-supplier-edges header files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ copy_root }}/extract/{{ item|basename }}"
+    mode: 0444
+    owner: "{{ database[deployment].db_user_account }}"
+    group: "{{ database[deployment].db_user_account }}"
+  with_fileglob:
+  - "{{ vendor }}/header-*"
+  become: yes
+
+
 - name: Remove node and edge text files
   command: rm node-files.txt edge-files.txt
   args:

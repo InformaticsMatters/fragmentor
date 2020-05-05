@@ -529,16 +529,13 @@ alter table ONLY public.price
     ADD CONSTRAINT price_molsource_id_fkey FOREIGN KEY (molsource_id) REFERENCES public.mol_source(id) ON delete CASCADE;
 
 --
--- View Used in extracting data for Neo4j database
+-- View Used in extracting data for Neo4j database - only used in old recursive extract process
 --
 
 create view v_edge as
     SELECT e.id, e.parent_id, e.child_id,
            p.smiles as parent_smiles,
            c.smiles as child_smiles,
-           p.hac as hac,
-           p.rac as rac,
-           p.ring_smiles as ring_smiles,
            e.label
       FROM edge e
 INNER JOIN nonisomol p ON e.parent_id = p.id
@@ -572,3 +569,54 @@ alter table edge set (autovacuum_vacuum_scale_factor = 0.01);
 alter table edge set (autovacuum_vacuum_cost_limit = 2000);
 alter table mol_source set (autovacuum_vacuum_scale_factor = 0.01);
 alter table mol_source set (autovacuum_vacuum_cost_limit = 2000);
+
+
+--
+-- Stored Procedure for loading o_source_edge
+--
+
+CREATE OR REPLACE PROCEDURE extract_o_source_edge(
+   src_id INTEGER,
+   commit_rate INTEGER,
+   chunk_size INTEGER
+)
+LANGUAGE plpgsql
+AS $edges$
+DECLARE
+    chunks_count INTEGER := 0;
+    commits INTEGER := 0;
+    chunks INTEGER := 0;
+    src_count INTEGER := 0;
+BEGIN
+	select count(*) into src_count from mol_source where source_id = src_id;
+    chunks := 1 + src_count / chunk_size;
+    RAISE NOTICE 'chunks %', chunks;
+	for chunk_nr IN 0 .. chunks - 1
+    loop
+       chunks_count := chunks_count + 1;
+       WITH RECURSIVE source_edges AS (
+           select parent_id, child_id, label
+             from edge e
+            where e.parent_id in (SELECT ms.nonisomol_id
+                                   from mol_source ms
+                                   where ms.source_id = src_id limit chunk_size offset (chunk_size*chunk_nr))
+            union
+           select c.parent_id, c.child_id, c.label
+             from edge c
+             inner join source_edges p on c.parent_id = p.child_id)
+           insert into o_source_edge
+              select parent_id, child_id, label
+                from source_edges
+           ON CONFLICT (parent_id, child_id, label) DO NOTHING;
+       if chunks_count >= commit_rate then
+          chunks_count := 0;
+          commit;
+          commits := commits + 1;
+          RAISE NOTICE 'molecules processed: %', commits * commit_rate * chunk_size;
+       end if;
+    END LOOP;
+end $edges$ ;
+
+
+
+

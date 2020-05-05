@@ -1,21 +1,5 @@
 ---
 
-- name: Extract NEO4J node information for this source_id to neonodefile
-  postgresql_query:
-    path_to_script: "{{ role_path }}/files/f100_neo4j_nodes_extract.sql"
-    named_args:
-      SOURCEID: "{{ source_id|int }}"
-      NEONODEFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
-    autocommit: no
-
-- name: Extract NEO4J edge information for this source_id to neoedgefile
-  postgresql_query:
-    path_to_script: "{{ role_path }}/files/f100_neo4j_edges_extract.sql"
-    named_args:
-      SOURCEID: "{{ source_id|int }}"
-      NEOEDGEFILE: "{{ copy_root }}/extract/{{ neoedgefile }}"
-    autocommit: no
-
 - name: Extract supporting information for this source_id / extract to various files
   postgresql_query:
     path_to_script: "{{ role_path }}/files/f100_neo4j_supporting_info_extract.sql"
@@ -33,7 +17,7 @@
 
 - name: Extract vendor specific supporting information for this source_id / extract
   postgresql_query:
-    path_to_script: "{{ role_path }}/files/f100-neo4j-vendor-{{ vendor }}.sql"
+    path_to_script: "{{ role_path }}/files/{{ vendor }}/f100-neo4j-vendor-suppliermol.sql"
     named_args:
       SOURCEID: "{{ source_id|int }}"
       SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"

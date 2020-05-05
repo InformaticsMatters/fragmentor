@@ -31,6 +31,7 @@
 - block:
 
   - import_tasks: initialise.yaml
+  - import_tasks: neo4j-extract-{{ extract }}.yaml
   - import_tasks: neo4j-extract.yaml
 
   module_defaults:

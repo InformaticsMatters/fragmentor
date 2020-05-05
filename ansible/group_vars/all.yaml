@@ -57,21 +57,34 @@ vendors:
     fragmaxfrags: 12
     # Limit for partial fragmentation processing (not operational)
     fraglimit: 0
+    # Number of chunks to process before commit - how many inserts build up
+    # Chunk of molecules to be processed before insert to index
+    # This is a sensitive value that seems to be optimally around 22000 edges per chunk.
+    # # So the values below are set based on the number of edges per mol_source.
+    extractchunksize: 800
+    # Number of chunks to process before commit - how many inserts build up
+    extractcommitrate: 5
   chemspace_bb:
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
+    extractchunksize: 4000
+    extractcommitrate: 5
   molport:
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
-  enamine_ro5:
+    extractchunksize: 300
+    extractcommitrate: 5
+  enamine_r05:
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
+    extractchunksize: 300
+    extractcommitrate: 5
 
 # The tag of the fragmentation container,
 neo4j_graph_version: 2019-12-18.2

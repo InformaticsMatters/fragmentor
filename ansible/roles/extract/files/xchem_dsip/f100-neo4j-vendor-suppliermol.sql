@@ -10,7 +10,7 @@
 -- suppliermol-supplier-edges.csv
 -- :START_ID(SM),:END_ID(S),:TYPE
 --
-COPY (select code, v.vendor_name, 'Availability'
+COPY (select code, v.supplier_node_name, 'Availability'
         from mol_source ms
         join source s on s.id = ms.source_id
         join vendor_name v on s.name = v.vendor_name

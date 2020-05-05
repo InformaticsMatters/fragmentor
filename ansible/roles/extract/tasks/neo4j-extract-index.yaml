@@ -1,0 +1,30 @@
+---
+
+#- name: (Re) create o_source_edge table
+#  postgresql_query:
+#    path_to_script: "{{ role_path }}/files/f100_create_o_source_edge.sql"
+#    autocommit: yes
+#
+#- name: Load o_source_edge table
+#  postgresql_query:
+#    query: >-
+#      call extract_o_source_edge({{ source_id|int }}, {{ vendors[vendor].extractchunksize|int }}, {{ vendors[vendor].extractcommitrate|int }});
+#    autocommit: yes
+
+- name: Extract NEO4J node information for this source_id to neonodefile
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f100_neo4j_nodes_extract.sql"
+    named_args:
+      SOURCEID: "{{ source_id|int }}"
+      NEONODEFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
+    autocommit: no
+
+- name: Extract NEO4J edge information for this source_id to neoedgefile
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f100_neo4j_edges_extract.sql"
+    named_args:
+      SOURCEID: "{{ source_id|int }}"
+      NEOEDGEFILE: "{{ copy_root }}/extract/{{ neoedgefile }}"
+    autocommit: no
+
+
