@@ -17,7 +17,7 @@
 -- NB - suggest these values are ultimately added to "Vendor_name" and Source.
 --
 COPY (select v.supplier_node_name, %(GRAPHVERSION)s, %(PROCESSID)s ,s.name || '/' || s.version, 1,
-             s.frag_limit, s.min_hac, s.max_hac, s.start_datetime, v.supplier_node_label, 'Supplier'
+             s.frag_limit, s.min_hac, s.max_hac, to_json(s.start_datetime)#>>'{}', v.supplier_node_label, 'Supplier'
         from source s
         join vendor_name v on s.name = v.vendor_name
        where s.id = %(SOURCEID)s)
