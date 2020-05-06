@@ -1,6 +1,6 @@
 ---
 
-- name: Extract isomol smiles for this source_id with missing inchi information to isoinchfile
+- name: Extract isomol smiles with missing inchi information to isoinchfile
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
      --set AUTOCOMMIT=off --set ON_ERROR_STOP=on
