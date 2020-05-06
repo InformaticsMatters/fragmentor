@@ -69,7 +69,7 @@ vendors:
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
-    extractchunksize: 4000
+    extractchunksize: 2000
     extractcommitrate: 5
   molport:
     fragminhac: 0
