@@ -1,0 +1,54 @@
+/*
+ * Generate inchi keys Nextflow process
+ * Purpose: Generate keys across a cluster.
+ *
+ * Author | Date    | Version
+ * Duncan | 05/2020 | Initial version.
+ *
+ */
+
+params.input = 'run/fragemnt/inchi.csv'
+params.chunk_size = 15000
+params.out_dir = '.'
+params.outputfile = 'inchi.tab'
+params.non_standard = '-n'
+params.standard = ''
+params.nodefile = ''
+
+
+/* Nextflow will not accept a "-" in a variable from ansible */
+if (params.standard != '') {
+    STAN = "-" + params.standard
+} else {
+    STAN = ''
+}
+
+if (params.nodefile != '') {
+    NODE = "-" + params.nodefile
+} else {
+    NODE = ''
+}
+
+
+chunks = Channel.from(file(params.input))
+    .splitText(by: params.chunk_size, file: 'chunk_')
+
+process generate {
+
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+
+    input:
+    file chunks
+
+    output:
+    file 'chunk_*.tab' into generated
+
+    """
+    python -m frag.network.scripts.generate_inchi -i $chunks -o inchitab.tab ${params.non_standard} $STAN $NODE
+    cp inchitab.tab ${chunks}_inchitab.tab
+    """
+
+}
+
+generated.collectFile(name: "${params.outputfile}", storeDir: "${params.out_dir}", keepHeader: true)
+

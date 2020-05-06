@@ -9,7 +9,7 @@
 - name: Load o_source_edge table
   postgresql_query:
     query: >-
-      call extract_o_source_edge({{ source_id|int }}, {{ vendors[vendor].extractchunksize|int }}, {{ vendors[vendor].extractcommitrate|int }});
+      call extract_o_source_edge({{ source_id|int }}, {{ vendors[vendor].extractcommitrate|int }}, {{ vendors[vendor].extractchunksize|int }});
     autocommit: yes
   when: load_index|bool
 

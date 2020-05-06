@@ -13,4 +13,16 @@ isoinchitab: isoinchi.tab
 # Chunk size for loading inchis
 inchichunk: 1000000
 
+# Parameters for generating inchis
+inchigenchunk: 1000000
+nonstandard: n
+standard: s
+nodefile: node
+
+# Fragmentation Nextflow timeouts -
+# note that on production a clean run for molport
+# may take 16 hours on the cluster.
+
+nextflow_timeout_minutes: 10
+nextflow_poll_period_minutes: 1
 

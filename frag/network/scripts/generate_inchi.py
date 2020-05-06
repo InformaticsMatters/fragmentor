@@ -33,7 +33,6 @@ import argparse
 import logging
 import csv
 
-
 from frag.utils import standardise_utils
 from rdkit import Chem
 from rdkit import RDLogger

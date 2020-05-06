@@ -12,9 +12,59 @@
     PGPASSWORD: "{{ database[deployment].login_password }}"
 
 #
-# python -m frag.network.scripts.generate_inchi -i $FRAGPATH/fragment/$FRAGNODEFILE -o $FRAGPATH/fragment/$INCHITAB -n -s -node
+# python -m frag.network.scripts.generate_inchi -i $FRAGPATH/fragment/$FRAGNODEFILE -o $FRAGPATH/fragment/$INCHITAB -n
 #
 
 - name: Run python generate_inchi
   script: generate_inchi.py -i {{ fragpath }}/fragment/{{ isoinchifile }} -o {{ fragpath }}/fragment/{{ isoinchitab }} -n
+
+- name: Variable sanity-check
+  assert:
+    that:
+    - inchigenchunk|int > 0
+
+# Move the nextflow workflow and config into place (from templates)
+# so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
+
+- name: Translate nextflow files
+  template:
+    src: "{{ item }}"
+    dest: "{{ reppath }}/nextflow/{{ item|regex_replace(deployment + '/')|regex_replace('.j2') }}"
+  loop:
+  - "generateinchi.nf.j2"
+  - "{{ deployment }}/nextflow.config.j2"
+
+#
+# python -m frag.network.scripts.generate_inchi -i $FRAGPATH/fragment/$FRAGNODEFILE -o $FRAGPATH/fragment/$INCHITAB -n
+#
+
+- name: Set nextflow command
+  set_fact:
+    nextflow_cmd: >-
+      nextflow run -c {{ reppath }}/nextflow/nextflow.config
+      {{ reppath }}/nextflow/generateinchi.nf
+      -with-report {{ fragpath }}/fragment/generateinchi_report.html
+      -with-tower
+      --input {{ fragpath }}/fragment/{{ isoinchifile }}
+      --out_dir {{ fragpath }}/fragment
+      --outputfile {{ isoinchitab }}
+      --chunk_size {{ inchigenchunk }}
+
+- name: Display nextflow command
+  debug:
+    var: nextflow_cmd
+
+- name: Run nextflow (async)
+  command: "{{ nextflow_cmd }}"
+  async: "{{ nextflow_timeout_minutes|int * 60 }}"
+  poll: 0
+  register: nextflow_async
+
+- name: Wait for nextflow (async)
+  async_status:
+    jid: "{{ nextflow_async.ansible_job_id }}"
+  register: nextflow_result
+  until: nextflow_result.finished
+  delay: 10
+  retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
 
