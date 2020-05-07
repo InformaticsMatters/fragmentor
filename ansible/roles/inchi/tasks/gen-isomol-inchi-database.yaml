@@ -11,13 +11,6 @@
   environment:
     PGPASSWORD: "{{ database[deployment].login_password }}"
 
-#
-# python -m frag.network.scripts.generate_inchi -i $FRAGPATH/fragment/$FRAGNODEFILE -o $FRAGPATH/fragment/$INCHITAB -n
-#
-
-- name: Run python generate_inchi
-  script: generate_inchi.py -i {{ fragpath }}/fragment/{{ isoinchifile }} -o {{ fragpath }}/fragment/{{ isoinchitab }} -n
-
 - name: Variable sanity-check
   assert:
     that:
