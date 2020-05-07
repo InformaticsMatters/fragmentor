@@ -23,4 +23,20 @@
       SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
     autocommit: no
 
+- name: Extract molecule-inchi-edges for this source_id / extract
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f100_neo4j_mol_inchi_extract.sql"
+    named_args:
+      SOURCEID: "{{ source_id|int }}"
+      MOLINCHIEDGEFILE: "{{ copy_root }}/extract/{{ molinchiedgefile }}"
+    autocommit: no
+
+- name: Extract inchis for this source_id / extract
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f100_neo4j_inchi_extract.sql"
+    named_args:
+      SOURCEID: "{{ source_id|int }}"
+      INCHIIDFILE: "{{ copy_root }}/extract/{{ inchiidfile }}"
+    autocommit: no
+
 

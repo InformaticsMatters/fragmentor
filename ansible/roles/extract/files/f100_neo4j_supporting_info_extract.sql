@@ -14,7 +14,6 @@
 --
 -- Supplier Nodes.csv
 -- name:ID(S),graph_version,processing_version,process_id,build_number:int,limit:int,min_hac:int,max_hac:int,build_datetime:datetime,label,:LABEL
--- NB - suggest these values are ultimately added to "Vendor_name" and Source.
 --
 COPY (select v.supplier_node_name, %(GRAPHVERSION)s, %(PROCESSID)s ,s.name || '/' || s.version, 1,
              s.frag_limit, s.min_hac, s.max_hac, to_json(s.start_datetime)#>>'{}', v.supplier_node_label, 'Supplier'
@@ -68,7 +67,7 @@ COPY (select iso.smiles, non.smiles, 'NonIso'
 -- isomolnodefile: isomol-nodes.csv
 -- smiles:ID(ISOMOL),cmpd_ids:STRING[],:LABEL
 --
-COPY (select iso.smiles, ms.code, 'CanSmi;Mol;' || v.supplier_node_name
+COPY (select iso.smiles, iso.inchik, iso.inchis, ms.code, 'CanSmi;Mol;' || v.supplier_node_name
         from mol_source ms
         join source s on s.id = ms.source_id
         join vendor_name v on s.name = v.vendor_name

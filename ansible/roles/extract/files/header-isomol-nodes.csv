@@ -1,1 +1,1 @@
-smiles:ID(ISOMOL),cmpd_ids:STRING[],:LABEL
+smiles:ID(ISOMOL),inchik,inchis,cmpd_ids:STRING[],:LABEL

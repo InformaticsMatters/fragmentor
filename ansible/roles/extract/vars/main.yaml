@@ -15,6 +15,8 @@ neonodefile: nodes.csv
 supnodefile: supplier-nodes.csv
 supmolnodefile: suppliermol-nodes.csv
 supmolsupedgefile: suppliermol-supplier-edges.csv
+inchiidfile: inchi.csv
+molinchiedgefile: molecule-inchi-edges.csv
 
 # The (AWS S3) location of vendor RAW data
 # a source for standardisation.

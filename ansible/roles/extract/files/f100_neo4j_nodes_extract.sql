@@ -7,7 +7,7 @@
 -- Nodes.csv
 -- smiles:ID(F2),hac:INT,chac:INT,osmiles,cmpd_ids:STRING[],:LABEL
 --
-COPY (select np.smiles, np.hac, np.rac, np.ring_smiles, ms.code as cmpd,
+COPY (select np.smiles, np.hac, np.rac, np.ring_smiles, np.inchik, np.inchis, ms.code as cmpd,
         (case when ms.code notnull then 'F2;CanSmi;Mol;' || v.supplier_node_name
               else 'F2'
          end) as label
@@ -17,7 +17,7 @@ COPY (select np.smiles, np.hac, np.rac, np.ring_smiles, ms.code as cmpd,
        left join source s on s.id = ms.source_id
        left join vendor_name v on s.name = v.vendor_name
       union
-     select nc.smiles, nc.hac, nc.rac, nc.ring_smiles, NULL, 'F2'
+     select nc.smiles, nc.hac, nc.rac, nc.ring_smiles, nc.inchik, nc.inchis, NULL, 'F2'
        from o_source_edge os2
        join nonisomol nc ON nc.id = os2.child_id
         and nc.child_count = 0)
