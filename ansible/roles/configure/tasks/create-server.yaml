@@ -105,6 +105,7 @@
       path: "{{ user_home.stdout }}/.ansible/tmp"
       mode: '0700'
       owner: "{{ db_user_account }}"
+    become: true
     become_user: "{{ db_user_account }}"
 
   # 4.

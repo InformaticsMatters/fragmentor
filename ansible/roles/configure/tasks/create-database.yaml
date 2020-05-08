@@ -1,6 +1,7 @@
 ---
 
-- pause:
+- name: Check destructive update
+  pause:
     prompt: |-
       Are you sure you want to configure the database?
       This is destructive and cannot be undone.

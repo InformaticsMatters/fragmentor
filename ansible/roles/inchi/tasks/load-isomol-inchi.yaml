@@ -21,6 +21,7 @@
 
 - name: Split iso inchtab file
   shell: >-
+    set -o pipefail
     cat {{ isoinchitab }} | split -d -l {{ inchichunk }} - isoinchichunk_
   args:
     chdir: "{{ fragpath }}/fragment"

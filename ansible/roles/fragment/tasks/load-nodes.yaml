@@ -21,6 +21,7 @@
 
 - name: Split nodes file
   shell: >-
+    set -o pipefail
     cat {{ fragnodefile }} | split -d -l {{ nodechunk }} - nodechunk_
   args:
     chdir: "{{ fragpath }}/fragment"

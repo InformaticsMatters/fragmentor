@@ -34,6 +34,7 @@
 
 - name: Split edge file
   shell: >-
+    set -o pipefail
     cat {{ fragedgefile }} | split -d -l {{ edgechunk }} - edgechunk_
   args:
     chdir: "{{ fragpath }}/fragment"

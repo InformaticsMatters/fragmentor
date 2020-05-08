@@ -25,6 +25,7 @@
   shell: gzip *.csv
   args:
     chdir: "{{ copy_root }}/extract"
+  become: true
   become_user: "{{ database[deployment].db_user_account }}"
 
 # List all the node files into ' node-files.txt'.
@@ -34,6 +35,7 @@
   shell: ls -1 *nodes*.gz > node-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
+  become: true
   become_user: "{{ database[deployment].db_user_account }}"
 
 # Create the 'node_text' variable that will be used when templating
@@ -52,6 +54,7 @@
 
 - name: Form node_result
   shell: >-
+    set -o pipefail &&
     paste -d , node-files.txt node-files.txt
     | sed 's/.gz,/,/g'
     | sed 's/^/        --nodes "header-/g'
@@ -59,6 +62,7 @@
   register: node_result
   args:
     chdir: "{{ copy_root }}/extract"
+  become: true
   become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Set node_text
@@ -72,10 +76,12 @@
   shell: ls -1 *edges*.gz > edge-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
+  become: true
   become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Form relationship_result
   shell: >-
+    set -o pipefail &&
     paste -d , edge-files.txt edge-files.txt
     | sed 's/.gz,/,/g'
     | sed 's/^/        --relationships "header-/g'
@@ -84,6 +90,7 @@
   register: relationship_result
   args:
     chdir: "{{ copy_root }}/extract"
+  become: true
   become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Set relationship_text
@@ -130,6 +137,7 @@
   args:
     chdir: "{{ copy_root }}/extract"
   become_user: "{{ database[deployment].db_user_account }}"
+  become: true
   delegate_to: "{{ groups['dbservers'][0] }}"
 
 # Synchronise the extract to S3
