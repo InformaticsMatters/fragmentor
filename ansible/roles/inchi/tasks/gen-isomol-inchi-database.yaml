@@ -60,4 +60,3 @@
   until: nextflow_result.finished
   delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
   retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
-

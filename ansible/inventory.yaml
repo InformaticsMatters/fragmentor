@@ -10,4 +10,3 @@ all:
     dbservers:
       hosts:
         192.168.253.51:
-

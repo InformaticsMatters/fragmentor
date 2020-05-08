@@ -25,4 +25,3 @@ nodefile: node
 
 nextflow_timeout_minutes: 360
 nextflow_poll_period_minutes: 10
-

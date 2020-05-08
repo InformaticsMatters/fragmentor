@@ -75,5 +75,3 @@
   - "{{ datapath }}/data/{{ vendor }}"
   - "{{ fragpath }}/fragment"
   - "{{ standpath }}/standardise"
-
-

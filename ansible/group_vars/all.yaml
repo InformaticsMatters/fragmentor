@@ -23,7 +23,7 @@ nextflow_container_tag: molport-04
 
 # The process id is the commit id of the fragmentation container,
 # Used in the extract file
-process_id: Fragmentor-a9ac622
+process_id: Fragmentor-c883d74
 
 # Database credentials.
 # A map of variables based on deployment target.
@@ -92,4 +92,3 @@ neo4j_graph_version: 2019-12-18.2
 # Chunk size to control size of transactions in
 # uploading standardised file data to database
 standchunk: 1000000
-

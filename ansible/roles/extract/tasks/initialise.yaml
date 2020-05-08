@@ -44,5 +44,3 @@
   delegate_to: "{{ groups['dbservers'][0] }}"
   become: yes
   when: deployment=="production"
-
-

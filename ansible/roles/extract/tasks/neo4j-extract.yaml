@@ -38,5 +38,3 @@
       SOURCEID: "{{ source_id|int }}"
       INCHIIDFILE: "{{ copy_root }}/extract/{{ inchiidfile }}"
     autocommit: no
-
-

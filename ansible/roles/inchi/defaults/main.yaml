@@ -20,5 +20,3 @@ version: SetMe
 # Nodes.csv will normally be present as part of a fragmentation process, but for initial loading/speed issues these
 # maybe added at a later date.
 inchifrom: database
-
-

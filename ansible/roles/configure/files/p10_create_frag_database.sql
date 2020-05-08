@@ -36,6 +36,24 @@ drop table IF EXISTS inchi;
 
 drop table IF EXISTS source;
 
+drop table IF EXISTS vendor_name;
+
+drop table IF EXISTS i_mols_chemspace;
+
+drop table IF EXISTS i_mols_dsip;
+
+drop table IF EXISTS i_mols_molport;
+
+drop table IF EXISTS i_mols_enamine;
+
+drop table IF EXISTS i_inchi;
+
+drop table IF EXISTS i_iso_inchi;
+
+drop table IF EXISTS i_node;
+
+drop table IF EXISTS i_edge;
+
 /*
  * Regenerate database 
  */
