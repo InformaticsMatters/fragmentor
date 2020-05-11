@@ -5,6 +5,10 @@
 #
 # 204 : Lines should be no longer than 160 chars
 # 301 : Commands should not change things if nothing needs doing
+# 306 : Shells that use pipes should set the pipefail option (pipefail not working on ubuntu)
+# 302 : rm used in place of argument state=absent to file module
 skip_list:
 - '204'
 - '301'
+- '306'
+- '302'
