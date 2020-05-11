@@ -22,4 +22,3 @@ save_extract: yes
 extract: index
 # Whether to load or use an existing index.
 load_index: yes
-

@@ -11,7 +11,6 @@
 
 - name: Split standard file
   shell: >-
-    set -o pipefail
     tail -n +2 standardised-compounds.tab
     | split -d -l {{ standchunk }} - chunk_
   args:
