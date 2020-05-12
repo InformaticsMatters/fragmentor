@@ -16,8 +16,8 @@
 -- name:ID(S),graph_version,processing_version,process_id,build_number:int,limit:int,min_hac:int,max_hac:int,build_datetime:datetime,label,:LABEL
 --
 COPY (select v.supplier_node_name, '{{ GRAPHVERSION }}', '{{ PROCESSID }}',s.name || '/' || s.version, 1,
-             s.frag_limit, s.min_hac, s.max_hac, to_json(s.start_datetime)#>>'{}', v.supplier_node_label, 'Supplier'
+             s.frag_limit, s.min_hac, s.max_hac, to_json(s.start_datetime), v.supplier_node_label, 'Supplier'
         from source s
         join vendor_name v on s.name = v.vendor_name
        where s.id in ({{ SOURCEIDS }}))
-          to {{ SUPNODEFILE }} DELIMITER ',' CSV;
+          to '{{ SUPNODEFILE }}' DELIMITER ',' CSV;
