@@ -8,33 +8,25 @@
   debug:
       msg: "{{ source_ids }}"
 
-- name: Retrieve source_id
+- name: Template the extract script
+  template:
+    src: sql/f100_neo4j_supporting_info_extract.sql.j2
+    dest: /tmp/f100_neo4j_supporting_info_extract.sql
+  vars:
+    SOURCEIDS: "{{ source_ids }}"
+    GRAPHVERSION: "{{ neo4j_graph_version }}"
+    PROCESSID: "{{ process_id }}"
+    ISOMOLEDGEFILE: "{{ copy_root }}/extract/{{ isomoledgefile }}"
+    ISOMOLNODEFILE: "{{ copy_root }}/extract/{{ isomolnodefile }}"
+    ISOSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ isosupmoledgefile }}"
+    MOLSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ molsupmoledgefile }}"
+    SUPNODEFILE: "{{ copy_root }}/extract/{{ supnodefile }}"
+    SUPMOLNODEFILE: "{{ copy_root }}/extract/{{ supmolnodefile }}"
+
+- name: Extract supporting information for this source_id / extract to various files
   postgresql_query:
-    query: >
-       COPY (select v.supplier_node_name, '{{ neo4j_graph_version }}', '{{ process_id }}' ,s.name || '/' || s.version, 1,
-             s.frag_limit, s.min_hac, s.max_hac, to_json(s.start_datetime)#>>'{}', v.supplier_node_label, 'Supplier'
-        from source s
-        join vendor_name v on s.name = v.vendor_name
-       where s.id in ({{ source_ids }}))
-       to {{ copy_root }}/extract/{{ supmolnodefile }} DELIMITER ',' CSV;
+    path_to_script: /tmp/f100_neo4j_supporting_info_extract.sql
     autocommit: no
-  register: query_result
-
-
-#- name: Extract supporting information for this source_id / extract to various files
-#  postgresql_query:
-#    path_to_script: "{{ role_path }}/files/f100_neo4j_supporting_info_extract.sql"
-#    named_args:
-#      SOURCEIDS: "{{ source_ids }}"
-#      GRAPHVERSION: "{{ neo4j_graph_version }}"
-#      PROCESSID: "{{ process_id }}"
-#      ISOMOLEDGEFILE: "{{ copy_root }}/extract/{{ isomoledgefile }}"
-#      ISOMOLNODEFILE: "{{ copy_root }}/extract/{{ isomolnodefile }}"
-#      ISOSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ isosupmoledgefile }}"
-#      MOLSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ molsupmoledgefile }}"
-#      SUPNODEFILE: "{{ copy_root }}/extract/{{ supnodefile }}"
-#      SUPMOLNODEFILE: "{{ copy_root }}/extract/{{ supmolnodefile }}"
-#    autocommit: no
 
 #- name: Extract vendor specific supporting information for this source_id / extract
 #  postgresql_query:
