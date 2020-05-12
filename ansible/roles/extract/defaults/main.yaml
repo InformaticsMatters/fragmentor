@@ -8,17 +8,19 @@
 reppath: "{{ role_path }}/../../.."
 
 # The following is used (amongst other things)
-# to load vendor-specific variables...
-vendor: SetMe
+# to load vendor-specific variables from a specified parameters file - see extract-parameters.template...
+extracts:
+    - lib:
+        vendor: 'SetMe'
+        version: 'SetMe'
+        regenerate_index: 'SetMe'
+
 # The user is required tp specify the version on the command-line
-version: SetMe
+# version: SetMe
 
 # Save the extract
 # (typically compressing and saving to S3)
-save_extract: yes
+save_extract: no
 
-# Whether an index or recursive extract is to be used.
-# The recursive sql statements are not safe for larger vendors.
-extract: index
 # Whether to load or use an existing index.
-load_index: yes
+# load_index: yes

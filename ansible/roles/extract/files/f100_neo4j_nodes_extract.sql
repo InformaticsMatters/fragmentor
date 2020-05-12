@@ -22,3 +22,7 @@ COPY (select np.smiles, np.hac, np.rac, np.ring_smiles, np.inchik, np.inchis, ms
        join nonisomol nc ON nc.id = os2.child_id
         and nc.child_count = 0)
    TO %(NEONODEFILE)s DELIMITER ',' CSV;
+
+--SELECT distinct c.parent_id, c.child_id, c.label
+--  FROM o_edge_parent c, pg_class p
+-- WHERE c.tableoid = p.oid and p.relname in ('o_edge_xchem_dsip','o_edge_molport');

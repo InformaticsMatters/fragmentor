@@ -1,30 +1,47 @@
 ---
 
-- name: (Re) create o_source_edge table
-  postgresql_query:
-    path_to_script: "{{ role_path }}/files/f100_create_o_source_edge.sql"
-    autocommit: yes
-  when: load_index|bool
+- name: Create a comma separated list of source_ids
+  set_fact:
+     source_ids:  "{{ source_id | join(',') }}"
 
-- name: Load o_source_edge table
-  postgresql_query:
-    query: >-
-      call extract_o_source_edge({{ source_id|int }}, {{ vendors[vendor].extractcommitrate|int }}, {{ vendors[vendor].extractchunksize|int }});
-    autocommit: yes
-  when: load_index|bool
+- name: test
+  debug:
+      msg: "{{ source_ids }}"
 
-- name: Extract NEO4J node information for this source_id to neonodefile
-  postgresql_query:
-    path_to_script: "{{ role_path }}/files/f100_neo4j_nodes_extract.sql"
-    named_args:
-      SOURCEID: "{{ source_id|int }}"
-      NEONODEFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
-    autocommit: no
+- name: Create a list of the table names involved
+  set_fact:
+     source_table:  "{{ source_table + ['_'.join(('o_edge',item.lib.vendor))] }}"
+  loop: "{{ extracts }}"
 
-- name: Extract NEO4J edge information for this source_id to neoedgefile
+- name: show list
+  debug:
+      msg: "{{ source_table }}"
+
+- name: Create a comma separated list of the table names
+  set_fact:
+     source_tables:  "'{{ source_table | map ('quote') | join(', ') }}'"
+
+#- name: Create a comma separated list of the table names
+#  set_fact:
+#     source_tables: "'({ source_table | join(', ') }}'"
+
+- name: show string
+  debug:
+      msg: "{{ source_tables }}"
+
+- name: Extract NEO4J edge information for these source_id(s) to neoedgefile
   postgresql_query:
     path_to_script: "{{ role_path }}/files/f100_neo4j_edges_extract.sql"
     named_args:
-      SOURCEID: "{{ source_id|int }}"
+      SOURCETABLES: "{{ source_tables }}"
       NEOEDGEFILE: "{{ copy_root }}/extract/{{ neoedgefile }}"
     autocommit: no
+
+#- name: Extract NEO4J node information for this source_id to neonodefile
+#  postgresql_query:
+#    path_to_script: "{{ role_path }}/files/f100_neo4j_nodes_extract.sql"
+#    named_args:
+#      SOURCEID: "{{ source_id|int }}"
+#      NEONODEFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
+#    autocommit: no
+

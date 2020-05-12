@@ -1,0 +1,19 @@
+---
+
+# A template of the Parameter file that must be supplied for the extract playbook.
+# Please copy this to a file called parameters, edit the file and then...
+#
+# ansible-playbook site-extract.yaml -e @parameters -e deployment=development|production
+
+# Vendors to be extracted into a single or combination database.
+# A map of deafults based on the vendor and library.
+
+extracts:
+    - lib:
+        vendor: 'xchem_dsip'
+        version: 'v1'
+        regenerate_index: 'no'
+    - lib:
+        vendor: 'molport'
+        version: '2020-02'
+        regenerate_index: 'no'

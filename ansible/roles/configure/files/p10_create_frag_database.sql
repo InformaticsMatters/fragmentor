@@ -54,6 +54,9 @@ drop table IF EXISTS i_node;
 
 drop table IF EXISTS i_edge;
 
+drop table IF EXISTS o_edge_parent;
+
+
 /*
  * Regenerate database 
  */
@@ -287,7 +290,9 @@ create sequence public.source_id_seq
 alter sequence public.source_id_seq OWNED BY public.source.id;
 
 --
--- Name: vendor_version; Type: TABLE; Schema: public; Owner: postgres
+-- Name: vendor_name; Type: TABLE; Schema: public; Owner: postgres
+--
+-- NOTE: This is loaded with default vendor information in p10_load_config_data.sql
 --
 
 create TABLE public.vendor_name (
@@ -297,6 +302,21 @@ create TABLE public.vendor_name (
     supplier_node_label text,
     PRIMARY KEY (vendor_name)
 );
+
+--
+-- Name: o_edge_parent; Type: TABLE; Schema: public; Owner: postgres
+--
+-- NOTE: This is an empty table used as a parent for the child tables o_edge_<vendor> used for creating extract indexes
+--
+
+create TABLE public.o_edge_parent (
+    parent_id integer,
+    child_id integer,
+    label text NOT NULL,
+    PRIMARY KEY (parent_id, child_id, label)
+);
+
+
 
 --
 -- Name: edge id; Type: DEFAULT; Schema: public; Owner: postgres
@@ -588,13 +608,16 @@ alter table mol_source set (autovacuum_vacuum_cost_limit = 2000);
 
 
 --
--- Stored Procedure for loading o_source_edge
+-- Stored Procedure for loading o_edge_<vendor>
 --
 
-CREATE OR REPLACE PROCEDURE extract_o_source_edge(
+
+CREATE OR REPLACE PROCEDURE extract_o_edge_vendor(
    src_id INTEGER,
-   commit_rate INTEGER,
-   chunk_size INTEGER
+   chunk_size INTEGER,
+   run_offset INTEGER,
+   run_limit INTEGER,
+   edge_table REGCLASS
 )
 LANGUAGE plpgsql
 AS $edges$
@@ -603,27 +626,29 @@ DECLARE
     commits INTEGER := 0;
     chunks INTEGER := 0;
     src_count INTEGER := 0;
+    commit_rate INTEGER := 1;
 BEGIN
-	select count(*) into src_count from mol_source where source_id = src_id;
-    chunks := 1 + src_count / chunk_size;
+    chunks := 1 + run_limit / chunk_size;
     RAISE NOTICE 'chunks %', chunks;
 	for chunk_nr IN 0 .. chunks - 1
     loop
        chunks_count := chunks_count + 1;
-       WITH RECURSIVE source_edges AS (
+       execute 'WITH RECURSIVE source_edges AS (
            select parent_id, child_id, label
              from edge e
             where e.parent_id in (SELECT ms.nonisomol_id
                                    from mol_source ms
-                                   where ms.source_id = src_id limit chunk_size offset (chunk_size*chunk_nr))
-            union
+                                  where ms.source_id = $1 limit $2 offset $3)
+           union
            select c.parent_id, c.child_id, c.label
              from edge c
-             inner join source_edges p on c.parent_id = p.child_id)
-           insert into o_source_edge
-              select parent_id, child_id, label
-                from source_edges
-           ON CONFLICT (parent_id, child_id, label) DO NOTHING;
+             inner join source_edges p on c.parent_id = p.child_id
+           )
+           insert into ' || edge_table || '
+                select se.parent_id, se.child_id, se.label
+                  from source_edges se
+                order by 1,2,3
+           ON CONFLICT (parent_id, child_id, label) DO NOTHING;' using src_id, chunk_size, (run_offset+(chunk_size*chunk_nr));
        if chunks_count >= commit_rate then
           chunks_count := 0;
           commit;
@@ -632,7 +657,4 @@ BEGIN
        end if;
     END LOOP;
 end $edges$ ;
-
-
-
 

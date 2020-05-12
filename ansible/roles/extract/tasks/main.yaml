@@ -1,22 +1,24 @@
 ---
 
-# Check that a version has been defined.
-# the most convenient way of doing this is via the command-line: -
+# Check that a vendor file containing vendor and version has been.
 #
 #   ansible-playbook site-standardise \
 #     -e vendor=dsip \
 #     -e version=123
+
 
 - name: Assert user-variable definitions
   assert:
     that:
     - deployment|string|length > 0
     - deployment|string != 'SetMe'
-    - version|string|length > 0
-    - version|string != 'SetMe'
-    - vendor|string|length > 0
-    - vendor|string != 'SetMe'
-    fail_msg: You must provide a 'deployment', 'vendor' and a 'version' to extract.
+    - "{{ extracts[0].lib.vendor|string != 'SetMe'}}"
+    fail_msg: You must provide a 'deployment', and a list of vendors in a parameter file to extract.
+
+- name: List input vendors
+  debug:
+     msg: "{{ item.lib }}"
+  loop: "{{ extracts }}"
 
 # We need AWS credentials
 
@@ -31,7 +33,13 @@
 - block:
 
   - import_tasks: initialise.yaml
-  - import_tasks: neo4j-extract-{{ extract }}.yaml
+
+  - include_tasks: build-index.yaml
+    loop: "{{ extracts }}"
+    loop_control:
+       index_var: vendor_index
+
+#  - import_tasks: neo4j-extract-index.yaml
   - import_tasks: neo4j-extract.yaml
 
   module_defaults:

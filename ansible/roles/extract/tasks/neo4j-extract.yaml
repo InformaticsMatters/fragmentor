@@ -1,40 +1,61 @@
 ---
 
-- name: Extract supporting information for this source_id / extract to various files
-  postgresql_query:
-    path_to_script: "{{ role_path }}/files/f100_neo4j_supporting_info_extract.sql"
-    named_args:
-      SOURCEID: "{{ source_id|int }}"
-      GRAPHVERSION: "{{ neo4j_graph_version }}"
-      PROCESSID: "{{ process_id }}"
-      ISOMOLEDGEFILE: "{{ copy_root }}/extract/{{ isomoledgefile }}"
-      ISOMOLNODEFILE: "{{ copy_root }}/extract/{{ isomolnodefile }}"
-      ISOSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ isosupmoledgefile }}"
-      MOLSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ molsupmoledgefile }}"
-      SUPNODEFILE: "{{ copy_root }}/extract/{{ supnodefile }}"
-      SUPMOLNODEFILE: "{{ copy_root }}/extract/{{ supmolnodefile }}"
-    autocommit: no
+- name: Create a comma separated list of source_ids
+  set_fact:
+     source_ids:  "{{ source_id | join(',') }}"
 
-- name: Extract vendor specific supporting information for this source_id / extract
-  postgresql_query:
-    path_to_script: "{{ role_path }}/files/{{ vendor }}/f100-neo4j-vendor-suppliermol.sql"
-    named_args:
-      SOURCEID: "{{ source_id|int }}"
-      SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
-    autocommit: no
+- name: test
+  debug:
+      msg: "{{ source_ids }}"
 
-- name: Extract molecule-inchi-edges for this source_id / extract
+- name: Retrieve source_id
   postgresql_query:
-    path_to_script: "{{ role_path }}/files/f100_neo4j_mol_inchi_extract.sql"
-    named_args:
-      SOURCEID: "{{ source_id|int }}"
-      MOLINCHIEDGEFILE: "{{ copy_root }}/extract/{{ molinchiedgefile }}"
+    query: >
+       COPY (select v.supplier_node_name, '{{ neo4j_graph_version }}', '{{ process_id }}' ,s.name || '/' || s.version, 1,
+             s.frag_limit, s.min_hac, s.max_hac, to_json(s.start_datetime)#>>'{}', v.supplier_node_label, 'Supplier'
+        from source s
+        join vendor_name v on s.name = v.vendor_name
+       where s.id in ({{ source_ids }}))
+       to {{ copy_root }}/extract/{{ supmolnodefile }} DELIMITER ',' CSV;
     autocommit: no
+  register: query_result
 
-- name: Extract inchis for this source_id / extract
-  postgresql_query:
-    path_to_script: "{{ role_path }}/files/f100_neo4j_inchi_extract.sql"
-    named_args:
-      SOURCEID: "{{ source_id|int }}"
-      INCHIIDFILE: "{{ copy_root }}/extract/{{ inchiidfile }}"
-    autocommit: no
+
+#- name: Extract supporting information for this source_id / extract to various files
+#  postgresql_query:
+#    path_to_script: "{{ role_path }}/files/f100_neo4j_supporting_info_extract.sql"
+#    named_args:
+#      SOURCEIDS: "{{ source_ids }}"
+#      GRAPHVERSION: "{{ neo4j_graph_version }}"
+#      PROCESSID: "{{ process_id }}"
+#      ISOMOLEDGEFILE: "{{ copy_root }}/extract/{{ isomoledgefile }}"
+#      ISOMOLNODEFILE: "{{ copy_root }}/extract/{{ isomolnodefile }}"
+#      ISOSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ isosupmoledgefile }}"
+#      MOLSUPMOLEDGEFILE: "{{ copy_root }}/extract/{{ molsupmoledgefile }}"
+#      SUPNODEFILE: "{{ copy_root }}/extract/{{ supnodefile }}"
+#      SUPMOLNODEFILE: "{{ copy_root }}/extract/{{ supmolnodefile }}"
+#    autocommit: no
+
+#- name: Extract vendor specific supporting information for this source_id / extract
+#  postgresql_query:
+#    path_to_script: "{{ role_path }}/files/{{ vendor }}/f100-neo4j-vendor-suppliermol.sql"
+#    named_args:
+#      SOURCEID: "{{ source_id|int }}"
+#      SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
+#    autocommit: no
+
+#- name: Extract molecule-inchi-edges for this source_id / extract
+#  postgresql_query:
+#    path_to_script: "{{ role_path }}/files/f100_neo4j_mol_inchi_extract.sql"
+#    named_args:
+#      SOURCEID: "{{ source_id|int }}"
+#      MOLINCHIEDGEFILE: "{{ copy_root }}/extract/{{ molinchiedgefile }}"
+#    autocommit: no
+
+#- name: Extract inchis for this source_id / extract
+#  postgresql_query:
+#    path_to_script: "{{ role_path }}/files/f100_neo4j_inchi_extract.sql"
+#    named_args:
+#      SOURCEID: "{{ source_id|int }}"
+#      INCHIIDFILE: "{{ copy_root }}/extract/{{ inchiidfile }}"
+#    autocommit: no

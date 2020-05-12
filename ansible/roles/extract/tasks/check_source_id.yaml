@@ -1,0 +1,24 @@
+---
+
+- name: Retrieve source_id
+  postgresql_query:
+    query: select id from source where name = '{{ item.lib.vendor }}' and version = '{{ item.lib.version }}';
+    autocommit: no
+  register: query_result
+
+- debug:
+    var: query_result
+
+- name: Variable sanity-check
+  assert:
+    that:
+    - "{{ query_result.query_result[0].id|int > 0 }}"
+
+- name: Set source_id
+  set_fact:
+     source_id: "{{ source_id + [ query_result.query_result[0].id ] }}"
+
+- name: Display source_id
+  debug:
+    var: source_id
+

@@ -60,5 +60,6 @@
     jid: "{{ nextflow_async.ansible_job_id }}"
   register: nextflow_result
   until: nextflow_result.finished
-  delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
+  delay: 60
+#  delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
   retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"

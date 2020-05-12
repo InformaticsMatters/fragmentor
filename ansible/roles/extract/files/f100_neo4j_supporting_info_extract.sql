@@ -19,7 +19,7 @@ COPY (select v.supplier_node_name, %(GRAPHVERSION)s, %(PROCESSID)s ,s.name || '/
              s.frag_limit, s.min_hac, s.max_hac, to_json(s.start_datetime)#>>'{}', v.supplier_node_label, 'Supplier'
         from source s
         join vendor_name v on s.name = v.vendor_name
-       where s.id = %(SOURCEID)s)
+       where s.id in (%(SOURCEIDS)s))
           to %(SUPNODEFILE)s DELIMITER ',' CSV;
 
 --
@@ -28,7 +28,7 @@ COPY (select v.supplier_node_name, %(GRAPHVERSION)s, %(PROCESSID)s ,s.name || '/
 --
 COPY (select code, smiles, 'Available'
         from mol_source ms
-       where ms.source_id = %(SOURCEID)s)
+       where ms.source_id in (%(SOURCEIDS)s))
           to %(SUPMOLNODEFILE)s DELIMITER ',' CSV;
 
 --
@@ -39,7 +39,7 @@ COPY (select non.smiles, ms.code, 'HasVendor'
         from mol_source ms
         join nonisomol non on ms.nonisomol_id = non.id
        where ms.isomol_id is null
-         and ms.source_id = %(SOURCEID)s)
+         and ms.source_id in (%(SOURCEIDS)s))
           to %(MOLSUPMOLEDGEFILE)s DELIMITER ',' CSV;
 
 --
@@ -49,7 +49,7 @@ COPY (select non.smiles, ms.code, 'HasVendor'
 COPY (select iso.smiles, ms.code, 'HasVendor'
         from mol_source ms
         join isomol iso on ms.isomol_id = iso.id
-         and ms.source_id = %(SOURCEID)s)
+         and ms.source_id in (%(SOURCEIDS)s))
           to %(ISOSUPMOLEDGEFILE)s DELIMITER ',' CSV;
 
 --
@@ -60,7 +60,7 @@ COPY (select iso.smiles, non.smiles, 'NonIso'
         from mol_source ms
         join isomol iso on iso.id = ms.isomol_id
         join nonisomol non on non.id = iso.nonisomol_id
-         and ms.source_id = %(SOURCEID)s)
+         and ms.source_id in (%(SOURCEIDS)s))
           to %(ISOMOLEDGEFILE)s DELIMITER ',' CSV;
 
 --
@@ -72,5 +72,5 @@ COPY (select iso.smiles, iso.inchik, iso.inchis, ms.code, 'CanSmi;Mol;' || v.sup
         join source s on s.id = ms.source_id
         join vendor_name v on s.name = v.vendor_name
         join isomol iso on iso.id = ms.isomol_id
-         and ms.source_id = %(SOURCEID)s)
+         and ms.source_id in (%(SOURCEIDS)s))
           to %(ISOMOLNODEFILE)s DELIMITER ',' CSV;
