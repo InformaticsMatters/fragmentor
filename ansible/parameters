@@ -12,8 +12,8 @@ extracts:
     - lib:
         vendor: 'xchem_dsip'
         version: 'v1'
-        regenerate_index: 'no'
+        regenerate_index: 'yes'
     - lib:
         vendor: 'molport'
         version: '2020-02'
-        regenerate_index: 'no'
+        regenerate_index: 'yes'

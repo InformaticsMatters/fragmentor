@@ -17,7 +17,7 @@ extracts:
 
 # Save the extract
 # (typically compressing and saving to S3)
-save_extract: no
+save_extract: yes
 
 # In the case of a combined extract, which of the vendor specific files to use.
 combined_vendor: molport
