@@ -15,12 +15,9 @@ extracts:
         version: 'SetMe'
         regenerate_index: 'SetMe'
 
-# The user is required tp specify the version on the command-line
-# version: SetMe
-
 # Save the extract
 # (typically compressing and saving to S3)
 save_extract: no
 
-# Whether to load or use an existing index.
-# load_index: yes
+# In the case of a combined extract, which of the vendor specific files to use.
+combined_vendor: molport

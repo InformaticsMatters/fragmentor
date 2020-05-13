@@ -67,10 +67,11 @@ COPY (select iso.smiles, non.smiles, 'NonIso'
 -- isomolnodefile: isomol-nodes.csv
 -- smiles:ID(ISOMOL),cmpd_ids:STRING[],:LABEL
 --
-COPY (select iso.smiles, iso.inchik, iso.inchis, ms.code, 'CanSmi;Mol;' || v.supplier_node_name
+COPY (select iso.smiles, iso.inchik, iso.inchis, string_agg (distinct(ms.code), ';'), 'CanSmi;Mol;' || string_agg (distinct(supplier_node_name), ';')
         from mol_source ms
         join source s on s.id = ms.source_id
         join vendor_name v on s.name = v.vendor_name
         join isomol iso on iso.id = ms.isomol_id
-         and ms.source_id in ({{ SOURCEIDS }}))
+         and ms.source_id in ({{ SOURCEIDS }})
+        group by 1,2,3)
           to '{{ ISOMOLNODEFILE }}' DELIMITER ',' CSV;

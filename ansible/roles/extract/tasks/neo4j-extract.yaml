@@ -1,17 +1,15 @@
 ---
 
-- name: Create a comma separated list of source_ids
-  set_fact:
-     source_ids:  "{{ source_id | join(',') }}"
+# This files contains tasks that are primarliy mol_source driven.
+#
+# As these are relatively small/fast queries they should be ok to run in series and so can be gathered here.
+#
 
-- name: test
-  debug:
-      msg: "{{ source_ids }}"
-
-- name: Template the extract script
+# Common Mol_source related extract scripts
+- name: Template the main extract script
   template:
     src: sql/f100_neo4j_supporting_info_extract.sql.j2
-    dest: /tmp/f100_neo4j_supporting_info_extract.sql
+    dest: "{{ reppath }}/sql/f100_neo4j_supporting_info_extract.sql"
   vars:
     SOURCEIDS: "{{ source_ids }}"
     GRAPHVERSION: "{{ neo4j_graph_version }}"
@@ -25,8 +23,10 @@
 
 - name: Extract supporting information for this source_id / extract to various files
   postgresql_query:
-    path_to_script: /tmp/f100_neo4j_supporting_info_extract.sql
+    path_to_script: "{{ reppath }}/sql/f100_neo4j_supporting_info_extract.sql"
     autocommit: no
+
+# Vendor specific extract scripts
 
 #- name: Extract vendor specific supporting information for this source_id / extract
 #  postgresql_query:
@@ -36,18 +36,27 @@
 #      SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
 #    autocommit: no
 
-#- name: Extract molecule-inchi-edges for this source_id / extract
-#  postgresql_query:
-#    path_to_script: "{{ role_path }}/files/f100_neo4j_mol_inchi_extract.sql"
-#    named_args:
-#      SOURCEID: "{{ source_id|int }}"
-#      MOLINCHIEDGEFILE: "{{ copy_root }}/extract/{{ molinchiedgefile }}"
-#    autocommit: no
+- name: Template the vendor specific extract script where a single vendor is defined
+  template:
+    src: sql/{{ extracts[0].lib.vendor }}/f100-neo4j-vendor-suppliermol.sql.j2
+    dest: "{{ reppath }}/sql/f100-neo4j-vendor-suppliermol.sql"
+  vars:
+    SOURCEIDS: "{{ source_ids }}"
+    SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
+  when: source_id|length == 1
 
-#- name: Extract inchis for this source_id / extract
-#  postgresql_query:
-#    path_to_script: "{{ role_path }}/files/f100_neo4j_inchi_extract.sql"
-#    named_args:
-#      SOURCEID: "{{ source_id|int }}"
-#      INCHIIDFILE: "{{ copy_root }}/extract/{{ inchiidfile }}"
-#    autocommit: no
+# This uses the combined_vendor parameter when the number of sourced requested is greater than 1.
+- name: Template the vendor specific extract script where multiple vendors are defined
+  template:
+    src: sql/{{ combined_vendor }}/f100-neo4j-vendor-suppliermol.sql.j2
+    dest: "{{ reppath }}/sql/f100-neo4j-vendor-suppliermol.sql"
+  vars:
+    SOURCEIDS: "{{ source_ids }}"
+    SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
+  when: source_id|length > 1
+
+- name: Extract supporting information for this source_id / extract to various files
+  postgresql_query:
+    path_to_script: "{{ reppath }}/sql/f100-neo4j-vendor-suppliermol.sql"
+    autocommit: no
+

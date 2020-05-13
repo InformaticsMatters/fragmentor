@@ -10,11 +10,8 @@
 
 COPY (select distinct np.smiles, nc.smiles, label, 'FRAG'
         from o_edge_parent os
-        join pg_class p on os.tableoid = p.oid and p.relname in (%(SOURCETABLES)s)
+        join pg_class p on os.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
         join nonisomol np ON np.id = os.parent_id
         join nonisomol nc ON nc.id = os.child_id)
-  TO %(NEOEDGEFILE)s DELIMITER ',' CSV;
+  TO '{{  NEOEDGEFILE }}' DELIMITER ',' CSV;
 
---SELECT distinct c.parent_id, c.child_id, c.label
---  FROM o_edge_parent c, pg_class p
--- WHERE c.tableoid = p.oid and p.relname in ('o_edge_xchem_dsip','o_edge_molport');

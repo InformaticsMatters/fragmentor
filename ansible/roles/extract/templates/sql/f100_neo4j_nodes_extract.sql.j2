@@ -1,0 +1,30 @@
+/*
+ * Extract Neo4j Node Data SQL Statements:
+ * Purpose: Extract Neo4j node data into CSV file on database server
+ */
+
+--
+-- Nodes.csv
+-- smiles:ID(F2),hac:INT,chac:INT,osmiles,cmpd_ids:STRING[],:LABEL
+-- Note that this can be for multiple sources.
+--
+
+COPY (select np.smiles, np.hac, np.rac, np.ring_smiles, np.inchik, np.inchis, string_agg (distinct(ms.code), ';'),
+        (case when string_agg (ms.code, ';') is null then 'F2'
+              else 'F2;CanSmi;Mol;' || string_agg (distinct(v.supplier_node_name), ';')
+         end) as label
+       from o_edge_parent os
+       join pg_class p on os.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
+       join nonisomol np ON np.id = os.parent_id
+       left join mol_source ms on os.parent_id = ms.nonisomol_id
+       left join source s on s.id = ms.source_id
+       left join vendor_name v on s.name = v.vendor_name
+       group by 1,2,3,4,5,6
+      union
+     select nc.smiles, nc.hac, nc.rac, nc.ring_smiles, nc.inchik, nc.inchis, NULL, 'F2'
+       from o_edge_parent os2
+       join pg_class p on os2.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
+       join nonisomol nc ON nc.id = os2.child_id
+        and nc.child_count = 0)
+   TO '{{ NEONODEFILE }}' DELIMITER ',' CSV;
+

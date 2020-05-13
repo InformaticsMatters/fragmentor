@@ -1,47 +1,60 @@
 ---
 
-- name: Create a comma separated list of source_ids
-  set_fact:
-     source_ids:  "{{ source_id | join(',') }}"
+# This files contains tasks that use the edge_index tables.
+#
+# As these are large queries for some vendors it may be prudent to run them in parallel so they are gathered here.
+#
 
-- name: test
-  debug:
-      msg: "{{ source_ids }}"
 
-- name: Create a list of the table names involved
-  set_fact:
-     source_table:  "{{ source_table + ['_'.join(('o_edge',item.lib.vendor))] }}"
-  loop: "{{ extracts }}"
-
-- name: show list
-  debug:
-      msg: "{{ source_table }}"
-
-- name: Create a comma separated list of the table names
-  set_fact:
-     source_tables:  "'{{ source_table | map ('quote') | join(', ') }}'"
-
-#- name: Create a comma separated list of the table names
-#  set_fact:
-#     source_tables: "'({ source_table | join(', ') }}'"
-
-- name: show string
-  debug:
-      msg: "{{ source_tables }}"
+- name: Template the neo4j edges extract script
+  template:
+    src: sql/f100_neo4j_edges_extract.sql.j2
+    dest: "{{ reppath }}/sql/f100_neo4j_edges_extract.sql"
+  vars:
+    SOURCETABLES: "{{ source_tables }}"
+    NEOEDGEFILE: "{{ copy_root }}/extract/{{ neoedgefile }}"
 
 - name: Extract NEO4J edge information for these source_id(s) to neoedgefile
   postgresql_query:
-    path_to_script: "{{ role_path }}/files/f100_neo4j_edges_extract.sql"
-    named_args:
-      SOURCETABLES: "{{ source_tables }}"
-      NEOEDGEFILE: "{{ copy_root }}/extract/{{ neoedgefile }}"
+    path_to_script: "{{ reppath }}/sql/f100_neo4j_edges_extract.sql"
     autocommit: no
 
-#- name: Extract NEO4J node information for this source_id to neonodefile
-#  postgresql_query:
-#    path_to_script: "{{ role_path }}/files/f100_neo4j_nodes_extract.sql"
-#    named_args:
-#      SOURCEID: "{{ source_id|int }}"
-#      NEONODEFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
-#    autocommit: no
+- name: Template the neo4j node extract script
+  template:
+    src: sql/f100_neo4j_nodes_extract.sql.j2
+    dest: "{{ reppath }}/sql/f100_neo4j_nodes_extract.sql"
+  vars:
+    SOURCETABLES: "{{ source_tables }}"
+    NEONODEFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
+
+- name: Extract NEO4J node information for these source_id(s) to neoedgefile
+  postgresql_query:
+    path_to_script: "{{ reppath }}/sql/f100_neo4j_nodes_extract.sql"
+    autocommit: no
+
+- name: Template for extract molecule-inchi-edges for these source_ids
+  template:
+    src: sql/f100_neo4j_mol_inchi_extract.sql.j2
+    dest: "{{ reppath }}/sql/f100_neo4j_mol_inchi_extract.sql"
+  vars:
+    SOURCETABLES: "{{ source_tables }}"
+    MOLINCHIEDGEFILE: "{{ copy_root }}/extract/{{ molinchiedgefile }}"
+
+- name: Extract molecule-inchi-edges for these source_ids
+  postgresql_query:
+    path_to_script: "{{ reppath }}/sql/f100_neo4j_mol_inchi_extract.sql"
+    autocommit: no
+
+- name: Template for extract inchis for these source_ids
+  template:
+    src: sql/f100_neo4j_inchi_extract.sql.j2
+    dest: "{{ reppath }}/sql/f100_neo4j_inchi_extract.sql"
+  vars:
+    SOURCETABLES: "{{ source_tables }}"
+    INCHIIDFILE: "{{ copy_root }}/extract/{{ inchiidfile }}"
+
+- name: Extract inchis for these source_ids / extract
+  postgresql_query:
+    path_to_script: "{{ reppath }}/sql/f100_neo4j_inchi_extract.sql"
+    autocommit: no
 
