@@ -162,11 +162,24 @@
     - python-dateutil==2.8.1
     - boto3==1.12.49
 
+# When only one vendor, use it
 - name: Synchronise extract to S3
   s3_sync:
     bucket: "{{ bucket }}"
-    key_prefix: extract/{{ vendor }}/{{ version }}
+    key_prefix: extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}
     file_root: "{{ copy_root }}/extract"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
+  when: source_id|length == 1
+
+# When combination, use combination/first vendor/first version
+- name: Synchronise extract to S3
+  s3_sync:
+    bucket: "{{ bucket }}"
+    key_prefix: extract/combination/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}
+    file_root: "{{ copy_root }}/extract"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+  when: source_id|length > 1

@@ -10,4 +10,4 @@ work
 /testrun/
 /ansible/SetMe/
 /nextflow/
-/sql/
+/sql/*.sql
