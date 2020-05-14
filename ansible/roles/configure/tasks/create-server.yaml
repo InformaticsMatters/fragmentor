@@ -70,7 +70,7 @@
 
 - name: Mount DB volumes
   mount:
-    path: "{{ item.value.mount_point }}"
+    path: "{{ item.value.mount_path }}"
     src: "{{ item.value.device }}"
     fstype: ext4
     state: mounted
