@@ -76,17 +76,3 @@
     state: mounted
   loop: "{{ lookup('dict', db_devices) }}"
   when: item.value.device not in mounted_devices
-
-- name: Get database user's home directory
-  shell: >-
-    getent passwd "{{ user_account }}" | awk -F: '{ print $6 }'
-  changed_when: false
-  register: user_home
-
-- name: Crete database user tmp (for Ansible)
-  file:
-    path: "{{ user_home.stdout }}/.ansible/tmp"
-    mode: '0700'
-    owner: "{{ user_account }}"
-  become: true
-  become_user: "{{ user_account }}"
