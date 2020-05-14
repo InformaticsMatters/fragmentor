@@ -1,0 +1,7 @@
+---
+
+- hosts: dbservers[0]
+  tasks:
+  - include_role:
+      name: configure
+      tasks_from: stop-database.yaml

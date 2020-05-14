@@ -1,5 +1,5 @@
 tqdm
 
-ansible == 2.9.6
+ansible == 2.9.9
 psycopg2-binary == 2.8.5
-jmespath == 0.9.5
+jmespath == 0.10.0

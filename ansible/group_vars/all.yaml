@@ -27,6 +27,10 @@ process_id: Fragmentor-c883d74
 
 # Database credentials.
 # A map of variables based on deployment target.
+#
+# Caution:  Ensure that the 'production.copy_directory' matches what's
+#           used in 'db_devices.pg_copy.mount_path'
+#           (see 'roles/configure/defaults/main.yaml')
 database:
   development:
     login_host: localhost
@@ -37,7 +41,7 @@ database:
     copy_directory: /var/lib/postgresql/data
     db_user_account: postgres
   production:
-    login_host: 192.168.253.51
+    login_host: 192.168.199.118
     port: 5432
     db: fairmolecules
     login_user: fragmentor
