@@ -1,6 +1,6 @@
 ---
 
-- hosts: localhost
+- hosts: dbservers[0]
   tasks:
   - include_role:
       name: configure
