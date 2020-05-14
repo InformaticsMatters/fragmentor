@@ -9,6 +9,6 @@ all:
         localhost:
     dbservers:
       hosts:
-        192.168.199.118:
+        130.246.214.154:
       vars:
         ansible_user: centos

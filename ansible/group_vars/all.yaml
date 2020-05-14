@@ -41,7 +41,7 @@ database:
     copy_directory: /var/lib/postgresql/data
     db_user_account: postgres
   production:
-    login_host: 192.168.199.118
+    login_host: 130.246.214.154
     port: 5432
     db: fairmolecules
     login_user: fragmentor
