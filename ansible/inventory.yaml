@@ -10,3 +10,5 @@ all:
     dbservers:
       hosts:
         192.168.199.118:
+      vars:
+        ansible_user: "{{ lookup('env', 'OS_USERNAME') }}"
