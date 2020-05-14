@@ -22,7 +22,7 @@
       POSTGRES_USER: "{{ database[deployment].login_user }}"
       POSTGRES_PASSWORD: "{{ database[deployment].login_password }}"
       POSTGRES_DB: "{{ database[deployment].db }}"
-      POSTGRES_INITDB_WALDIR: /var/lib/postgresql/wal
+      POSTGRES_INITDB_WALDIR: /var/lib/postgresql/wal/wal
     volumes:
     - "{{ db_devices['pg_data'].mount_path }}:/var/lib/postgresql/data"
     - "{{ db_devices['pg_wal'].mount_path }}:/var/lib/postgresql/wal"
