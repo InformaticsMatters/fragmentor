@@ -59,13 +59,13 @@
     owner: "{{ user_account }}"
     group: "{{ user_account }}"
     recurse: yes
-  loop: "{{ lookup('dict', db_devices }}"
+  loop: "{{ lookup('dict', db_devices) }}"
 
 - name: Create DB volume ext4 filesystem
   filesystem:
     fstype: ext4
     dev: "{{ item.value.device }}"
-  loop: "{{ lookup('dict', db_devices }}"
+  loop: "{{ lookup('dict', db_devices) }}"
   when: item.value.device not in mounted_devices
 
 - name: Mount DB volumes
@@ -74,7 +74,7 @@
     src: "{{ item.value.device }}"
     fstype: ext4
     state: mounted
-  loop: "{{ lookup('dict', db_devices }}"
+  loop: "{{ lookup('dict', db_devices) }}"
   when: item.value.device not in mounted_devices
 
 - name: Get database user's home directory
