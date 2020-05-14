@@ -24,9 +24,9 @@
       POSTGRES_DB: "{{ database[deployment].db }}"
       POSTGRES_INITDB_WALDIR: /var/lib/postgresql/wal
     volumes:
-    - /pgdata:/var/lib/postgresql/data
-    - /pgwal:/var/lib/postgresql/wal
-    - /pgcopy:/pgcopy
+    - "{{ db_devices['pg_data'].mount_path }}:/var/lib/postgresql/data"
+    - "{{ db_devices['pg_wal'].mount_path }}:/var/lib/postgresql/wal"
+    - "{{ db_devices['pg_copy'].mount_path }}:{{ db_devices['pg_copy'].mount_path }}"
     exposed_ports:
     - "{{ database[deployment].port }}:5432"
     network_mode: host

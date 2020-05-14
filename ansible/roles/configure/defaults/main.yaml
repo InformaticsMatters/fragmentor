@@ -3,14 +3,25 @@
 db_container_image: informaticsmatters/rdkit-cartridge-debian
 db_container_tag: Release_2020_03
 
-# The DB server's database volume device
-db_db_volume: /dev/vdb
-# The DB backup volume
-db_backup_volume: /dev/vdc
-# The DB pgcopy volume
-db_db_pgcopy_volume: /dev/vdd
+# The DB server's database, backup, pgcopy and wal volume
+# devices, and mount-points
+db_devices:
+  pg_data:
+     device: /dev/vdb
+     mount_path: /pgdata
+  pg_backup:
+     device: /dev/vdc
+     mount_path: /pgdata-backup
+  pg_copy:
+     device: /dev/vdd
+     mount_path: /pgcopy
+  pg_wal:
+     device: /dev/vde
+     mount_path: /pgwal
+
 # The DB shared_buffers size (Gi)
 # The deployment sets the container shm_mem to twice this value
-db_shared_buffers_g: 128
+# so make sure your host has sufficient root-volume space.
+db_shared_buffers_g: 32
 # The DB work_mem (Mi)
 db_work_mem_m: 1024
