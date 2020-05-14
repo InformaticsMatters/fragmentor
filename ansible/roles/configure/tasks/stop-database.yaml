@@ -9,4 +9,4 @@
     name: db
     state: stopped
   become: yes
-  become_user: "{{ db_user_account }}"
+  become_user: "{{ database[deployment].db_user_account }}"

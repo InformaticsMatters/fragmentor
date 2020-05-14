@@ -8,9 +8,17 @@
 # Our expectation here is that docker is installed on the server -
 # a responsibility of the docker role we should have already applied.
 
+- name: Check deployment definition
+  assert:
+    that: deployment|string != 'SetMe'
+
+- name: Set DB user account
+  set_fact:
+    user_account: "{{ database[deployment].db_user_account }}"
+
 - name: Create database user account
   user:
-    name: "{{ db_user_account }}"
+    name: "{{ user_account }}"
     groups: docker
     append: yes
 
@@ -48,8 +56,8 @@
     path: "{{ item.value.mount_path }}"
     state: directory
     mode: '0777'
-    owner: "{{ db_user_account }}"
-    group: "{{ db_user_account }}"
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"
     recurse: yes
   loop: "{{ lookup('dict', db_devices }}"
 
@@ -71,7 +79,7 @@
 
 - name: Get database user's home directory
   shell: >-
-    getent passwd "{{ db_user_account }}" | awk -F: '{ print $6 }'
+    getent passwd "{{ user_account }}" | awk -F: '{ print $6 }'
   changed_when: false
   register: user_home
 
@@ -79,6 +87,6 @@
   file:
     path: "{{ user_home.stdout }}/.ansible/tmp"
     mode: '0700'
-    owner: "{{ db_user_account }}"
+    owner: "{{ user_account }}"
   become: true
-  become_user: "{{ db_user_account }}"
+  become_user: "{{ user_account }}"
