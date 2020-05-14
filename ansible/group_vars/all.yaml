@@ -45,6 +45,14 @@ database:
     copy_directory: /pgcopy
     db_user_account: fragmentor
 
+# Hardware sizing - used to calculate size of chunks in standardization/fragmentation.
+# A map of variables based on deployment target.
+hardware:
+  development:
+    parallel_jobs: 8
+  production:
+    parallel_jobs: 250
+
 # Vendor defaults.
 # A map of deafults based on the vendor and library.
 vendors:
@@ -87,3 +95,4 @@ neo4j_graph_version: 2019-12-18.2
 # Chunk size to control size of transactions in
 # uploading standardised file data to database
 standchunk: 1000000
+

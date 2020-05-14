@@ -68,7 +68,7 @@ begin;
 SELECT clock_timestamp();
 
 INSERT INTO price (quantity_mg, price, price_min, price_max, molsource_id)
-  (SELECT 0, im.price, 0, 0, ms.id
+  (SELECT 1, im.price,  im.price,  im.price, ms.id
    FROM  i_mols_chemspace im, mol_source ms
    WHERE im.nonisomol_id = ms.nonisomol_id
      AND ms.source_id =%(SOURCEID)s
