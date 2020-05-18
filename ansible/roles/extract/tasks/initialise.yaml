@@ -26,7 +26,7 @@
 # For example ('o_edge_molport',o_edge_xchem_dsip)
 - name: Create a comma separated list of source_tables
   set_fact:
-    source_tables: '{{ "''" + source_table | join("'',''")  + "''"}}'
+    source_tables: '{{ "''" + source_table | join("'',''")  + "''" }}'
 
 - name: show list of source_tables
   debug:
