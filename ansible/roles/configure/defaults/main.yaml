@@ -7,17 +7,17 @@ db_container_tag: Release_2020_03
 # devices, and mount-points
 db_devices:
   pg_data:
-     device: /dev/vdb
-     mount_path: /pgdata
+    device: /dev/vdb
+    mount_path: /pgdata
   pg_backup:
-     device: /dev/vdc
-     mount_path: /pgdata-backup
+    device: /dev/vdc
+    mount_path: /pgdata-backup
   pg_copy:
-     device: /dev/vdd
-     mount_path: /pgcopy
+    device: /dev/vdd
+    mount_path: /pgcopy
   pg_wal:
-     device: /dev/vde
-     mount_path: /pgwal
+    device: /dev/vde
+    mount_path: /pgwal
 
 # The DB shared_buffers size (Gi)
 # The deployment sets the container shm_mem to twice this value

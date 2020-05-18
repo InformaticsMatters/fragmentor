@@ -57,4 +57,3 @@
   postgresql_query:
     path_to_script: "{{ reppath }}/sql/f100_neo4j_inchi_extract.sql"
     autocommit: no
-

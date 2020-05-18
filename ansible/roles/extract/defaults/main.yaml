@@ -10,10 +10,10 @@ reppath: "{{ role_path }}/../../.."
 # The following is used (amongst other things)
 # to load vendor-specific variables from a specified parameters file - see extract-parameters.template...
 extracts:
-    - lib:
-        vendor: 'SetMe'
-        version: 'SetMe'
-        regenerate_index: 'SetMe'
+- lib:
+    vendor: 'SetMe'
+    version: 'SetMe'
+    regenerate_index: 'SetMe'
 
 # Save the extract
 # (typically compressing and saving to S3)

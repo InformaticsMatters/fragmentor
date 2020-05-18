@@ -19,7 +19,7 @@
 
 - name: List input vendors
   debug:
-     msg: "{{ item.lib }}"
+    msg: "{{ item.lib }}"
   loop: "{{ extracts }}"
 
 # We need AWS credentials
@@ -39,7 +39,7 @@
   - include_tasks: build-index.yaml
     loop: "{{ extracts }}"
     loop_control:
-       index_var: vendor_index
+    index_var: vendor_index
 
   - import_tasks: neo4j-extract-index.yaml
   - import_tasks: neo4j-extract.yaml

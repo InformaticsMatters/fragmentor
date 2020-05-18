@@ -41,7 +41,7 @@
 
 - name: Set no_of_molecules
   set_fact:
-     no_of_molecules: "{{ query_result.query_result[0].count  }}"
+    no_of_molecules: "{{ query_result.query_result[0].count  }}"
 
 # This calls a stored procedure that is stored in p10_create_frag_database
 - name: Load o_edge_vendor table

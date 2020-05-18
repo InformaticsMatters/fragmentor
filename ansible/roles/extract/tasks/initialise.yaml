@@ -14,11 +14,11 @@
 # For example (4,5)
 - name: Create a comma separated list of source_ids
   set_fact:
-     source_ids:  "{{ source_id | join(',') }}"
+    source_ids: "{{ source_id | join(',') }}"
 
 - name: Show list of source_ids
   debug:
-      msg: "{{ source_ids }}"
+    msg: "{{ source_ids }}"
 
 # Create a comma separated string of source tables for use in combination sql statements.
 # Note that for this string the quotes below have single quote on the outside and double quotes inside.
@@ -26,11 +26,11 @@
 # For example ('o_edge_molport',o_edge_xchem_dsip)
 - name: Create a comma separated list of source_tables
   set_fact:
-     source_tables:  '{{ "''"+source_table | join("'',''")  + "''"}}'
+    source_tables: '{{ "''" + source_table | join("'',''")  + "''"}}'
 
 - name: show list of source_tables
   debug:
-      msg: "{{ source_tables }}"
+    msg: "{{ source_tables }}"
 
 # Erase and create the neo4j extract directory.
 - name: Remove extract path

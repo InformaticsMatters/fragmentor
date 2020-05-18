@@ -59,4 +59,3 @@
   postgresql_query:
     path_to_script: "{{ reppath }}/sql/f100-neo4j-vendor-suppliermol.sql"
     autocommit: no
-
