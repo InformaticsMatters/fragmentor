@@ -50,7 +50,7 @@ database:
     db_user_account: fragmentor
 
 # Vendor defaults.
-# A map of deafults based on the vendor and library.
+# A map of defaults based on the vendor and library.
 vendors:
   xchem_dsip:
     # Minimum heavy atom count for extraction/fragmentation processing
