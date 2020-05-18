@@ -2,33 +2,25 @@
 
 # In order to create the server we need to: -
 #
-# 1. Check running container
-#
-# Then, if the container is not running...
-#
-# 2. format and mount the backup volume
-# 3. Create the database service account
-# 4. format and mount the DB and WAL volumes
+# 1. Create the database service account
+# 2. Create mount paths and format and mount the volumes
 #
 # Our expectation here is that docker is installed on the server -
 # a responsibility of the docker role we should have already applied.
 
+- name: Check deployment definition
+  assert:
+    that: deployment|string != 'SetMe'
+
+- name: Set DB user account
+  set_fact:
+    user_account: "{{ database[deployment].db_user_account }}"
+
 - name: Create database user account
   user:
-    name: "{{ db_user_account }}"
+    name: "{{ user_account }}"
     groups: docker
     append: yes
-
-# 1.
-
-- name: Check DB container
-  docker_container_info:
-    name: db
-  register: db_result
-
-- name: Display DB container state
-  debug:
-    var: db_result
 
 # Get the list of exiting mounts, present in the built-in 'ansible_mounts'
 # variable, which looks little like this...
@@ -59,96 +51,28 @@
   debug:
     var: mounted_devices
 
-# 2.
-
-- name: Ensure DB backup volume mount path
+- name: Create DB volume mount paths
   file:
-    path: "{{ item }}"
+    path: "{{ item.value.mount_path }}"
     state: directory
     mode: '0777'
-    owner: "{{ db_user_account }}"
-    group: "{{ db_user_account }}"
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"
     recurse: yes
-  loop:
-  - /pgdata-backup
+  loop: "{{ lookup('dict', db_devices) }}"
 
-- name: Create DB backup volume ext4 filesystem
+- name: Create DB volume ext4 filesystem
   filesystem:
     fstype: ext4
-    dev: "{{ item }}"
-  loop:
-  - "{{ db_backup_volume }}"
-  when: db_backup_volume not in mounted_devices
+    dev: "{{ item.value.device }}"
+  loop: "{{ lookup('dict', db_devices) }}"
+  when: item.value.device not in mounted_devices
 
-- name: Mount DB backup volume
+- name: Mount DB volumes
   mount:
-    path: /pgdata-backup
-    src: "{{ db_backup_volume }}"
+    path: "{{ item.value.mount_path }}"
+    src: "{{ item.value.device }}"
     fstype: ext4
     state: mounted
-  when: db_backup_volume not in mounted_devices
-
-- block:
-
-  # If the database is not running...
-
-  # 3.
-
-  - name: Get database user's home directory
-    shell: >-
-      getent passwd "{{ db_user_account }}" | awk -F: '{ print $6 }'
-    changed_when: false
-    register: user_home
-
-  - name: Crete database user tmp (for Ansible)
-    file:
-      path: "{{ user_home.stdout }}/.ansible/tmp"
-      mode: '0700'
-      owner: "{{ db_user_account }}"
-    become: true
-    become_user: "{{ db_user_account }}"
-
-  # 4.
-
-  - name: Ensure mount paths
-    file:
-      path: "{{ item }}"
-      state: directory
-      mode: '0777'
-      owner: "{{ db_user_account }}"
-      group: "{{ db_user_account }}"
-      recurse: yes
-    loop:
-    - /pgdata
-    - /pgcopy
-
-  - name: Create DB data volume ext4 filesystem
-    filesystem:
-      fstype: ext4
-      dev: "{{ db_db_volume }}"
-    when: db_db_volume not in mounted_devices
-
-  - name: Mount DB data volume
-    mount:
-      path: /pgdata
-      src: "{{ db_db_volume }}"
-      fstype: ext4
-      state: mounted
-    when: db_db_volume not in mounted_devices
-
-  - name: Create DB pgcopy volume ext4 filesystem
-    filesystem:
-      fstype: ext4
-      dev: "{{ db_db_pgcopy_volume }}"
-    when: db_db_pgcopy_volume not in mounted_devices
-
-  - name: Mount DB pgcopy volume
-    mount:
-      path: /pgcopy
-      src: "{{ db_db_pgcopy_volume }}"
-      fstype: ext4
-      state: mounted
-    when: db_db_pgcopy_volume not in mounted_devices
-
-  when:
-  - db_result.container.State is not defined
+  loop: "{{ lookup('dict', db_devices) }}"
+  when: item.value.device not in mounted_devices
