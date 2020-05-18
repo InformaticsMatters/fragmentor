@@ -14,6 +14,6 @@ COPY (select code, v.supplier_node_name, 'Availability'
         from mol_source ms
         join source s on s.id = ms.source_id
         join vendor_name v on s.name = v.vendor_name
-       where ms.source_id = %(SOURCEID)s)
-          to %(SUPMOLSUPEDGEFILE)s DELIMITER ',' CSV;
+       where ms.source_id in ({{ SOURCEIDS }}))
+          to '{{ SUPMOLSUPEDGEFILE }}' DELIMITER ',' CSV;
 

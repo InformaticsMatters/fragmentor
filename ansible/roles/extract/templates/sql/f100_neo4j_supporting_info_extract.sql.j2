@@ -15,12 +15,12 @@
 -- Supplier Nodes.csv
 -- name:ID(S),graph_version,processing_version,process_id,build_number:int,limit:int,min_hac:int,max_hac:int,build_datetime:datetime,label,:LABEL
 --
-COPY (select v.supplier_node_name, %(GRAPHVERSION)s, %(PROCESSID)s ,s.name || '/' || s.version, 1,
-             s.frag_limit, s.min_hac, s.max_hac, to_json(s.start_datetime)#>>'{}', v.supplier_node_label, 'Supplier'
+COPY (select v.supplier_node_name, '{{ GRAPHVERSION }}', '{{ PROCESSID }}',s.name || '/' || s.version, 1,
+             s.frag_limit, s.min_hac, s.max_hac, to_json(s.start_datetime), v.supplier_node_label, 'Supplier'
         from source s
         join vendor_name v on s.name = v.vendor_name
-       where s.id in (%(SOURCEIDS)s))
-          to %(SUPNODEFILE)s DELIMITER ',' CSV;
+       where s.id in ({{ SOURCEIDS }}))
+          to '{{ SUPNODEFILE }}' DELIMITER ',' CSV;
 
 --
 -- suppliermol-nodes.csv
@@ -28,8 +28,8 @@ COPY (select v.supplier_node_name, %(GRAPHVERSION)s, %(PROCESSID)s ,s.name || '/
 --
 COPY (select code, smiles, 'Available'
         from mol_source ms
-       where ms.source_id in (%(SOURCEIDS)s))
-          to %(SUPMOLNODEFILE)s DELIMITER ',' CSV;
+       where ms.source_id in ({{ SOURCEIDS }}))
+          to '{{ SUPMOLNODEFILE }}' DELIMITER ',' CSV;
 
 --
 -- molecule-suppliermol-edges.csv
@@ -39,8 +39,8 @@ COPY (select non.smiles, ms.code, 'HasVendor'
         from mol_source ms
         join nonisomol non on ms.nonisomol_id = non.id
        where ms.isomol_id is null
-         and ms.source_id in (%(SOURCEIDS)s))
-          to %(MOLSUPMOLEDGEFILE)s DELIMITER ',' CSV;
+         and ms.source_id in ({{ SOURCEIDS }}))
+          to '{{ MOLSUPMOLEDGEFILE }}' DELIMITER ',' CSV;
 
 --
 -- isomol-suppliermol-edges.csv
@@ -49,8 +49,8 @@ COPY (select non.smiles, ms.code, 'HasVendor'
 COPY (select iso.smiles, ms.code, 'HasVendor'
         from mol_source ms
         join isomol iso on ms.isomol_id = iso.id
-         and ms.source_id in (%(SOURCEIDS)s))
-          to %(ISOSUPMOLEDGEFILE)s DELIMITER ',' CSV;
+         and ms.source_id in ({{ SOURCEIDS }}))
+          to '{{ ISOSUPMOLEDGEFILE }}' DELIMITER ',' CSV;
 
 --
 -- isomol-molecule-edges.csv
@@ -60,17 +60,18 @@ COPY (select iso.smiles, non.smiles, 'NonIso'
         from mol_source ms
         join isomol iso on iso.id = ms.isomol_id
         join nonisomol non on non.id = iso.nonisomol_id
-         and ms.source_id in (%(SOURCEIDS)s))
-          to %(ISOMOLEDGEFILE)s DELIMITER ',' CSV;
+         and ms.source_id in ({{ SOURCEIDS }}))
+          to '{{ ISOMOLEDGEFILE }}' DELIMITER ',' CSV;
 
 --
 -- isomolnodefile: isomol-nodes.csv
 -- smiles:ID(ISOMOL),cmpd_ids:STRING[],:LABEL
 --
-COPY (select iso.smiles, iso.inchik, iso.inchis, ms.code, 'CanSmi;Mol;' || v.supplier_node_name
+COPY (select iso.smiles, iso.inchik, iso.inchis, string_agg (distinct(ms.code), ';'), 'CanSmi;Mol;' || string_agg (distinct(supplier_node_name), ';')
         from mol_source ms
         join source s on s.id = ms.source_id
         join vendor_name v on s.name = v.vendor_name
         join isomol iso on iso.id = ms.isomol_id
-         and ms.source_id in (%(SOURCEIDS)s))
-          to %(ISOMOLNODEFILE)s DELIMITER ',' CSV;
+         and ms.source_id in ({{ SOURCEIDS }})
+        group by 1,2,3)
+          to '{{ ISOMOLNODEFILE }}' DELIMITER ',' CSV;

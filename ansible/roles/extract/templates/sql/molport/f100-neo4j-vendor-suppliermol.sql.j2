@@ -15,6 +15,6 @@ COPY (select code, p.quantity_mg, p.price_min,p.price_max, v.currency, ms.lead_t
         join source s on s.id = ms.source_id
         join vendor_name v on s.name = v.vendor_name
         join price p on molsource_id = ms.id
-       where ms.source_id = %(SOURCEID)s)
-          to %(SUPMOLSUPEDGEFILE)s DELIMITER ',' CSV;
+       where ms.source_id in ({{ SOURCEIDS }}))
+          to '{{ SUPMOLSUPEDGEFILE }}' DELIMITER ',' CSV;
 

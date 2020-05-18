@@ -12,3 +12,24 @@
     {{ database[deployment].db }}
   environment:
     PGPASSWORD: "{{ database[deployment].login_password }}"
+
+
+- name: Calculate how many smiles to fragment
+  command: >-
+      wc -l {{ fragpath }}/fragment/{{ fragsmifile }}
+  register: wc_result
+
+- name: Set Mols to Fragment
+  set_fact:
+    mols_to_fragment: "{{ wc_result.stdout.split(' ')[0]|int }}"
+
+- debug:
+    var: mols_to_fragment
+
+- name: Set Chunksize
+  set_fact:
+    fragchunksize: "{{ (0.5 * mols_to_fragment|int/hardware[deployment].parallel_jobs)|int }}"
+
+- debug:
+    var: fragchunksize
+

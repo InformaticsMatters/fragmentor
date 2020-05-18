@@ -1,11 +1,13 @@
 ---
 
-# Check that a vendor file containing vendor and version has been.
+# Check that required command line parameters have been set:
+# - deployment
+# - Parameter file file containing vendor and version has been included.
 #
 #   ansible-playbook site-standardise \
-#     -e vendor=dsip \
-#     -e version=123
-
+#     -e @parameters \
+#     -e deployment=development|production
+#
 
 - name: Assert user-variable definitions
   assert:
@@ -39,7 +41,7 @@
     loop_control:
        index_var: vendor_index
 
-#  - import_tasks: neo4j-extract-index.yaml
+  - import_tasks: neo4j-extract-index.yaml
   - import_tasks: neo4j-extract.yaml
 
   module_defaults:

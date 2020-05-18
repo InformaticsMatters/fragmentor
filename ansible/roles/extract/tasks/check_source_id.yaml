@@ -14,11 +14,11 @@
     that:
     - "{{ query_result.query_result[0].id|int > 0 }}"
 
-- name: Set source_id
+- name: Add this source id to the list of source_ids
   set_fact:
      source_id: "{{ source_id + [ query_result.query_result[0].id ] }}"
 
-- name: Display source_id
-  debug:
-    var: source_id
+- name: Add the index table name for this source_id to a list of the source tables involved in the extract
+  set_fact:
+     source_table:  "{{ source_table + ['_'.join(('o_edge',item.lib.vendor))] }}"
 

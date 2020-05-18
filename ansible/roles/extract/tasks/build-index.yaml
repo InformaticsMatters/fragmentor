@@ -1,15 +1,16 @@
 ---
-
+# For each source_id where flag "regenerate_index" is true, rebuild the index.
+# Note that this allows combination builds without having to rebuild indexes for all the vendors involved.
 
 - name: Display vendor
   debug:
     msg: "{{ item.lib.vendor }}"
 
-- name: Display vendor
+- name: Display version
   debug:
     msg: "{{ item.lib.version }}"
 
-- name: Display vendor
+- name: Display regenerate flag
   debug:
     msg: "{{ item.lib.regenerate_index }}"
 
@@ -17,6 +18,8 @@
   debug:
     msg: "{{ source_id[vendor_index] }}"
 
+# Create a child table for this vendor that inherits from o_edge_parent table.
+# The subsequent extracts can then use o_edge_parent as a basis for selecting data from multiple child tables.
 - name: (Re) create o_edge_<vendor> table
   postgresql_query:
     query: >-
