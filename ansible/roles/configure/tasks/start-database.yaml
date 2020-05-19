@@ -18,7 +18,7 @@
       -c 'synchronous_commit=on'
     shm_size: "{{ db_shared_buffers_g|int * 2 }}G"
     state: started
-    restart_policy: always
+    restart_policy: on-failure
     restart_retries: 5
     env:
       PGDATA: /var/lib/postgresql/data/pgdata
