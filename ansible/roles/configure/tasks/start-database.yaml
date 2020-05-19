@@ -15,7 +15,7 @@
       -c 'max_worker_processes=24'
       -c 'max_parallel_workers=24'
       -c 'max_parallel_workers_per_gather=8'
-      -c 'sychronous_commit=on'
+      -c 'synchronous_commit=on'
     shm_size: "{{ db_shared_buffers_g|int * 2 }}G"
     state: started
     env:
