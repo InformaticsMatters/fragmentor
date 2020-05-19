@@ -63,6 +63,8 @@ vendors:
   xchem_dsip:
     # Used for sizing timeouts and processing parameters
     approx_vendor_molecules: 800
+    # Total time (in minutes) across all CPUs - Used for sizing timeouts and processing parameters
+    est_total_fragmentation_time: 10
     # Minimum heavy atom count for extraction/fragmentation processing
     fragminhac: 0
     # Maximum heavy atom count for extraction/fragmentation processing
@@ -77,8 +79,8 @@ vendors:
     # and validated by testing.
     extractchunksize: 800
   chemspace_bb:
-    # Used for sizing timeouts and processing parameters
     approx_vendor_molecules: 18000000
+    est_total_fragmentation_time: 7500
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
@@ -87,6 +89,7 @@ vendors:
   molport:
     # Used for sizing timeouts and processing parameters
     approx_vendor_molecules: 8000000
+    est_total_fragmentation_time: 360000
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
@@ -95,6 +98,7 @@ vendors:
   enamine_r05:
     # Used for sizing timeouts and processing parameters
     approx_vendor_molecules: 40000000
+    est_total_fragmentation_time: 720000
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12

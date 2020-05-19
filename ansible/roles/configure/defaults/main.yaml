@@ -25,6 +25,6 @@ db_devices:
 db_shared_buffers_g: 32
 
 # The DB work_mem (Mi)
-# Attention: a value of 256Mb corresponds to a maximum of about 26% memory usage with the edges extraction query
+# Attention: a value of 256Mb corresponds to a maximum of about 28% memory usage with the nodes extraction query
 # assuming a # 32Gb shared buffer value. If this memory usage goes over 100%, queries may crash the database server.
 db_work_mem_m: 256

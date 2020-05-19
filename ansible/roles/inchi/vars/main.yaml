@@ -10,11 +10,23 @@ inchitab: inchi.tab
 isoinchifile: isoinchi.csv
 isoinchitab: isoinchi.tab
 
-# Chunk size for loading inchis
+# Chunk size for uploading inchis to database
 inchichunk: 1000000
 
+# Inchi Rate in molecules processed per minute by a single generate inchi python script
+# This approximate parameter is used to tune the nextflow_timeout_minutes in conjunction with the number
+# of CPUs and Smiles to translate.
+inchi_mols_minute: 50000
+
+# Used for calculation
+nextflow_timeout_calc: 0
+inchigenchunk_calc: 0
+
+# Safety factor is used in case, for example, other processes are on the machine
+safety_factor: 5
+
 # Parameters for generating inchis
-inchigenchunk: 1000000
+inchigenchunk: 10000
 nonstandard: n
 standard: s
 nodefile: node
@@ -23,5 +35,5 @@ nodefile: node
 # note that on production a clean run for molport
 # may take 16 hours on the cluster.
 
-nextflow_timeout_minutes: 360
-nextflow_poll_period_minutes: 10
+nextflow_timeout_minutes: 60
+nextflow_poll_period_minutes: 3

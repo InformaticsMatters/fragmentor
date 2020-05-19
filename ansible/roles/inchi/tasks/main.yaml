@@ -15,8 +15,8 @@
     fail_msg: You must provide a 'deployment' to update inchi data.
 
 - block:
-  - import_tasks: gen-nonisomol-inchi-{{ inchifrom }}.yaml
-  - import_tasks: load-nonisomol-inchi.yaml
+#  - import_tasks: gen-nonisomol-inchi-{{ inchifrom }}.yaml
+#  - import_tasks: load-nonisomol-inchi.yaml
   - import_tasks: gen-isomol-inchi-database.yaml
   - import_tasks: load-isomol-inchi.yaml
 

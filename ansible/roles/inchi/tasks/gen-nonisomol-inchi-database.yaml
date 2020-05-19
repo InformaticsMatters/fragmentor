@@ -11,10 +11,60 @@
   environment:
     PGPASSWORD: "{{ database[deployment].login_password }}"
 
+- name: Calculate how many smiles to generate inchi for
+  command: >-
+      wc -l {{ fragpath }}/fragment/{{ inchifile }}
+  register: wc_result
+
+- name: Set Inchis to Process
+  set_fact:
+    inchis_to_process: "{{ wc_result.stdout.split(' ')[0]|int }}"
+
+- debug:
+    var: inchis_to_process
+
+- name: Set inchigenchunk_calc
+  set_fact:
+    inchigenchunk_calc: "{{ (0.5 * inchis_to_process|int/hardware[deployment].parallel_jobs)|int }}"
+
+# Check this is greater than the minimum
+- name: Set inchigenchunk
+  set_fact:
+    inchigenchunk: "{{ inchigenchunk_calc|int }}"
+  when: inchigenchunk_calc|int>inchigenchunk
+
+- debug:
+    var: inchigenchunk
+
 - name: Variable sanity-check
   assert:
     that:
     - inchigenchunk|int > 0
+
+# Set nextflow_timeout_minutes based on the expected input file(s), speed of python script and number of CPUS.
+# If this is development or the value is lower than the default then the default is used.
+- name: Set nextflow_timeout_calc
+  set_fact:
+    nextflow_timeout_calc: "{{ (safety_factor * inchigenchunk|int/(inchi_mols_minute * hardware[deployment].parallel_jobs))|int }}"
+  when: deployment=="production"
+
+- name: Set nextflow_timeout_minutes
+  set_fact:
+    nextflow_timeout_minutes: "{{ nextflow_timeout_calc|int }}"
+  when: nextflow_timeout_calc|int>nextflow_timeout_minutes
+
+- debug:
+    var: nextflow_timeout_minutes
+
+# Set nextflow_poll_period_minutes based on nextflow_timeout_minutes/30.
+# If this is development then this defaults.
+- name: Set nextflow_poll_period_minutes
+  set_fact:
+    nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/30)|int }}"
+  when: deployment=="production"
+
+- debug:
+    var: nextflow_poll_period_minutes
 
 # Move the nextflow workflow and config into place (from templates)
 # so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
@@ -41,7 +91,7 @@
       --input {{ fragpath }}/fragment/{{ inchifile }}
       --out_dir {{ fragpath }}/fragment
       --outputfile {{ inchitab }}
-      --chunk_size {{ inchigenchunk }}
+      --chunk_size {{ inchigenchunk|int }}
       --standard '{{ standard }}'
 
 - name: Display nextflow command

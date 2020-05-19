@@ -21,6 +21,43 @@
 - debug:
     var: fragchunksize
 
+- name: Variable sanity-check
+  assert:
+    that:
+    - fragchunksize|int > 0
+
+- name: Variable sanity-check
+  assert:
+    that:
+    - mols_to_fragment|int > 0
+
+# Set nextflow_timeout_minutes based on the expected time, proportion of total run being done and number of CPUS.
+# If this is development or the value is lower than the default then the default is used.
+- name: Set nextflow_timeout_calc
+  set_fact:
+    nextflow_timeout_calc: "{{ (safety_factor
+                                * (vendors[vendor].est_total_fragmentation_time|int/hardware[deployment].parallel_jobs)
+                                * (mols_to_fragment|int/vendors[vendor].approx_vendor_molecules))|int }}"
+  when: deployment=="production"
+
+- name: Set nextflow_timeout_minutes
+  set_fact:
+    nextflow_timeout_minutes: "{{ nextflow_timeout_calc|int }}"
+  when: nextflow_timeout_calc|int>nextflow_timeout_minutes
+
+- debug:
+    var: nextflow_timeout_minutes
+
+# Set nextflow_poll_period_minutes based on nextflow_timeout_minutes/30.
+# If this is development then this defaults.
+- name: Set nextflow_poll_period_minutes
+  set_fact:
+    nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/30)|int }}"
+  when: deployment=="production"
+
+- debug:
+    var: nextflow_poll_period_minutes
+
 # Move the nextflow workflow and config into place (from templates)
 # so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
 
@@ -41,7 +78,7 @@
        -with-tower
        --input {{ fragpath }}/fragment/{{ fragsmifile }}
        --out_dir {{ fragpath }}/fragment
-       --chunk_size {{ fragchunksize }}
+       --chunk_size {{ fragchunksize|int }}
        --max_hac {{ vendors[vendor].fraghac }}
        --max_frag {{ vendors[vendor].fragmaxfrags }}
 
