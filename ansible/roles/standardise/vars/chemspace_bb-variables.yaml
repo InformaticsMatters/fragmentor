@@ -1,7 +1,6 @@
 ---
 
 standardiser: frag.standardise.scripts.chemspace_bb.standardise_chemspace_bb_pricing_compounds
-standchunksize: 24000
 standinputfile: chemspace_bb.txt
 
 standardise_copy_table: i_mols_chemspace

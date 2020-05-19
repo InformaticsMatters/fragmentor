@@ -1,10 +1,6 @@
 ---
-
 # Variables that a user might want to change
 # through the command-line or a parameter file.
-
-nextflow_timeout_minutes: 60
-nextflow_poll_period_minutes: 1
 
 # The (AWS S3) location of vendor RAW data
 # a source for standardisation.
@@ -13,3 +9,22 @@ bucket: im-fragnet
 # AWS credentials for bucket access
 aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
 aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+
+# Standardisation Rate in molecules processed per minute by a single standardisation python script
+# This approximate parameter is used to tune the nextflow_timeout_minutes in conjunction with the number
+# of CPUs and Vendor_molecules.
+standardisation_mols_minute: 4500
+nextflow_timeout_calc: 0
+
+# Safety factor is used in case, for example, other processes are on the machine
+safety_factor: 5
+
+# Default nextflow parameters for development - these are overwritten in production deployment based on the
+# size of the vendor input files.
+nextflow_timeout_minutes: 30
+nextflow_poll_period_minutes: 1
+standchunksize: 250
+
+# Chunk size to control size of transactions in
+# uploading standardised file data to database
+standchunk: 1000000

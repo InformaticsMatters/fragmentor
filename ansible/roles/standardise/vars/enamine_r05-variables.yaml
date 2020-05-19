@@ -1,7 +1,6 @@
 ---
 
 standardiser: frag.standardise.scripts.enamine.standardise_enamine_compounds
-standchunksize: 1500
 standinputfile: j*.smi
 
 standardise_copy_table: i_mols_enamine

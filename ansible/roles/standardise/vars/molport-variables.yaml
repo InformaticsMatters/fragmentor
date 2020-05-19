@@ -1,7 +1,6 @@
 ---
 
 standardiser: frag.standardise.scripts.molport.standardise_molport_compounds
-standchunksize: 1500
 standinputfile: iis_smiles-*.txt
 
 standardise_copy_table: i_mols_molport

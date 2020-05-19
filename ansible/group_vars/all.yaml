@@ -61,6 +61,8 @@ hardware:
 # A map of defaults based on the vendor and library.
 vendors:
   xchem_dsip:
+    # Used for sizing timeouts and processing parameters
+    approx_vendor_molecules: 800
     # Minimum heavy atom count for extraction/fragmentation processing
     fragminhac: 0
     # Maximum heavy atom count for extraction/fragmentation processing
@@ -69,33 +71,36 @@ vendors:
     fragmaxfrags: 12
     # Limit for partial fragmentation processing (not operational)
     fraglimit: 0
-    # Number of chunks to process before commit - how many inserts build up
-    # Chunk of molecules to be processed before insert to index
-    # This is a sensitive value that seems to be optimally around 22000 edges per chunk.
-    # # So the values below are set based on the number of edges per mol_source.
+    # Extract Playbook: Chunk of molecules to be processed before insert to index
+    # This is a sensitive value - settings for each vendor should be tuned.
+    # So the values below are set based on the number of edges per mol_source value
+    # and validated by testing.
     extractchunksize: 800
   chemspace_bb:
+    # Used for sizing timeouts and processing parameters
+    approx_vendor_molecules: 18000000
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
     extractchunksize: 2000
   molport:
+    # Used for sizing timeouts and processing parameters
+    approx_vendor_molecules: 8000000
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
     extractchunksize: 300
   enamine_r05:
+    # Used for sizing timeouts and processing parameters
+    approx_vendor_molecules: 40000000
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
-    extractchunksize: 300
+    extractchunksize: 2000
 
 # The tag of the fragmentation container,
 neo4j_graph_version: 2019-12-18.2
 
-# Chunk size to control size of transactions in
-# uploading standardised file data to database
-standchunk: 1000000
