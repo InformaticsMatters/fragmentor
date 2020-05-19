@@ -24,4 +24,4 @@ db_devices:
 # so make sure your host has sufficient root-volume space.
 db_shared_buffers_g: 32
 # The DB work_mem (Mi)
-db_work_mem_m: 1024
+db_work_mem_m: 256
