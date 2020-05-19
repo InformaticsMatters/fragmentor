@@ -9,5 +9,6 @@ tmp
 work
 /testrun/
 /ansible/SetMe/
+/ansible/parameters/
 /nextflow/
 /sql/*.sql

@@ -166,7 +166,7 @@
 - name: Synchronise extract to S3
   s3_sync:
     bucket: "{{ bucket }}"
-    key_prefix: extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}
+    key_prefix: extract/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}
     file_root: "{{ copy_root }}/extract"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
