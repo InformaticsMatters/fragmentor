@@ -23,7 +23,7 @@ nextflow_container_tag: molport-04
 
 # The process id is the commit id of the fragmentation container,
 # Used in the extract file
-process_id: Fragmentor-c883d74
+process_id: Fragmentor-56c9593
 
 # Database credentials.
 # A map of variables based on deployment target.
@@ -87,7 +87,6 @@ vendors:
     fraglimit: 0
     extractchunksize: 2000
   molport:
-    # Used for sizing timeouts and processing parameters
     approx_vendor_molecules: 8000000
     est_total_fragmentation_time: 360000
     fragminhac: 0
@@ -96,7 +95,6 @@ vendors:
     fraglimit: 0
     extractchunksize: 300
   enamine_r05:
-    # Used for sizing timeouts and processing parameters
     approx_vendor_molecules: 40000000
     est_total_fragmentation_time: 720000
     fragminhac: 0
