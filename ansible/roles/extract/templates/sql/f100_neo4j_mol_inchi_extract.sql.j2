@@ -5,7 +5,7 @@
 
 --
 -- molecule-inchi-edges.csv
--- :START_ID(NONISOMOL),:END_ID(Inchi),:TYPE
+-- :START_ID(F2),:END_ID(INCHI),:TYPE
 --- Link inchi-nodes to nonisomol-nodes, "HasInchi"
 --
 COPY (select np.smiles, np.inchi_id, 'HasInchi' as label
