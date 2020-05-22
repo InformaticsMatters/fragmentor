@@ -46,7 +46,7 @@ COPY (select non.smiles, ms.code, 'HasVendor'
 -- isomol-suppliermol-edges.csv
 -- :START_ID(ISOMOL),:END_ID(SM),:TYPE
 --
-COPY (select iso.smiles, ms.code, 'HasVendor'
+COPY (select replace(iso.smiles, chr(10), chr(92) || chr(110)), ms.code, 'HasVendor'
         from mol_source ms
         join isomol iso on ms.isomol_id = iso.id
          and ms.source_id in ({{ SOURCEIDS }}))
@@ -56,7 +56,7 @@ COPY (select iso.smiles, ms.code, 'HasVendor'
 -- isomol-molecule-edges.csv
 -- :START_ID(ISOMOL),:END_ID(F2),:TYPE
 --
-COPY (select iso.smiles, non.smiles, 'NonIso'
+COPY (select replace(iso.smiles, chr(10), chr(92) || chr(110)), non.smiles, 'NonIso'
         from mol_source ms
         join isomol iso on iso.id = ms.isomol_id
         join nonisomol non on non.id = iso.nonisomol_id
@@ -67,7 +67,8 @@ COPY (select iso.smiles, non.smiles, 'NonIso'
 -- isomolnodefile: isomol-nodes.csv
 -- smiles:ID(ISOMOL),cmpd_ids:STRING[],:LABEL
 --
-COPY (select iso.smiles, iso.inchik, iso.inchis, string_agg (distinct(ms.code), ';'), 'CanSmi;Mol;' || string_agg (distinct(supplier_node_name), ';')
+COPY (select replace(iso.smiles, chr(10), chr(92) || chr(110)), iso.inchik, iso.inchis,
+        string_agg (distinct(ms.code), ';'), 'CanSmi;Mol;' || string_agg (distinct(supplier_node_name), ';')
         from mol_source ms
         join source s on s.id = ms.source_id
         join vendor_name v on s.name = v.vendor_name
