@@ -1,12 +1,17 @@
 ---
 
+#   Extract new isomol smiles and generate inchis.
+#   Note that isomol inchis should be copied down as CSV so that backslash characters are preserved.
+#   Combinations such as \n, \N and \C are valid in isomol smiles.
+#
+
 - name: Extract isomol smiles with missing inchi information to isoinchfile
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
      --set AUTOCOMMIT=off --set ON_ERROR_STOP=on
      -c "\COPY (SELECT iso.smiles FROM isomol iso
                  WHERE iso.inchis IS NULL)
-                    TO '{{ fragpath }}/fragment/{{ isoinchifile }}'"
+                    TO '{{ fragpath }}/fragment/{{ isoinchifile }}' (FORMAT csv);"
     {{ database[deployment].db }}
   environment:
     PGPASSWORD: "{{ database[deployment].login_password }}"

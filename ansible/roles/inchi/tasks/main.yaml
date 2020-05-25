@@ -3,7 +3,7 @@
 # Check that a version has been defined.
 # the most convenient way of doing this is via the command-line: -
 #
-#   ansible-playbook site-standardise \
+#   ansible-playbook site-inchi \
 #     -e vendor=dsip
 #     -e version=123
 
@@ -15,8 +15,8 @@
     fail_msg: You must provide a 'deployment' to update inchi data.
 
 - block:
-#  - import_tasks: gen-nonisomol-inchi-{{ inchifrom }}.yaml
-#  - import_tasks: load-nonisomol-inchi.yaml
+  - import_tasks: gen-nonisomol-inchi-{{ inchifrom }}.yaml
+  - import_tasks: load-nonisomol-inchi.yaml
   - import_tasks: gen-isomol-inchi-database.yaml
   - import_tasks: load-isomol-inchi.yaml
 

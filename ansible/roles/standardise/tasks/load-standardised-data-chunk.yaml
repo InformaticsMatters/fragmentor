@@ -14,13 +14,17 @@
 #    copy_from: "{{ item }}"
 #    dst: "{{ standardise_copy_table }}"
 #    columns: "{{ standardise_copy_columns }}"
+#
+# NOTE: For ismols, the smiles (and osmiles) can contain a \. So that these are correctly loaded into the i_mols tabe
+#       the tab file must be uploaded with (FORMAT csv, DELIMITER E'\t'). Using CSV format means that the \ is not read
+#       is an escape character os as a linefeed (as \n).
 
 - name: Copy chunk
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
      --set AUTOCOMMIT=on --set ON_ERROR_STOP=on
      -c "\COPY {{ standardise_copy_table }}({{ standardise_copy_columns }})
-         FROM '{{ item }}';"
+         FROM '{{ item }}' (FORMAT csv, DELIMITER E'\t');"
     {{ database[deployment].db }}
   environment:
     PGPASSWORD: "{{ database[deployment].login_password }}"

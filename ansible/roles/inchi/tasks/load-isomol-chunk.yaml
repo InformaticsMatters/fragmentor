@@ -9,12 +9,16 @@
     path_to_script: "{{ role_path }}/files/f75_create_i_iso_inchi.sql"
     autocommit: yes
 
+# NOTE: For ismols, the smiles (and osmiles) can contain a \. So that these are correctly loaded into the i_mols tabe
+#       the tab file must be uploaded with (FORMAT csv, DELIMITER E'\t'). Using CSV format means that the \ is not read
+#       is an escape character os as a linefeed (as \n).
+
 - name: Copy chunk to i_iso_inchi
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
      --set AUTOCOMMIT=on --set ON_ERROR_STOP=on
      -c "\COPY i_iso_inchi(smiles, ninchik, ninchis)
-         FROM '{{ item }}';"
+         FROM '{{ item }}' (FORMAT csv, DELIMITER E'\t');"
     {{ database[deployment].db }}
   environment:
     PGPASSWORD: "{{ database[deployment].login_password }}"
