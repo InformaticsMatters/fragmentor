@@ -29,3 +29,11 @@
   file:
     path: "{{ fragpath }}/fragment"
     state: directory
+
+- name: Ensure sql, nextflow directories are present
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ reppath }}/sql"
+  - "{{ reppath }}/nextflow"

@@ -53,3 +53,10 @@
   delegate_to: "{{ groups['dbservers'][0] }}"
   become: yes
   when: deployment=="production"
+
+- name: Ensure sql directory is present
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ reppath }}/sql"

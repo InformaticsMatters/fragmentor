@@ -28,32 +28,40 @@
 - debug:
     var: query_result
 
+# If add_file is no (normal situation) then check the version had not been processed before
 - name: version already processed sanity-check
   assert:
     that:
     - "{{ query_result.rowcount|int }} == 0"
+  when: add_file|bool==false
 
+# If add_file is true then use the existing source id from the previous run
+- name: Set source_id
+  set_fact:
+    source_id: "{{ query_result.query_result[0].id }}"
+  when: add_file|bool==true
+
+# If add_file is no (normal situation) and the version has not been processed then add to the source table.
 - name: Insert run parameters
   postgresql_query:
     query: >-
       insert into source (name, version, min_hac, max_hac, max_frags, frag_limit, start_datetime )
       values ('{{ vendor }}', '{{ version }}',{{ vendors[vendor].fragminhac|int }},
-              {{ vendors[vendor].fraghac|int }},{{ vendors[vendor].fragmaxfrags|int }}, {{ vendors[vendor].fraglimit|int }}, now())
+              {{ vendors[vendor].fraghac|int }},{{ vendors[vendor].fragmaxfrags|int }}, {{ vendors[vendor].fraglimit|int }}, now() at time zone 'utc')
       returning id;
     autocommit: yes
   register: query_result
+  when: add_file|bool==false
 
-- debug:
-    var: query_result
-
+# If add_file is true then use the existing source id from the previous run
 - name: Set source_id
   set_fact:
     source_id: "{{ query_result.query_result[0].id }}"
+  when: add_file|bool==false
 
 - name: Display source_id
   debug:
     var: source_id
-
 
 # Optionally erase and then create the working directories...
 
@@ -75,3 +83,11 @@
   - "{{ datapath }}/data/{{ vendor }}"
   - "{{ fragpath }}/fragment"
   - "{{ standpath }}/standardise"
+
+- name: Ensure sql and nextflow directories are present
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ reppath }}/sql"
+  - "{{ reppath }}/nextflow"

@@ -17,3 +17,7 @@ fragpath: SetMe
 vendor: SetMe
 # The user is required tp specify the version on the command-line
 version: SetMe
+
+# Add this fileset to an existing source
+# (typically when inserting files from a large vendor progressively)
+add_file: no

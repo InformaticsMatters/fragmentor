@@ -14,6 +14,15 @@
     - deployment|string != 'SetMe'
     fail_msg: You must provide a 'deployment' to update inchi data.
 
+- name: Ensure sql, nextflow and fragment directories are present
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ reppath }}/sql"
+  - "{{ reppath }}/nextflow"
+  - "{{ fragpath }}/fragment"
+
 - block:
   - import_tasks: gen-nonisomol-inchi-{{ inchifrom }}.yaml
   - import_tasks: load-nonisomol-inchi.yaml
