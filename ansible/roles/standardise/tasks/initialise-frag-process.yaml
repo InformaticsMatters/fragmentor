@@ -33,13 +33,13 @@
   assert:
     that:
     - "{{ query_result.rowcount|int }} == 0"
-  when: add_file|bool==false
+  when: not add_file|bool
 
 # If add_file is true then use the existing source id from the previous run
 - name: Set source_id
   set_fact:
     source_id: "{{ query_result.query_result[0].id }}"
-  when: add_file|bool==true
+  when: add_file|bool
 
 # If add_file is no (normal situation) and the version has not been processed then add to the source table.
 - name: Insert run parameters
@@ -51,13 +51,13 @@
       returning id;
     autocommit: yes
   register: query_result
-  when: add_file|bool==false
+  when: not add_file|bool
 
 # If add_file is true then use the existing source id from the previous run
 - name: Set source_id
   set_fact:
     source_id: "{{ query_result.query_result[0].id }}"
-  when: add_file|bool==false
+  when: not add_file|bool
 
 - name: Display source_id
   debug:
