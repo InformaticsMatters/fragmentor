@@ -52,7 +52,7 @@
 # If this is development then this defaults.
 - name: Set nextflow_poll_period_minutes
   set_fact:
-    nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/30)|int }}"
+    nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/60)|int }}"
   when: deployment=="production"
 
 - debug:
