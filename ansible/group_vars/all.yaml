@@ -94,7 +94,7 @@ vendors:
     fragmaxfrags: 12
     fraglimit: 0
     extractchunksize: 300
-  enamine_r05:
+  enamine_ro5:
     approx_vendor_molecules: 40000000
     est_total_fragmentation_time: 720000
     fragminhac: 0

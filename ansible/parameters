@@ -10,6 +10,6 @@
 
 extracts:
     - lib:
-        vendor: 'chemspace_bb'
-        version: 'Testisomol'
+        vendor: 'enamine_ro5'
+        version: 'jun2018'
         regenerate_index: 'yes'
