@@ -1,5 +1,7 @@
-tqdm
-
+#
+# Modules for running ansible and modules used in many playbooks
+# Modules used in specific playbooks are installed at the point of use.
+#
 ansible == 2.9.9
 psycopg2-binary == 2.8.5
 jmespath == 0.10.0

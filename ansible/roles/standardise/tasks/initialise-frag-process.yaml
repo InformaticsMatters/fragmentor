@@ -12,6 +12,18 @@
     - "{{ vendors[vendor].fragmaxfrags|int }} > 0"
     - "{{ vendors[vendor].fraglimit|int }} >= 0"
 
+# Install the modules to be able to synchronise the data from S3
+
+- name: Upgrade PIP
+  command: pip install --upgrade pip
+
+- name: Install S3 requirements
+  pip:
+    name:
+    - python-dateutil==2.8.1
+    - boto3==1.12.49
+
+# Check the vendor name is one that can be processed.
 - name: check vendor_name
   postgresql_query:
     query: >-
@@ -19,6 +31,7 @@
       where vendor_name = '{{ vendor }}';
     autocommit: no
 
+# Check if the data library version for the vendor has been processed before.
 - name: check if previous version
   postgresql_query:
     query: select id from source where name = '{{ vendor }}' and version = '{{ version }}';
