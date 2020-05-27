@@ -1,7 +1,7 @@
 ---
 
 standardiser: frag.standardise.scripts.enamine.standardise_enamine_compounds
-standinputfile: j*.smi
+standinputfile: Jun2018_1.smi
 
 standardise_copy_table: i_mols_enamine
 standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id

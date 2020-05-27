@@ -55,7 +55,7 @@ hardware:
   development:
     parallel_jobs: 8
   production:
-    parallel_jobs: 250
+    parallel_jobs: 160
 
 # Vendor defaults.
 # A map of defaults based on the vendor and library.
