@@ -43,7 +43,7 @@
   vars:
     SOURCEIDS: "{{ source_ids }}"
     SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
-  when: source_id|length == 1
+  when: source_id_lst|length == 1
 
 # This uses the combined_vendor parameter when the number of sourced requested is greater than 1.
 - name: Template the vendor specific extract script where multiple vendors are defined
@@ -53,7 +53,7 @@
   vars:
     SOURCEIDS: "{{ source_ids }}"
     SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
-  when: source_id|length > 1
+  when: source_id_lst|length > 1
 
 - name: Extract supporting information for this source_id / extract to various files
   postgresql_query:

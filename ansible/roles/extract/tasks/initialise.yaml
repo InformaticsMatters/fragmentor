@@ -8,13 +8,13 @@
 
 - name: Display source_id list
   debug:
-    var: source_id
+    var: source_id_lst
 
 # Create a comma separated string of source_ids for use in combination sql statements.
 # For example (4,5)
 - name: Create a comma separated list of source_ids
   set_fact:
-    source_ids: "{{ source_id | join(',') }}"
+    source_ids: "{{ source_id_lst | join(',') }}"
 
 - name: Show list of source_ids
   debug:
@@ -26,7 +26,7 @@
 # For example ('o_edge_molport',o_edge_xchem_dsip)
 - name: Create a comma separated list of source_tables
   set_fact:
-    source_tables: '{{ "''" + source_table | join("'',''")  + "''" }}'
+    source_tables: '{{ "''" + source_table_lst | join("'',''")  + "''" }}'
 
 - name: show list of source_tables
   debug:

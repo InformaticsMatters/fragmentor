@@ -16,7 +16,7 @@
 
 - name: Display source_id
   debug:
-    msg: "{{ source_id[vendor_index] }}"
+    msg: "{{ source_id_lst[vendor_index] }}"
 
 # Create a child table for this vendor that inherits from o_edge_parent table.
 # The subsequent extracts can then use o_edge_parent as a basis for selecting data from multiple child tables.
@@ -30,23 +30,27 @@
 
 - name: Retrieve number of molecules to extract
   postgresql_query:
-    query: select count(*) from mol_source where source_id = {{ source_id[vendor_index] }};
+    query: select count(*) from mol_source where source_id = {{ source_id_lst[vendor_index] }};
     autocommit: no
   register: query_result
+  when: item.lib.regenerate_index|bool
 
 - name: Variable sanity-check
   assert:
     that:
     - "{{ query_result.query_result[0].count|int > 0 }}"
+  when: item.lib.regenerate_index|bool
 
 - name: Set no_of_molecules
   set_fact:
     no_of_molecules: "{{ query_result.query_result[0].count  }}"
+  when: item.lib.regenerate_index|bool
 
 # This calls a stored procedure that is stored in p10_create_frag_database
 - name: Load o_edge_vendor table
   postgresql_query:
     query: >-
-      call extract_o_edge_vendor({{ source_id[vendor_index] }}, {{ vendors[item.lib.vendor].extractchunksize }}, 0, {{ no_of_molecules }}, 'o_edge_{{ item.lib.vendor }}' );
+      call extract_o_edge_vendor({{ source_id_lst[vendor_index] }}, {{ vendors[item.lib.vendor].extractchunksize }}, 0,
+      {{ no_of_molecules }}, 'o_edge_{{ item.lib.vendor }}' );
     autocommit: yes
   when: item.lib.regenerate_index|bool

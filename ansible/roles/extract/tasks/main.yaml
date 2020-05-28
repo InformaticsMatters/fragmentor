@@ -2,12 +2,29 @@
 
 # Check that required command line parameters have been set:
 # - deployment
-# - Parameter file file containing vendor and version has been included.
+# - Parameter file file containing vendor(s) and version(s) has been created.
 #
-#   ansible-playbook site-standardise \
+#  e.g.
+#   extracts:
+#       - lib:
+#           vendor: 'enamine_ro5'
+#           version: 'jun2018'
+#           regenerate_index: 'no'
+#       - lib:
+#           vendor: 'molport'
+#           version: '2020-02'
+#           regenerate_index: 'yes'
+#
+#  The first time a library version is extracted, regenerate_index should be set to 'yes'
+#  so that the index of edges for the latest library version can be regenerated.
+#  For subsequent runs (e.g. to extract combinations) it can be set to 'no' for speed.
+#
+#   ansible-playbook site-extract \
 #     -e @parameters \
 #     -e deployment=development|production
 #
+#  Also be aware of the save_extract flag that indicated whether files should be zipped and uploaded to S3.
+#  For deployment=development this would normally be set to "N".
 
 - name: Assert user-variable definitions
   assert:

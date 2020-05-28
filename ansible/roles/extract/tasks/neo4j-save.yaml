@@ -129,7 +129,7 @@
   with_fileglob:
   - "{{ extracts[0].lib.vendor }}/header-*"
   become: yes
-  when: source_id|length == 1
+  when: source_id_lst|length == 1
 
 - name: Copy combined suppliermol-supplier-edges header file if combination
   copy:
@@ -141,7 +141,7 @@
   with_fileglob:
   - "{{ combined_vendor }}/header-*"
   become: yes
-  when: source_id|length > 1
+  when: source_id_lst|length > 1
 
 - name: Remove node and edge text files
   command: rm node-files.txt edge-files.txt
@@ -171,7 +171,7 @@
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
-  when: source_id|length == 1
+  when: source_id_lst|length == 1
 
 # When combination, use combination/first vendor/first version
 - name: Synchronise extract to S3
@@ -182,4 +182,4 @@
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
-  when: source_id|length > 1
+  when: source_id_lst|length > 1

@@ -10,6 +10,7 @@
 
 extracts:
     - lib:
-        vendor: 'enamine_ro5'
-        version: 'jun2018'
-        regenerate_index: 'yes'
+        vendor: 'xchem_dsip'
+        version: 'v1'
+        regenerate_index: 'no'
+

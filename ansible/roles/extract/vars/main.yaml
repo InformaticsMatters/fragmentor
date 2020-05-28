@@ -35,7 +35,7 @@ aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true
 
 
 # Source_id will be a comma-separated list of source_ids for use is the sql
-source_id: []
+source_id_lst: []
 
 # Source_id will be a comma-separated list of source_ids for use is the sql
-source_table: []
+source_table_lst: []

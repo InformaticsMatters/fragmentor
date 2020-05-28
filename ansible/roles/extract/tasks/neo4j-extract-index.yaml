@@ -25,6 +25,7 @@
     dest: "{{ reppath }}/sql/f100_neo4j_nodes_extract.sql"
   vars:
     SOURCETABLES: "{{ source_tables }}"
+    SOURCEIDS: "{{ source_ids }}"
     NEONODEFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
 
 - name: Extract NEO4J node information for these source_id(s) to neoedgefile

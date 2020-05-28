@@ -11,12 +11,12 @@
 
 COPY (select np.smiles, np.hac, np.rac, np.ring_smiles, np.inchik, np.inchis, string_agg (distinct(ms.code), ';'),
         (case when string_agg (ms.code, ';') is null then 'F2'
-              else 'F2;CanSmi;Mol;' || string_agg (distinct(v.supplier_node_name), ';')
+              else 'F2;CanSmi;Mol;' || string_agg (distinct(v.supplier_node_label), ';')
          end) as label
        from o_edge_parent os
        join pg_class p on os.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
        join nonisomol np ON np.id = os.parent_id
-       left join mol_source ms on os.parent_id = ms.nonisomol_id
+       left join mol_source ms on os.parent_id = ms.nonisomol_id and ms.source_id in ({{ SOURCEIDS }})
        left join source s on s.id = ms.source_id
        left join vendor_name v on s.name = v.vendor_name
        group by 1,2,3,4,5,6
