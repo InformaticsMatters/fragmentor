@@ -21,7 +21,7 @@ with something like: -
     It configures the server with Docker and runs the designated database
     image and then formats the initial DB.
 
-You can run fragmentation plays from the head node with something like: -
+You can run standardisation plays from the head node with something like: -
 
     $ ansible-playbook site-standardise.yaml \
         -e deployment=production \
