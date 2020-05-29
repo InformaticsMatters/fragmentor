@@ -62,7 +62,7 @@ This parameter tells the playbook to either set up a production instance (a data
 a local docker container on, say, a laptop. The deployment is configured in the all.yaml file.
 
 
-## New Process Description
+## Process Description
 
 The sequence diagram below shows the basic steps in the new end-to-end fragmentation 
 process including a fragmentation database called FairMolecules. The advantage of the database 
@@ -133,7 +133,7 @@ combination/xchem_dsip/2020-01-01
 
 The process consists of three steps, described below:
 
-###Standardisation
+### Standardisation
 
 The standardisation step is run as follows:
 
@@ -172,7 +172,7 @@ should be used with caution.
 
 
 
-###Fragmentation
+### Fragmentation
 
 The fragmentation step will identify molcules for the vendor/library that have not been fragmented yet and process them.
 It is run as follows:
@@ -195,7 +195,7 @@ the database it it possible to run multiple standardisation steps for a vendor/l
 step.
 
 
-###Create Inchi Keys
+### Create Inchi Keys
 
 The Create Inchi step will identify any molcules that have not had inchi keys generated yet and process them.
 It is not vendor/library specific and can be run as follows:
@@ -337,7 +337,7 @@ extract process.
 
 ## Adding a new vendor library to the repository
 
-Summary of actions required.
+TBA: a summery of changes to add a new vendor library.
 
 
 
@@ -360,4 +360,4 @@ conda env remove --name fragmentor
 
 ## Future Improvements
 
-A summary of makjor planned improvements.
+TBA: a summary of major planned improvements.
