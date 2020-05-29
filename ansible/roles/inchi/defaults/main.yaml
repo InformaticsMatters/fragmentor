@@ -9,5 +9,3 @@ reppath: "{{ role_path }}/../../.."
 # The following is used is store extract files. It is common with the fragment play (at least for now) because
 # the inchi processing can be driven from nodes.csv (output from fragmentation step).
 fragpath: SetMe
-
-
