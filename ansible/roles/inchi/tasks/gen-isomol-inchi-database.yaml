@@ -11,14 +11,14 @@
      --set AUTOCOMMIT=off --set ON_ERROR_STOP=on
      -c "\COPY (SELECT iso.smiles FROM isomol iso
                  WHERE iso.inchis IS NULL)
-                    TO '{{ fragpath }}/fragment/{{ isoinchifile }}' (FORMAT csv);"
+                    TO '{{ fragpath }}/isoinchi/{{ isoinchifile }}' (FORMAT csv);"
     {{ database[deployment].db }}
   environment:
     PGPASSWORD: "{{ database[deployment].login_password }}"
 
 - name: Calculate how many smiles to generate inchi for
   command: >-
-      wc -l {{ fragpath }}/fragment/{{ isoinchifile }}
+      wc -l {{ fragpath }}/isoinchi/{{ isoinchifile }}
   register: wc_result
 
 - name: Set Inchis to Process
@@ -41,7 +41,7 @@
 - name: Set inchigenchunk
   set_fact:
     inchigenchunk: "{{ inchigenchunk_calc|int }}"
-  when: inchigenchunk_calc|int>inchigenchunk
+  when: inchigenchunk_calc|int>inchigenchunk|int
 
 - debug:
     var: inchigenchunk
@@ -93,10 +93,10 @@
     nextflow_cmd: >-
       nextflow run -c {{ reppath }}/nextflow/nextflow.config
       {{ reppath }}/nextflow/generateinchi.nf
-      -with-report {{ fragpath }}/fragment/generateinchi_report.html
+      -with-report {{ fragpath }}/isoinchi/generateinchi_report.html
       -with-tower
-      --input {{ fragpath }}/fragment/{{ isoinchifile }}
-      --out_dir {{ fragpath }}/fragment
+      --input {{ fragpath }}/isoinchi/{{ isoinchifile }}
+      --out_dir {{ fragpath }}/isoinchi
       --outputfile {{ isoinchitab }}
       --chunk_size {{ inchigenchunk|int }}
 

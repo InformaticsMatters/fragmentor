@@ -11,7 +11,7 @@
 
 - name: Check inputfile present
   stat:
-    path: "{{ fragpath }}/fragment/{{ isoinchitab }}"
+    path: "{{ fragpath }}/isoinchi/{{ isoinchitab }}"
   register: isoinchitab_result
 
 - name: Assert isoinchitab
@@ -23,9 +23,9 @@
   shell: >-
     cat {{ isoinchitab }} | split -d -l {{ inchichunk }} - isoinchichunk_
   args:
-    chdir: "{{ fragpath }}/fragment"
+    chdir: "{{ fragpath }}/isoinchi"
 
 - name: Load isoinchichunk
   include_tasks: load-isomol-chunk.yaml
   with_fileglob:
-  - "{{ fragpath }}/fragment/isoinchichunk_*"
+  - "{{ fragpath }}/isoinchi/isoinchichunk_*"

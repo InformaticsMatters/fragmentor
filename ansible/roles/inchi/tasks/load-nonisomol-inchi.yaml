@@ -11,7 +11,7 @@
 
 - name: Check inputfile present
   stat:
-    path: "{{ fragpath }}/fragment/{{ inchitab }}"
+    path: "{{ fragpath }}/inchi/{{ inchitab }}"
   register: inchitab_result
 
 - name: Assert inchitab
@@ -23,9 +23,9 @@
   shell: >-
     cat {{ inchitab }} | split -d -l {{ inchichunk }} - inchichunk_
   args:
-    chdir: "{{ fragpath }}/fragment"
+    chdir: "{{ fragpath }}/inchi"
 
 - name: Load inchichunk
   include_tasks: load-nonisomol-chunk.yaml
   with_fileglob:
-  - "{{ fragpath }}/fragment/inchichunk_*"
+  - "{{ fragpath }}/inchi/inchichunk_*"
