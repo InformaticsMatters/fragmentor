@@ -278,13 +278,15 @@ The file all.yaml contains the following parameters used to control the differen
 > Hardware sizing - used to calculate size of chunks in standardization/fragmentation. A map of variables based on 
 >deployment and should reflect the approximate CPUs available on the machine/cluster.
 
-For example:
 
+For example:
+```
 hardware:
   development:
     parallel_jobs: 8
   production:
     parallel_jobs: 160
+```
 
 > Vendor defaults.
 
@@ -293,6 +295,7 @@ a significant change to the size/composition of vendor supplied libraries.
 
 For example xchem_dsip is set up as follows.
 
+```
 vendors:
   xchem_dsip:
     # Used for sizing timeouts and processing parameters
@@ -312,6 +315,7 @@ vendors:
     # So the values below are set based on the number of edges per mol_source value
     # and validated by testing.
     extractchunksize: 800
+```
 
 ## Approximate Sizing and Timings
 
@@ -320,8 +324,8 @@ Numbers are given based on a maximum fragmentation cycles of 12.
 | Vendor/Lib   | Version     | Molecules   | Nodes       |Edges        |
 | ------------ | ----------- | ----------- | ----------- | ----------- | 
 | Xchem_dsip   | v1          | 768         | 5099        | 14221       |
-| Molport      | 2020-01     | 7118865     | tba         | tba         |
-| Chemspace_bb | December2019| 17257752    | tba         | tba         |
+| Molport      | 2020-01     | 7118865     | tba         | 582264651   |
+| Chemspace_bb | December2019| 17257752    | tba         | 111716670   |
 | Enamine_ro5  | Jun2018     | tba         | tba         | tba         |
 
 
