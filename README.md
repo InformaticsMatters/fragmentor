@@ -248,7 +248,7 @@ ansible-playbook site-extract \
 Example: navigate to the ansible directory
 
 ```
-$ ansible-playbook site-extract.yaml -e deployment=production  
+$ ansible-playbook site-extract.yaml -e @parameters -e deployment=production  
 ```
 
 > Optional parameter save_extract: default: yes
@@ -317,16 +317,16 @@ vendors:
     extractchunksize: 800
 ```
 
-## Approximate Sizing and Timings
+## Sizing and Approximate Timings
 
 Numbers are given based on a maximum fragmentation cycles of 12. 
 
 | Vendor/Lib   | Version     | Molecules   | Nodes       |Edges        |
 | ------------ | ----------- | ----------- | ----------- | ----------- | 
-| Xchem_dsip   | v1          | 768         | 5099        | 14221       |
-| Molport      | 2020-01     | 7118865     | tba         | 582264651   |
-| Chemspace_bb | December2019| 17257752    | tba         | 111716670   |
-| Enamine_ro5  | Jun2018     | tba         | tba         | tba         |
+| Xchem_dsip   | v1          | 768         | 5099        | 14421       |
+| Molport      | 2020-01     | 7118865     | 104407052   | 582264651   |
+| Chemspace_bb | December2019| 17257752    | 27265866    | 111716670   |
+| Enamine_ro5  | Jun2018     | 39765321    | 178240230   | 1212234672  |
 
 
 ## FairMolecules Database Schema
