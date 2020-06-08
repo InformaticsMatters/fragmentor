@@ -95,15 +95,13 @@ vendors:
     fraglimit: 0
     extractchunksize: 300
   enamine_ro5:
-#    approx_vendor_molecules: 40000000
-    approx_vendor_molecules: 20000000
-#    est_total_fragmentation_time: 720000
-    est_total_fragmentation_time: 360000
+    approx_vendor_molecules: 40000000
+    est_total_fragmentation_time: 720000
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
-    extractchunksize: 2000
+    extractchunksize: 450
 
 # The tag of the fragmentation container,
 neo4j_graph_version: 2019-12-18.2
