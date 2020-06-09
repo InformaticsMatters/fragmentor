@@ -629,7 +629,7 @@ DECLARE
     commit_rate INTEGER := 1;
 BEGIN
     chunks := 1 + run_limit / chunk_size;
-    RAISE NOTICE 'chunks %', chunks;
+    RAISE NOTICE 'offset: % has chunks: %', run_offset, chunks;
 	for chunk_nr IN 0 .. chunks - 1
     loop
        chunks_count := chunks_count + 1;
@@ -653,7 +653,7 @@ BEGIN
           chunks_count := 0;
           commit;
           commits := commits + 1;
-          RAISE NOTICE 'molecules processed: %', commits * commit_rate * chunk_size;
+          RAISE NOTICE 'offset: %, molecules processed: %', run_offset, commits * commit_rate * chunk_size;
        end if;
     END LOOP;
 end $edges$ ;

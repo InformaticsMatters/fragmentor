@@ -339,11 +339,6 @@ The diagram below shows the FairMolcules database schema:
 Tables beginning with “i_” (not shown) are used in the loading process and tables beginning with "o_" are used in the 
 extract process. 
 
-## Adding a new vendor library to the repository
-
-TBA: a summery of changes to add a new vendor library.
-
-
 
 ## Running Python Scripts directly via the conda environment
 
@@ -361,6 +356,12 @@ Removing the environment:
 ```
 conda env remove --name fragmentor
 ```
+
+## Adding a new vendor library to the repository
+
+TBA: a summery of changes to add a new vendor library.
+
+
 
 ## Future Improvements
 

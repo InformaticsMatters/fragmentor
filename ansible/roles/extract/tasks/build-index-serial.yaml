@@ -1,6 +1,8 @@
 ---
 # For each source_id where flag "regenerate_index" is true, rebuild the index.
 # Note that this allows combination builds without having to rebuild indexes for all the vendors involved.
+# This runs a single index build process - kept in case there is a problem with the parallel process or the database
+# cannot support parallel connections.
 
 - name: Display vendor
   debug:
@@ -50,7 +52,7 @@
 - name: Load o_edge_vendor table
   postgresql_query:
     query: >-
-      call extract_o_edge_vendor({{ source_id_lst[vendor_index] }}, {{ vendors[item.lib.vendor].extractchunksize }}, 0,
+      call extract_o_edge_vendor({{ source_id_lst[vendor_index] }}, {{ vendors[item.lib.vendor].indexchunksize }}, 0,
       {{ no_of_molecules }}, 'o_edge_{{ item.lib.vendor }}' );
     autocommit: yes
   when: item.lib.regenerate_index|bool

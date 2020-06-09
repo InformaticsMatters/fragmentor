@@ -1,0 +1,137 @@
+---
+# For each source_id where flag "regenerate_index" is true, rebuild the index.
+# Note that this allows combination builds without having to rebuild indexes for all the vendors involved.
+# This builds the index in parallel using a number of simultaneous calls to a postgres function created by
+# p10_create_frag_database.sql.
+
+- name: Display vendor
+  debug:
+    msg: "{{ item.lib.vendor }}"
+
+- name: Display version
+  debug:
+    msg: "{{ item.lib.version }}"
+
+- name: Display regenerate flag
+  debug:
+    msg: "{{ item.lib.regenerate_index }}"
+
+- name: Display source_id
+  debug:
+    msg: "{{ source_id_lst[vendor_index] }}"
+
+# Create a child table for this vendor that inherits from o_edge_parent table.
+# The subsequent extracts can then use o_edge_parent as a basis for selecting data from multiple child tables.
+- name: (Re) create o_edge_<vendor> table
+  postgresql_query:
+    query: >-
+      drop table if exists public.o_edge_{{ item.lib.vendor }};
+      create TABLE public.o_edge_{{ item.lib.vendor }} (PRIMARY KEY (parent_id, child_id, label)) inherits (o_edge_parent);
+    autocommit: yes
+  when:
+    - item.lib.regenerate_index|bool
+    - drop_index_table|bool
+
+- name: Retrieve number of molecules to extract
+  postgresql_query:
+    query: select count(*) from mol_source where source_id = {{ source_id_lst[vendor_index] }};
+    autocommit: no
+  register: query_result
+  when: item.lib.regenerate_index|bool
+
+- name: Variable sanity-check
+  assert:
+    that:
+    - "{{ query_result.query_result[0].count|int > 0 }}"
+  when: item.lib.regenerate_index|bool
+
+- name: Set no_of_molecules
+  set_fact:
+    no_of_molecules: "{{ query_result.query_result[0].count  }}"
+  when: item.lib.regenerate_index|bool
+
+- name: Display no_of_molecules
+  debug:
+    msg: "{{ no_of_molecules }}"
+  when: item.lib.regenerate_index|bool
+
+- name: Set parallel chunk size
+  set_fact:
+    parallel_chunk: "{{ (no_of_molecules|int / hardware[deployment].postgres_jobs|int) | round(0,'ceil') }}"
+  when: item.lib.regenerate_index|bool
+
+# Running multiple tasks in parallel (asynchronously)
+# requires the use of the 'async' property and 'poll: 0'.
+# Set maximum index timeout based
+- name: Set index_timeout_calc
+  set_fact:
+    index_timeout_calc: "{{ (safety_factor|int
+                 * vendors[item.lib.vendor].index_build_time|int)/hardware[deployment].postgres_jobs|int }}"
+  when: deployment=="production"
+
+- name: Set index_timeout_minutes
+  set_fact:
+    index_timeout_minutes: "{{ index_timeout_calc|int }}"
+  when: index_timeout_calc|int>index_timeout_minutes|int
+
+- debug:
+    var: index_timeout_minutes
+
+# Set index_poll_period_minutes based on index_timeout_minutes/120.
+# If this is development then this defaults.
+- name: Set index_poll_period_minutes
+  set_fact:
+    index_poll_period_minutes: "{{ (index_timeout_minutes|int/120)|int }}"
+  when: deployment=="production"
+
+- debug:
+    var: index_poll_period_minutes
+
+# The command list divides the number of molecules into postgres_jobs
+- name: Create queue_lst of limits and offsets.
+  vars:
+    queue_element:
+      offset: "{{ parallel_chunk|int * job_queue|int }}"
+      limit: "{{ parallel_chunk|int }}"
+  set_fact:
+    queue_lst: "{{ (queue_lst | default([])) + [queue_element] }}"
+  with_sequence: "start=0 count={{ hardware[deployment].postgres_jobs|int }}"
+  loop_control:
+    loop_var: job_queue
+  when: item.lib.regenerate_index|bool
+
+# Run parallel extract_o_edge_vendor jobs asynchronously.
+# This calls a stored procedure that is stored in p10_create_frag_database
+# Because we use 'async' and 'poll: 0' no task will block here,
+# it's run-and-move-on...
+
+- name: Run parallel extract_o_edge_vendor jobs asynchronously
+  postgresql_query:
+    query: >-
+      call extract_o_edge_vendor({{ source_id_lst[vendor_index] }}, {{ vendors[item.lib.vendor].indexchunksize }},
+      {{ job_queue.offset }}, {{ job_queue.limit }}, 'o_edge_{{ item.lib.vendor }}' );
+    autocommit: yes
+  async: "{{ index_timeout_minutes|int * 60 }}"
+  poll: 0
+  register: job_results
+  loop: "{{ queue_lst }}"
+  loop_control:
+    loop_var: job_queue
+  when: item.lib.regenerate_index|bool
+
+# Now we need to wait for all of the above tasks to complete.
+# Ansible picks one of them, waits until completion then moves to the next
+# and waits for that until all the tasks in the list have finished...
+
+- name: Wait for commands
+  async_status:
+    jid: "{{ cmd_results.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  retries: "{{ (index_timeout_minutes|int /
+            index_poll_period_minutes|int )|int }}"
+  delay: "{{ index_poll_period_minutes|int * 60 }}"
+  loop: "{{ job_results.results }}"
+  loop_control:
+    loop_var: cmd_results
+  when: item.lib.regenerate_index|bool

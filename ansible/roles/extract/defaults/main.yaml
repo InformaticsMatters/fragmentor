@@ -21,3 +21,13 @@ save_extract: yes
 
 # In the case of a combined extract, which of the vendor specific files to use.
 combined_vendor: molport
+
+# Only for restart.
+# If this is set to yes (the default) the index table will be deleted,
+# Otherwise the table will be left and processing will restart using this data.
+# It will speed up processing in edges are already present.
+# If a proper restart point is required, this functionality can be reconsidered.
+drop_index_table: no
+
+# Whether the index should be built in serial or parallel.
+index_build: parallel

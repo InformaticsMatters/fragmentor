@@ -33,9 +33,20 @@ aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
 aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
 aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
 
-
-# Source_id will be a comma-separated list of source_ids for use is the sql
+# Source_id will be a comma-separated list of source_ids for use in the sql
 source_id_lst: []
 
-# Source_id will be a comma-separated list of source_ids for use is the sql
+# Source_id will be a comma-separated list of source_ids for use in the sql
 source_table_lst: []
+
+# Default o_edge_vedor index creation timeouts for parallel running
+# These are replaced by calculated amounts and act as minimum figures for development.
+index_timeout_minutes: 10
+index_poll_period_minutes: 1
+index_timeout_calc: 0
+
+# Safety factor is used in case, for example, other processes are on the machine
+safety_factor: 3
+
+# job queue for use in building the index
+queue_lst: []

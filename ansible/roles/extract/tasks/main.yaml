@@ -52,14 +52,13 @@
 - block:
 
   - import_tasks: initialise.yaml
-
-  - include_tasks: build-index.yaml
+  - include_tasks: build-index-{{ index_build }}.yaml
     loop: "{{ extracts }}"
     loop_control:
       index_var: vendor_index
 
-  - import_tasks: neo4j-extract-index.yaml
-  - import_tasks: neo4j-extract.yaml
+#  - import_tasks: neo4j-extract-index.yaml
+#  - import_tasks: neo4j-extract.yaml
 
   module_defaults:
     postgresql_query:
