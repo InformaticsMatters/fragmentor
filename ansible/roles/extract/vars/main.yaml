@@ -45,8 +45,8 @@ index_timeout_minutes: 10
 index_poll_period_minutes: 1
 index_timeout_calc: 0
 
-# Safety factor is used in case, for example, other processes are on the machine
-safety_factor: 3
+# Safety factor is used in case, for example, other processes are on the machine or processes are waiting for each other
+safety_factor: 6
 
 # job queue for use in building the index
 queue_lst: []
