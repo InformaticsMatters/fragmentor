@@ -19,9 +19,20 @@
 - name: check vendor_name
   postgresql_query:
     query: >-
-      select * from vendor_name
+      select count(*) from vendor_name
       where vendor_name = '{{ vendor }}';
     autocommit: no
+  register: query_result
+
+- debug:
+    var: query_result
+
+# If check the vendor name is present
+- name: vendor_name is present in database
+  assert:
+    that:
+    - "{{ query_result.query_result[0].count|int }} == 1"
+    fail_msg: The vendor must be configured in the vendor_name table.
 
 # Check if the data library version for the vendor has been processed before.
 - name: check if previous version
@@ -38,6 +49,7 @@
   assert:
     that:
     - "{{ query_result.rowcount|int }} == 0"
+    fail_msg: This version has already been processed once. If you are adding a file to this library, use the add_file parameter.
   when: not add_file|bool
 
 # If add_file is true then use the existing source id from the previous run
