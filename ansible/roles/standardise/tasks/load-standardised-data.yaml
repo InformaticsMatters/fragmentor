@@ -4,6 +4,33 @@
 # and then call on the 'chunk' loader
 # for each file created to load into the database
 
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {standardise-load} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ standpath }}/standardise/standardise_report.html"
+    block: |
+      <h2>Step: Load Standardised Data</h2>
+      <p>Begin: {{ now(utc=True).isoformat() }}</p>
+
+- name: Count molecules
+  shell: wc -l < {{ standpath }}/standardise/standardised-compounds.tab
+  register: standcount_result
+
+- name: Set stand_count
+  set_fact:
+    stand_count: "{{ standcount_result.stdout|int - 1 }}"
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {standardise-load} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ standpath }}/standardise/standardise_report.html"
+    block: |
+      <p><table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>Standardised Compounds to Load</td><td>{{ stand_count }}</td></tr>
+      <tr><td>Standardisation Load Chunk Size</td><td>{{ standchunk }}</td></tr>
+      </table></p>
+
 - name: Extract standard header
   shell: head -1 standardised-compounds.tab > standardheader
   args:
@@ -20,3 +47,10 @@
   include_tasks: load-standardised-data-chunk.yaml
   with_fileglob:
   - "{{ standpath }}/standardise/chunk_*"
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {standardise-load} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ standpath }}/standardise/standardise_report.html"
+    block: |
+      <p>End: {{ now(utc=True).isoformat() }}</p>

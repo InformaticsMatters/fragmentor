@@ -1,4 +1,5 @@
 ---
+# Load chunks to Database
 
 - name: Display chunk
   debug:
@@ -35,3 +36,14 @@
     named_args:
       SOURCEID: "{{ source_id|int }}"
     autocommit: no
+  register: query_result
+
+- debug:
+   var: query_result
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {standardise-load} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ standpath }}/standardise/standardise_report.html"
+    block: |
+      <p>Chunk: {{ item }} </p>

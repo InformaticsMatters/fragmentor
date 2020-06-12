@@ -1,16 +1,8 @@
 ---
+# Initialise Fragmentation Process
 
 - debug:
     msg: "{{ reppath }}/run/vendor/{{ vendor }}"
-
-
-- name: Variable sanity-check
-  assert:
-    that:
-    - "{{ vendors[vendor].fraghac|int }} > 0"
-    - "{{ vendors[vendor].fragminhac|int }} >= 0"
-    - "{{ vendors[vendor].fragmaxfrags|int }} > 0"
-    - "{{ vendors[vendor].fraglimit|int }} >= 0"
 
 # Install the modules to be able to synchronise the data from S3
 
@@ -54,6 +46,14 @@
     source_id: "{{ query_result.query_result[0].id }}"
   when: add_file|bool
 
+- name: Variable sanity-check
+  assert:
+    that:
+    - "{{ vendors[vendor].fraghac|int }} > 0"
+    - "{{ vendors[vendor].fragminhac|int }} >= 0"
+    - "{{ vendors[vendor].fragmaxfrags|int }} > 0"
+    - "{{ vendors[vendor].fraglimit|int }} >= 0"
+
 # If add_file is no (normal situation) and the version has not been processed then add to the source table.
 - name: Insert run parameters
   postgresql_query:
@@ -77,15 +77,14 @@
     var: source_id
 
 # Optionally erase and then create the working directories...
-
 - name: Erase directories
   file:
     path: "{{ item }}"
     state: absent
   loop:
   - "{{ datapath }}/data/{{ vendor }}"
-  - "{{ fragpath }}/fragment"
   - "{{ standpath }}/standardise"
+  - "{{ logpath }}/{{ vendor }}/{{ version }}/standardise"
   when: clean_start|bool
 
 - name: Create directories
@@ -94,8 +93,8 @@
     state: directory
   loop:
   - "{{ datapath }}/data/{{ vendor }}"
-  - "{{ fragpath }}/fragment"
   - "{{ standpath }}/standardise"
+  - "{{ logpath }}/log/{{ vendor }}/{{ version }}/standardise"
 
 - name: Ensure sql and nextflow directories are present
   file:
@@ -104,3 +103,23 @@
   loop:
   - "{{ reppath }}/sql"
   - "{{ reppath }}/nextflow"
+
+# Create Standardisation Summary Report. This is saved with the playbook results.
+- name: Create Standardise HTML log report
+  blockinfile:
+    path: "{{ standpath }}/standardise/standardise_report.html"
+    create: yes
+    marker: "<!-- {standardise-init} ANSIBLE MANAGED BLOCK -->"
+    insertafter: "<body>"
+    block: |
+      <h1>Ansible Standardisation Playbook</h1>
+      <p><table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>Vendor</td><td>{{ vendor }}</td></tr>
+      <tr><td>Version</td><td>{{ version }}</td></tr>
+      <tr><td>Source-id</td><td>{{ source_id }}</td></tr>
+      <tr><td>User</td><td>{{ ansible_hostname }}</td></tr>
+      <tr><td>Deployment</td><td>{{ deployment }}</td></tr>
+      </table></p>
+      <p>Standardisation play started on: {{ now(utc=True).isoformat() }}</p>
+  when: clean_start|bool

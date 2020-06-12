@@ -1,0 +1,48 @@
+---
+
+# This performs any finalisation steps required for the standardisation process:
+# 1. Removes any working files no longer required (production only).
+# 2. Copies any reports to save location in S3 identified by vendor/version/standardisation (production only)
+
+- name: remove working files
+  shell: rm standardheader
+  args:
+    chdir: "{{ standpath }}/standardise"
+
+- name: remove working files
+  shell: rm chunk_*
+  args:
+    chdir: "{{ standpath }}/standardise"
+
+# Finalise report
+- name: Write line to report
+  blockinfile:
+    marker: "<!-- {standardise-init} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ standpath }}/standardise/standardise_report.html"
+    block: |
+      <p>Standardisation play ended on: {{ now(utc=True).isoformat() }}</p>
+      <p>Saving Files to logs/{{ vendor }}/{{ version }}/standardise </p>
+
+# Zip files for transfer
+- name: Compress files
+  shell: gzip *
+  args:
+    chdir: "{{ standpath }}/standardise"
+
+# Copy log files to S3
+- name: Synchronise logs to S3
+  s3_sync:
+    bucket: "{{ bucket }}"
+    key_prefix: logs/{{ vendor }}/{{ version }}/standardise
+    file_root: "{{ standpath }}/standardise"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+  when: deployment=="production"
+
+# Copy log files to Repo
+- name: Copy log files to repo
+  shell: cp {{ standpath }}/standardise/* {{ logpath }}/log/{{ vendor }}/{{ version }}/standardise
+  when: deployment=="development"
+
+

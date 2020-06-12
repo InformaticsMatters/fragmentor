@@ -37,7 +37,6 @@
     fail_msg: You must define 'AWS_ACCESS_KEY_ID' and 'AWS_SECRET_ACCESS_KEY'
   when: deployment=="production"
 
-
 - block:
 
   - import_tasks: initialise-frag-process.yaml
@@ -45,6 +44,7 @@
   - import_tasks: get-raw-data-{{ deployment }}.yaml
   - import_tasks: standardise-file.yaml
   - import_tasks: load-standardised-data.yaml
+  - import_tasks: finalise.yaml
 
   module_defaults:
     postgresql_query:
@@ -59,3 +59,4 @@
       db: "{{ database[deployment].db }}"
       login_user: "{{ database[deployment].login_user }}"
       login_password: "{{ database[deployment].login_password }}"
+

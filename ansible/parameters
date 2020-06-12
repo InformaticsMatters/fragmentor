@@ -10,7 +10,7 @@
 
 extracts:
     - lib:
-        vendor: 'xchem_dsip'
-        version: 'v1'
+        vendor: 'chemspace_bb'
+        version: 'December2019'
         regenerate_index: 'yes'
 

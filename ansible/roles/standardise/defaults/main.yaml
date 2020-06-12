@@ -11,6 +11,7 @@ reppath: "{{ role_path }}/../../.."
 datapath: SetMe
 standpath: SetMe
 fragpath: SetMe
+logpath: SetMe
 
 # The vendor. Typically a vendor and collection,
 # like 'chemspace_bb' or 'xchem_dsip'.

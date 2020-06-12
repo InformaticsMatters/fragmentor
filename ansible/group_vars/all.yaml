@@ -100,8 +100,8 @@ vendors:
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
-    indexchunksize: 2160
-    index_build_time:
+    indexchunksize: 300
+    index_build_time: 2160
   enamine_ro5:
     approx_vendor_molecules: 40000000
     est_total_fragmentation_time: 720000
@@ -109,7 +109,7 @@ vendors:
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
-    indexchunksize: 450
+    indexchunksize: 300
     index_build_time: 17280
 
 # The tag of the fragmentation container,

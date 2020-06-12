@@ -37,3 +37,11 @@
   loop:
   - "{{ reppath }}/sql"
   - "{{ reppath }}/nextflow"
+
+- name: Variable sanity-check
+  assert:
+    that:
+    - "{{ vendors[vendor].fraghac|int }} > 0"
+    - "{{ vendors[vendor].fragminhac|int }} >= 0"
+    - "{{ vendors[vendor].fragmaxfrags|int }} > 0"
+    - "{{ vendors[vendor].fraglimit|int }} >= 0"

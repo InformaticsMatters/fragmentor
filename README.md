@@ -359,9 +359,18 @@ conda env remove --name fragmentor
 
 ## Adding a new vendor library to the repository
 
-TBA: a summery of changes to add a new vendor library.
+TBA: Change summary of changes to add a new vendor library into tutorial.
 
-
+ 1. Folder changes to add new library.
+ 2. Add new vendor/library to vendor name table and load script.
+ 3. all.yaml - new configuration for vendor
+ 4. Add vendor specific config file. 
+ 5. Standardise - new python directory
+ 6. standardise - new i_mols_table + load script (details depend on source)
+ 7. fragment - config
+ 8. Inchi - should just "work"
+ 9. Extract - add vendor specific extract -> remember to also check combinations will work (uses molport config) 
+ 
 
 ## Future Improvements
 

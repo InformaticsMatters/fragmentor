@@ -1,6 +1,13 @@
 ---
-
 # Gets 'raw' data from data path in repository by vendor
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {standardise-get} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ standpath }}/standardise/standardise_report.html"
+    block: |
+      <h2>Step: Get Raw Data from Repo</h2>
+      <p>Begin: {{ now(utc=True).isoformat() }}</p>
 
 - name: Set raw path
   set_fact:
@@ -24,3 +31,10 @@
 # this is where we do vendor-specific presentation...
 
 - include_tasks: unpack-raw-data-{{ vendor }}.yaml
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {standardise-get} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ standpath }}/standardise/standardise_report.html"
+    block: |
+      <p>End: {{ now(utc=True).isoformat() }}</p>
