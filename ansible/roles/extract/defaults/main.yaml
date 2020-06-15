@@ -27,7 +27,7 @@ combined_vendor: molport
 # Otherwise the table will be left and processing will restart using this data.
 # It will speed up processing in edges are already present.
 # If a proper restart point is required, this functionality can be reconsidered.
-drop_index_table: no
+drop_index_table: yes
 
 # Whether the index should be built in serial or parallel.
 index_build: parallel

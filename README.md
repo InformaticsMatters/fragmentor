@@ -61,6 +61,9 @@ Parameter deployment=development|production
 This parameter tells the playbook to either set up a production instance (a database server) or to use a Postgres in 
 a local docker container on, say, a laptop. The deployment is configured in the all.yaml file.
 
+>   Note that if there are automatic update jobs running that periodically stops servers (to install new software 
+    for example),  it may be prudent to disable them and use alternative arrangements to prevent the database being 
+    brought down when in use.
 
 ## Process Description
 
@@ -326,7 +329,9 @@ Numbers are given based on a maximum fragmentation cycles of 12.
 | Xchem_dsip   | v1          | 768         | 5099        | 14421       |
 | Molport      | 2020-01     | 7118865     | 104407052   | 582264651   |
 | Chemspace_bb | December2019| 17257752    | 27265866    | 111716670   |
-| Enamine_ro5  | Jun2018     | 39765321    | 178240230   | 1212234672  |
+| Enamine_ro5  | Jun2018     | 39765321    | 178240230   | 1130306251  |
+| Xchem_spot   | v1          | 96          | 576         | 1388        |
+| Xchem_probe  | v1          | 239         | 857         | 2396        |
 
 
 ## FairMolecules Database Schema
@@ -361,17 +366,82 @@ conda env remove --name fragmentor
 
 TBA: Change summary of changes to add a new vendor library into tutorial.
 
- 1. Folder changes to add new library.
- 2. Add new vendor/library to vendor name table and load script.
- 3. all.yaml - new configuration for vendor
- 4. Add vendor specific config file. 
- 5. Standardise - new python directory
- 6. standardise - new i_mols_table + load script (details depend on source)
- 7. fragment - config
- 8. Inchi - should just "work"
- 9. Extract - add vendor specific extract -> remember to also check combinations will work (uses molport config) 
+The new vendor/library details must be added to the vendor name table (in the database) and to the configuration 
+load script (configure/files/p10_load_config_data.sql).
+For example:
+
+```
+insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_spot', NULL, 'Xchem','V_XSPOT');
+```
  
+ 2. Folder changes to add new library in the data directory of the repository and S3 directory. Note that the input file should be compressed with gzip and,
+if using an existing format, the header line must also match.
+For eaxmple:
+```
+xchem/spot/v1/spotfinder.smi.gz
+```
+ 
+ 3. all.yaml - new configuration for vendor/library. For example:
 
-## Future Improvements
+```
+  xchem_spot:
+    approx_vendor_molecules: 100
+    est_total_fragmentation_time: 10
+    fragminhac: 0
+    fraghac: 36
+    fragmaxfrags: 12
+    fraglimit: 0
+    indexchunksize: 100
+    index_build_time: 10
+```
+ 
+ 4. Add vendor/library specific config file to the standardise playbook to identify the input file format, python 
+ script, upload table and copy columns that will be used for standardisation. Note that the name should begin with 
+ the vendor/library identifier. For example standardise/vars/xchem_spot-variables.yaml contains:
 
-TBA: a summary of major planned improvements.
+```
+# Python script used to standardise the molecules
+standardiser: frag.standardise.scripts.dsip.standardise_xchem_compounds
+# Input file template (unzipped) expected by standardiser. If there are multiple files this can be a glob. 
+standinputfile: spotfinder.smi
+# Upload table template to match fields in standardised compounds. 
+standardise_copy_table: i_mols_dsip
+# Fields to upload to table (used in copy statement). 
+standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id
+```
+ 
+ 5. Standardise - new tasks to unpack raw data. If this is an existing format then the script for that format can be
+ copied. If no specific processing is required then the script can simply include the tasks in 
+ unpack-raw-data-decompress-gz-all.yaml.
+ 6. Standardise - new python script - only required if the table layout is different to an existing format.
+ 7. standardise - new create script for i_mols_table (standardise/files/vendor/f40_create_stand_database.sql) and new 
+ load script (standardise/files/vendor/f40_load_standardised_data.sql). If this is an existing format then the scripts
+ for that format can be copied. For example:
+
+```
+-- Create Fragmentation Database SQL Statements for Libary xchem_spot
+-- Purpose: Creates fragmentation company specific tables. This is the same as the xchem_dsip library.
+DROP TABLE IF EXISTS i_mols_dsip;
+
+-- Create i_mols        
+CREATE TABLE i_mols_dsip (
+  osmiles TEXT,
+  isosmiles TEXT,
+  nonisosmiles TEXT,
+  hac SMALLINT,
+  cmpd_id TEXT,
+  isomol_id INTEGER,
+  nonisomol_id INTEGER
+);
+
+```
+   
+ 7. The fragment playbook should not require any specific changes apart from the fragmentation configuration parameters in 
+ all.yaml.
+ 8. The inchi playbook should not require any specific changes
+ 9. Extract - Add the vendor/library specific header file in extract/files. If this is an existing format than the
+ scripts for that format can be copied.
+ 10. Extract - Add the vendor/library specific sql to match the header files in templates/sql. If this is an existing 
+ format than the scripts for that format can be copied.
+ 11. Remember to also check combinations will work (combinations use the molport vendor/library specific sql as this 
+ contains all the fields). 

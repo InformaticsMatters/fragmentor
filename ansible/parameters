@@ -10,7 +10,7 @@
 
 extracts:
     - lib:
-        vendor: 'chemspace_bb'
-        version: 'December2019'
+        vendor: 'xchem_probe'
+        version: 'v1'
         regenerate_index: 'yes'
 

@@ -1,4 +1,4 @@
--- Purpose: Loads xchem_dsip standardised data into database
+-- Purpose: Loads xchem_probe standardised data into database
 
 -- Load nonisomol except where already exists
 begin;

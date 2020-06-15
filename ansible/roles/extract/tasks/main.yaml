@@ -57,8 +57,8 @@
     loop_control:
       index_var: vendor_index
 
-#  - import_tasks: neo4j-extract-index.yaml
-#  - import_tasks: neo4j-extract.yaml
+  - import_tasks: neo4j-extract-index.yaml
+  - import_tasks: neo4j-extract.yaml
 
   module_defaults:
     postgresql_query:

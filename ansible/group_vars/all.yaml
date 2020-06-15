@@ -84,6 +84,24 @@ vendors:
     indexchunksize: 100
     # Total time (in minutes) to build index (will be divided by number of postgres_jobs)
     index_build_time: 10
+  xchem_spot:
+    approx_vendor_molecules: 96
+    est_total_fragmentation_time: 10
+    fragminhac: 0
+    fraghac: 36
+    fragmaxfrags: 12
+    fraglimit: 0
+    indexchunksize: 100
+    index_build_time: 10
+  xchem_probe:
+    approx_vendor_molecules: 239
+    est_total_fragmentation_time: 10
+    fragminhac: 0
+    fraghac: 36
+    fragmaxfrags: 12
+    fraglimit: 0
+    indexchunksize: 100
+    index_build_time: 10
   chemspace_bb:
     approx_vendor_molecules: 18000000
     est_total_fragmentation_time: 7500
