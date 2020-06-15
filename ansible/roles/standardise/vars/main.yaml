@@ -9,6 +9,7 @@ bucket: im-fragnet
 # AWS credentials for bucket access
 aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
 aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
 
 # Standardisation Rate in molecules processed per minute by a single standardisation python script
 # This approximate parameter is used to tune the nextflow_timeout_minutes in conjunction with the number
