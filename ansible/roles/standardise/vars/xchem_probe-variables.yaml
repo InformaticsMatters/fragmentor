@@ -1,0 +1,7 @@
+---
+
+standardiser: frag.standardise.scripts.dsip.standardise_xchem_compounds
+standinputfile: dsip.txt
+
+standardise_copy_table: i_mols_dsip
+standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id
