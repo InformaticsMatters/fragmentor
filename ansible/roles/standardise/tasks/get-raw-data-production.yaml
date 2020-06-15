@@ -1,10 +1,10 @@
 ---
-
 # Gets 'raw' data from an AWS S3 path
+
 - name: Log line to report
   blockinfile:
     marker: "<!-- {standardise-get} ANSIBLE MANAGED BLOCK -->"
-    path: "{{ standpath }}/standardise/standardise-report.html"
+    path: "{{ standpath }}/standardise/standardise_report.html"
     block: |
       <h2>Step: Get Raw Data from S3</h2>
       <p>Begin: {{ now(utc=True).isoformat() }}</p>
@@ -70,6 +70,6 @@
 - name: Log line to report
   blockinfile:
     marker: "<!-- {standardise-get} ANSIBLE MANAGED BLOCK -->"
-    path: "{{ standpath }}/standardise/standardise-report.html"
+    path: "{{ standpath }}/standardise/standardise_report.html"
     block: |
       <p>End: {{ now(utc=True).isoformat() }}</p>
