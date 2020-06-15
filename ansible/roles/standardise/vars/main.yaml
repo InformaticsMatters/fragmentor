@@ -24,6 +24,7 @@ safety_factor: 5
 nextflow_timeout_minutes: 30
 nextflow_poll_period_minutes: 1
 standchunksize: 250
+standchunksize_calc: 0
 
 # Chunk size to control size of transactions in
 # uploading standardised file data to database

@@ -17,11 +17,18 @@
   set_fact:
     mol_count: "{{ molcount_result.stdout }}"
 
-# Set chunksize based on the expected input file(s) and number of CPUS. If this is development then this defaults.
-- name: Set Chunksize
+# Set chunksize based on the expected input file(s) and number of CPUS. If this is development or too small
+# then this defaults.
+- name: Set chunksize_calc
   set_fact:
-    standchunksize: "{{ (0.5 * vendors[vendor].approx_vendor_molecules|int/hardware[deployment].parallel_jobs)|int }}"
+    standchunksize_calc: "{{ (0.5 *
+        vendors[vendor].approx_vendor_molecules|int/hardware[deployment].parallel_jobs)|int }}"
   when: deployment=="production"
+
+- name: Set standardisation chunksize
+  set_fact:
+    standchunksize: "{{ standchunksize_calc|int }}"
+  when: standchunksize_calc|int>standchunksize
 
 - name: Variable sanity-check
   assert:
