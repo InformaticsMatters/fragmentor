@@ -78,11 +78,13 @@
     var: index_timeout_minutes
 
 # Set index_poll_period_minutes based on index_timeout_minutes/120.
-# If this is development then this defaults.
+# If this is development or less that 2 hours then this default.
 - name: Set index_poll_period_minutes
   set_fact:
     index_poll_period_minutes: "{{ (index_timeout_minutes|int/120)|int }}"
-  when: deployment=="production"
+  when:
+    - deployment=="production"
+    - index_timeout_minutes|int > 120
 
 - debug:
     var: index_poll_period_minutes
