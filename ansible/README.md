@@ -1,4 +1,7 @@
 # Ansible playbooks
+
+Note that the ReadMe on the root directory has considerably more details.
+
 Install requirements: -
 
     $ pip install -r ../requirements.txt
