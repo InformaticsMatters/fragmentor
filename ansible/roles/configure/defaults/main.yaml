@@ -10,10 +10,10 @@ db_devices:
     device: /dev/vdb
     mount_path: /pgdata
   pg_backup:
-    device: /dev/vdc
+    device: /dev/vdg
     mount_path: /pgdata-backup
   pg_copy:
-    device: /dev/vdd
+    device: /dev/vdf
     mount_path: /pgcopy
   pg_wal:
     device: /dev/vde
