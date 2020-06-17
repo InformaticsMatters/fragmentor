@@ -7,13 +7,13 @@ db_container_tag: Release_2020_03
 # devices, and mount-points
 db_devices:
   pg_data:
-    device: /dev/vdb
+    device: /dev/vdf
     mount_path: /pgdata
   pg_backup:
     device: /dev/vdg
     mount_path: /pgdata-backup
   pg_copy:
-    device: /dev/vdf
+    device: /dev/vdd
     mount_path: /pgcopy
   pg_wal:
     device: /dev/vde
