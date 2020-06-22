@@ -29,8 +29,8 @@
       create TABLE public.o_edge_{{ item.lib.vendor }} (PRIMARY KEY (parent_id, child_id, label)) inherits (o_edge_parent);
     autocommit: yes
   when:
-    - item.lib.regenerate_index|bool
-    - drop_index_table|bool
+  - item.lib.regenerate_index|bool
+  - drop_index_table|bool
 
 - name: Retrieve number of molecules to extract
   postgresql_query:
@@ -83,8 +83,8 @@
   set_fact:
     index_poll_period_minutes: "{{ (index_timeout_minutes|int/120)|int }}"
   when:
-    - deployment=="production"
-    - index_timeout_minutes|int > 120
+  - deployment=="production"
+  - index_timeout_minutes|int > 120
 
 - debug:
     var: index_poll_period_minutes

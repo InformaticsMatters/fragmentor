@@ -5,7 +5,7 @@
 # 2. Copies any reports to save location in S3 identified by vendor/version/standardisation (production only)
 
 - name: remove working files
-  shell: rm standardheader
+  command: rm standardheader
   args:
     chdir: "{{ standpath }}/standardise"
 
@@ -44,5 +44,3 @@
 - name: Copy log files to repo
   shell: cp {{ standpath }}/standardise/* {{ logpath }}/log/{{ vendor }}/{{ version }}/standardise
   when: deployment=="development"
-
-

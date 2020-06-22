@@ -10,7 +10,7 @@
 
 # Count molecules in all input files.
 - name: Count molecules
-  shell: wc -l {{ datapath }}/data/{{ vendor }}/{{ standinputfile }}
+  command: wc -l {{ datapath }}/data/{{ vendor }}/{{ standinputfile }}
   register: molcount_result
 
 - name: Set mol_count

@@ -39,7 +39,7 @@
   register: query_result
 
 - debug:
-   var: query_result
+    var: query_result
 
 - name: Log line to report
   blockinfile:
