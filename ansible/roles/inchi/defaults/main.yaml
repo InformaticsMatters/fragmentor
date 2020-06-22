@@ -16,4 +16,3 @@ runpath: SetMe
 fragpath: "{{ runpath }}"
 # Directory for nextflow work files
 nextpath: "{{ runpath }}/nextflow"
-
