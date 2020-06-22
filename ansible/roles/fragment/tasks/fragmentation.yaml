@@ -1,5 +1,14 @@
 ---
 
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {fragmentation-nextflow} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    block: |
+      <h2>Step: Fragmentation of New Molecules</h2>
+      <p>Begin: {{ now(utc=True).isoformat() }}</p>
+
+
 - name: Variable sanity-check
   assert:
     that:
@@ -58,6 +67,19 @@
 - debug:
     var: nextflow_poll_period_minutes
 
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {fragmentation-nextflow} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    block: |
+      <p><table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>Molecules to Fragment</td><td>{{ mols_to_fragment }}</td></tr>
+      <tr><td>Fragmentation Chunk Size</td><td>{{ fragchunksize }}</td></tr>
+      <tr><td>nextflow_timeout_minutes</td><td>{{ nextflow_timeout_minutes }}</td></tr>
+      <tr><td>nextflow_poll_period_minutes</td><td>{{ nextflow_poll_period_minutes }}</td></tr>
+      </table></p>
+
 # Move the nextflow workflow and config into place (from templates)
 # so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
 
@@ -75,7 +97,7 @@
       nextflow run -c {{ reppath }}/nextflow/nextflow.config
        {{ reppath }}/nextflow/fragmentation.nf
        -w {{ nextpath }}
-       -with-report {{ fragpath }}/fragment/frag_report.html
+       -with-report {{ fragpath }}/fragment/fragmentation_nextflow_report.html
        -with-tower
        --input {{ fragpath }}/fragment/{{ fragsmifile }}
        --out_dir {{ fragpath }}/fragment
@@ -103,3 +125,10 @@
   until: nextflow_result.finished
   delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
   retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {fragmentation-nextflow} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    block: |
+      <p>End: {{ now(utc=True).isoformat() }}</p>

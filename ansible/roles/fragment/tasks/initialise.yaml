@@ -43,18 +43,24 @@
   debug:
     var: source_id
 
-# Optionally erase and then create the fragmentation directory...
-
-- name: Erase fragment path
+# Optionally erase and then create the working directories...
+- name: Erase directories
   file:
-    path: "{{ fragpath }}/fragment"
+    path: "{{ item }}"
     state: absent
+  loop:
+  - "{{ fragpath }}/fragment"
+  - "{{ logpath }}/{{ vendor }}/{{ version }}/fragment"
   when: clean_start|bool
 
-- name: Create fragment path
+- name: Create directories
   file:
-    path: "{{ fragpath }}/fragment"
+    path: "{{ item }}"
     state: directory
+  loop:
+  - "{{ fragpath }}/fragment"
+  - "{{ logpath }}/log/{{ vendor }}/{{ version }}/fragment"
+
 
 - name: Ensure sql, nextflow directories are present
   file:
@@ -71,3 +77,28 @@
     - "{{ vendors[vendor].fragminhac|int }} >= 0"
     - "{{ vendors[vendor].fragmaxfrags|int }} > 0"
     - "{{ vendors[vendor].fraglimit|int }} >= 0"
+
+# Create Standardisation Summary Report. This is saved with the playbook results.
+- name: Create Standardise HTML log report
+  blockinfile:
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    create: yes
+    marker: "<!-- {fragment-init} ANSIBLE MANAGED BLOCK -->"
+    insertafter: "<body>"
+    block: |
+      <h1>Ansible Fragmentation Playbook</h1>
+      <p><table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>Vendor</td><td>{{ vendor }}</td></tr>
+      <tr><td>Version</td><td>{{ version }}</td></tr>
+      <tr><td>Source-id</td><td>{{ source_id }}</td></tr>
+      <tr><td>User</td><td>{{ ansible_hostname }}</td></tr>
+      <tr><td>Deployment</td><td>{{ deployment }}</td></tr>
+      <tr><td>Heavy Atom Count</td><td>{{ vendors[vendor].fraghac}}</td></tr>
+      <tr><td>Minimum Heavy Atom Count</td><td>{{ vendors[vendor].fragminhac}}</td></tr>
+      <tr><td>Maximum Fragmentation Passes</td><td>{{ vendors[vendor].fragmaxfrags }}</td></tr>
+      <tr><td>Fragmentation Limit</td><td>{{ vendors[vendor].fraglimit }}</td></tr>
+      <tr><td>Working Directory</td><td>{{ runpath }}</td></tr>
+      </table></p>
+      <p>Fragmentation play started on: {{ now(utc=True).isoformat() }}</p>
+  when: clean_start|bool

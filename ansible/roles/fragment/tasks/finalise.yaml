@@ -1,0 +1,46 @@
+---
+
+# This performs any finalisation steps required for the standardisation process:
+# 1. Removes any working files no longer required (production only).
+# 2. Copies any reports to save location in S3 identified by vendor/version/standardisation (production only)
+
+- name: remove working files
+  shell: "rm -f {{ item }}"
+  args:
+    chdir: "{{ fragpath }}/fragment"
+  loop:
+  - "edgechunk_*"
+  - "nodechunk_*"
+  - "edges.csv"
+  - "nodes.csv"
+
+# Finalise report
+- name: Write line to report
+  blockinfile:
+    marker: "<!-- {fragment-init} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    block: |
+      <p>Fragmentation play ended on: {{ now(utc=True).isoformat() }}</p>
+      <p>Saving Files to logs/{{ vendor }}/{{ version }}/fragment </p>
+
+# Zip files for transfer
+- name: Compress files
+  shell: gzip *
+  args:
+    chdir: "{{ fragpath }}/fragment"
+
+# Copy log files to S3
+- name: Synchronise logs to S3
+  s3_sync:
+    bucket: "{{ bucket }}"
+    key_prefix: logs/{{ vendor }}/{{ version }}/fragment
+    file_root: "{{ fragpath }}/fragment"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+  when: deployment=="production"
+
+# Copy log files to Repo
+- name: Copy log files to repo
+  shell: cp {{ fragpath }}/fragment/* {{ logpath }}/log/{{ vendor }}/{{ version }}/fragment
+  when: deployment=="development"

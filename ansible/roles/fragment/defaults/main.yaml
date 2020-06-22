@@ -15,6 +15,8 @@ runpath: SetMe
 # Hence they all default to runpath - set in the command line.
 # Work directory for standardisation
 fragpath: "{{ runpath }}"
+# Log directory
+logpath: "{{ runpath }}"
 # Directory for nextflow work files
 nextpath: "{{ runpath }}/nextflow"
 

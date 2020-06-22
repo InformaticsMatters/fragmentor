@@ -23,6 +23,19 @@
     - runpath|string != 'SetMe'
     fail_msg: You must provide a 'deployment', 'vendor', 'version' and default run path where files will be stored.
 
+# The user is also expected to have defined the environment variables: -
+#
+# - AWS_ACCESS_KEY_ID
+# - AWS_SECRET_ACCESS_KEY
+
+- name: Assert AWS credentials
+  assert:
+    that:
+    - aws_access_key|string|length > 0
+    - aws_secret_key|string|length > 0
+    fail_msg: You must define 'AWS_ACCESS_KEY_ID' and 'AWS_SECRET_ACCESS_KEY'
+  when: deployment=="production"
+
 - block:
 
   - import_tasks: initialise.yaml
@@ -30,6 +43,7 @@
   - import_tasks: fragmentation.yaml
   - import_tasks: load-nodes.yaml
   - import_tasks: load-edges.yaml
+  - import_tasks: finalise.yaml
 
   module_defaults:
     postgresql_query:
