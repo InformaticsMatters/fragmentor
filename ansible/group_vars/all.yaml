@@ -23,7 +23,7 @@ nextflow_container_tag: molport-04
 
 # The process id is the commit id of the fragmentation container,
 # Used in the extract file
-process_id: Fragmentor-56c9593
+process_id: Fragmentor-6cef074
 
 # Database credentials.
 # A map of variables based on deployment target.

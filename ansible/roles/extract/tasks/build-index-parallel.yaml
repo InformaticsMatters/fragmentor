@@ -90,6 +90,10 @@
     var: index_poll_period_minutes
 
 # The command list divides the number of molecules into postgres_jobs
+- name: initialise queue_lst.
+  set_fact:
+    queue_lst: []
+
 - name: Create queue_lst of limits and offsets.
   vars:
     queue_element:
