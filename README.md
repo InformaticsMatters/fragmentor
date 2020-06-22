@@ -19,6 +19,12 @@ Summary of Contents:
 into the process and will be the destination for Neo4j compatible extract files - and where they can be picked up by 
 Fragnet Search.  
 
+The libraries currently supported are as follows:
+- Xchem: dsip, probing library, spotfinder
+- Molport
+- Chemspace: bb
+- Enamine: ro5
+
 ## Prerequisites
 
 For the production configuration, it is assumed that the user has access to a cluster and that the following 
@@ -267,6 +273,9 @@ $ ansible-playbook site-extract.yaml -e @parameters -e deployment=production
 The save_extract flag indicates whether files should be zipped and uploaded to AWS S3. For 
 deployment=development this would normally be set to "N".
 
+Note that for the larger extracts to complete there needs to be sufficient temporary space on the postgres pgdata 
+directory for the database queries to complete. In the case of the complete extract including enamine and molport, for
+example, around 900GB if temporary space is required.
 
 ## Backing up the Database
 
