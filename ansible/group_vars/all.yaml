@@ -58,7 +58,7 @@ hardware:
 # Number of connections to postgres - note that this should be less than max_worker_processes in start-database.yaml.
     postgres_jobs: 6
   production:
-    parallel_jobs: 160
+    parallel_jobs: 500
     postgres_jobs: 18
 
 # Vendor defaults.

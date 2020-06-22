@@ -8,10 +8,20 @@
 
 reppath: "{{ role_path }}/../../.."
 
-datapath: SetMe
-standpath: SetMe
-fragpath: SetMe
-logpath: SetMe
+# Base path for all folders used in the run.
+# This should normally be different to the repo path and ideally should start with a "/".
+runpath: SetMe
+
+# These have been coded so that they can different to each other, but there is no obvious need at this point.
+# Hence they all default to runpath - set in the command line.
+# Place where raw data files are copied to.
+datapath: "{{ runpath }}"
+# Work directory for standardisation
+standpath: "{{ runpath }}"
+# Log directory
+logpath: "{{ runpath }}"
+# Directory for nextflow work files
+nextpath: "{{ runpath }}/nextflow"
 
 # The vendor. Typically a vendor and collection,
 # like 'chemspace_bb' or 'xchem_dsip'.

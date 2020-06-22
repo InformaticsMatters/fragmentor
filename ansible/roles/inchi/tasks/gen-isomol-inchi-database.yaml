@@ -93,6 +93,7 @@
     nextflow_cmd: >-
       nextflow run -c {{ reppath }}/nextflow/nextflow.config
       {{ reppath }}/nextflow/generateinchi.nf
+      -w {{ nextpath }}
       -with-report {{ fragpath }}/isoinchi/generateinchi_report.html
       -with-tower
       --input {{ fragpath }}/isoinchi/{{ isoinchifile }}

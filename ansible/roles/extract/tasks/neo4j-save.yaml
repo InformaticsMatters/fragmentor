@@ -153,15 +153,6 @@
 
 # Synchronise the extract to S3
 
-- name: Upgrade PIP
-  command: pip install --upgrade pip
-
-- name: Install S3 requirements
-  pip:
-    name:
-    - python-dateutil==2.8.1
-    - boto3==1.12.49
-
 # When only one vendor, use it
 - name: Synchronise extract to S3 - Single Vendor
   s3_sync:

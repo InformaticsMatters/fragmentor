@@ -74,6 +74,7 @@
     nextflow_cmd: >-
       nextflow run -c {{ reppath }}/nextflow/nextflow.config
        {{ reppath }}/nextflow/fragmentation.nf
+       -w {{ nextpath }}
        -with-report {{ fragpath }}/fragment/frag_report.html
        -with-tower
        --input {{ fragpath }}/fragment/{{ fragsmifile }}

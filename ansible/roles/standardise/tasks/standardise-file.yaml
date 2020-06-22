@@ -8,9 +8,9 @@
       <h2>Step: Standardise Raw Data</h2>
       <p>Begin: {{ lookup('pipe', 'date +%Y-%m-%d-%H:%M:%S') }}</p>
 
-# Count molecules in all input files.
+# Count molecules in all input files. Note that command does not work with a glob as a standinputfile template.
 - name: Count molecules
-  command: wc -l {{ datapath }}/data/{{ vendor }}/{{ standinputfile }}
+  shell: wc -l {{ datapath }}/data/{{ vendor }}/{{ standinputfile }} # noqa 305
   register: molcount_result
 
 - name: Set mol_count
@@ -91,6 +91,7 @@
     nextflow_cmd: >-
       nextflow run -c {{ reppath }}/nextflow/nextflow.config
       {{ reppath }}/nextflow/standardizer.nf
+      -w {{ nextpath }}
       -with-report {{ standpath }}/standardise/standardise_nextflow_report.html
       -with-tower
       --script {{ standardiser }}

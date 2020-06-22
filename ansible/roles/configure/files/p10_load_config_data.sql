@@ -7,7 +7,7 @@
  *
  */
 
-insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_dsip', NULL, 'Xchem','V_XDSIP';
+insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_dsip', NULL, 'Xchem','V_XDSIP');
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('chemspace_bb', 'USD', 'ChemSpace-BB','V_CS_BB');
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('molport', 'USD', 'MolPort','V_MP');
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('enamine_ro5', NULL, 'REAL','V_REAL');

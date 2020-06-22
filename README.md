@@ -78,6 +78,20 @@ a local docker container on, say, a laptop. The deployment is configured in the 
     for example),  it may be prudent to disable them and use alternative arrangements to prevent the database being 
     brought down when in use.
 
+
+Note that site-configure is primarily aimed at a production database instance. for a local (development) postgres a  
+docker container could be launched with a command something like:         
+
+```
+$ docker run --shm-size=1g --name psql -v /home/user/project/postgresql/data:/var/lib/postgresql/data 
+  -e POSTGRES_PASSWORD=1234 -p 5432:5432 -d postgres:alpine -c 'logging_collector=true' 
+```
+
+Example: navigate to the ansible directory
+
+    $ ansible-playbook site-configure_create-database.yaml -e deployment=development
+
+
 ## Process Description
 
 The sequence diagram below shows the basic steps in the new end-to-end fragmentation 
@@ -157,15 +171,16 @@ The standardisation step is run as follows:
 $ ansible-playbook site-standardise.yaml  \ 
           -e vendor=<vendor_library> \ 
           -e version=<version> \
-          -e deployment=<development|production>
-          (-e add_file=<yes|no>)
+          -e deployment=<development|production> \
+          -e runpath=<work directory for this run> \
+          (-e add_file=<yes|no> \)
           (-e clean_start=<yes|no>)
 ```
 
 Example: navigate to the ansible directory
 
 ```
-$ ansible-playbook site-standardise.yaml -e vendor=xchem_dsip -e version=v1 -e deployment=production  
+$ ansible-playbook site-standardise.yaml -e vendor=xchem_dsip -e version=v1 -e deployment=production -e runpath=/data/share-2/run01 
 ```
 
 > Parameter deployment=development|production
@@ -197,13 +212,14 @@ It is run as follows:
 $ ansible-playbook site-fragment.yaml  \ 
           -e vendor=<vendor_library> \ 
           -e version=<version> \
-          -e deployment=<development|production>
+          -e deployment=<development|production> \
+          -e runpath=<work directory for this run> 
 ```
 
 Example: navigate to the ansible directory
 
 ```
-$ ansible-playbook site-fragment.yaml -e vendor=xchem_dsip -e version=v1 -e deployment=production  
+$ ansible-playbook site-fragment.yaml -e vendor=xchem_dsip -e version=v1 -e deployment=production -e runpath=/data/share-2/run01 
 ```
 
 A fragmentation step would normally be processed directly after a standardisation step, but as this step is driven by 
@@ -218,13 +234,14 @@ It is not vendor/library specific and can be run as follows:
 
 ```
 $ ansible-playbook site-inchi.yaml  \ 
-          -e deployment=<development|production>
+          -e deployment=<development|production> \
+          -e runpath=<work directory for this run> 
 ```
 
 Example: navigate to the ansible directory
 
 ```
-$ ansible-playbook site-inchi.yaml -e deployment=production  
+$ ansible-playbook site-inchi.yaml -e deployment=production -e runpath=/data/share-2/run01
 ```
 As this step is driven by the database it it possible to run multiple standardisation/fragmentation steps for different 
 vendor/libraries followed by a single create_inchi step.

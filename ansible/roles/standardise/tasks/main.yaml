@@ -7,6 +7,7 @@
 #     -e vendor=dsip
 #     -e version=123
 #     -e deployment=production
+#     -e runpath=data/share-2/run01
 #
 
 - name: Assert user-variable definitions
@@ -18,7 +19,9 @@
     - version|string != 'SetMe'
     - vendor|string|length > 0
     - vendor|string != 'SetMe'
-    fail_msg: You must provide a 'deployment', 'vendor' and a 'version'
+    - runpath|string|length > 0
+    - runpath|string != 'SetMe'
+    fail_msg: You must provide a 'deployment', 'vendor', 'version' and default run path where files will be stored.
 
 - name: Include vendor-specific varaibles
   include_vars:

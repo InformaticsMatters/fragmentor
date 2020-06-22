@@ -1,0 +1,51 @@
+---
+# Check run path
+- name: Ensure runpath is present
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ runpath }}"
+
+# Install the required modules to be able to synchronise with S3 and use ansible python modules
+- name: Install requirements
+  pip:
+    name:
+    - python-dateutil==2.8.1
+    - boto3==1.12.49
+    - psycopg2-binary==2.8.5
+  become: yes
+  when: deployment=="production"
+
+- name: Install requirements
+  pip:
+    name:
+    - python-dateutil==2.8.1
+    - boto3==1.12.49
+    - psycopg2-binary==2.8.5
+  when: deployment=="development"
+
+- name: Erase inchi paths
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - "{{ fragpath }}/inchi"
+  - "{{ fragpath }}/isoinchi"
+  when: clean_start|bool
+
+- name: Create inchi paths
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ fragpath }}/inchi"
+  - "{{ fragpath }}/isoinchi"
+
+- name: Ensure sql, nextflow and inchi directories are present
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ reppath }}/sql"
+  - "{{ reppath }}/nextflow"

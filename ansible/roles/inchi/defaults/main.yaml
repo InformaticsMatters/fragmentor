@@ -6,6 +6,14 @@
 # Less common variables can be found in vars/main.yaml
 reppath: "{{ role_path }}/../../.."
 
-# The following is used is store extract files. It is common with the fragment play (at least for now) because
-# the inchi processing can be driven from nodes.csv (output from fragmentation step).
-fragpath: SetMe
+# Base path for all folders used in the run.
+# This should normally be different to the repo path and ideally should start with a "/".
+runpath: SetMe
+
+# These have been coded so that they can different to each other, but there is no obvious need at this point.
+# Hence they all default to runpath - set in the command line.
+# Work directory for standardisation
+fragpath: "{{ runpath }}"
+# Directory for nextflow work files
+nextpath: "{{ runpath }}/nextflow"
+

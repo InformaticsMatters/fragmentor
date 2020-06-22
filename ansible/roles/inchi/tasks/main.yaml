@@ -4,43 +4,22 @@
 # the most convenient way of doing this is via the command-line: -
 #
 #   ansible-playbook site-inchi \
-#     -e vendor=dsip
-#     -e version=123
+#     -e deployment=production
+#     -e runpath=data/share-2/run01
+#
 
 - name: Assert user-variable definitions
   assert:
     that:
     - deployment|string|length > 0
     - deployment|string != 'SetMe'
-    fail_msg: You must provide a 'deployment' to update inchi data.
-
-
-- name: Erase inchi paths
-  file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-  - "{{ fragpath }}/inchi"
-  - "{{ fragpath }}/isoinchi"
-  when: clean_start|bool
-
-- name: Create inchi paths
-  file:
-    path: "{{ item }}"
-    state: directory
-  loop:
-  - "{{ fragpath }}/inchi"
-  - "{{ fragpath }}/isoinchi"
-
-- name: Ensure sql, nextflow and inchi directories are present
-  file:
-    path: "{{ item }}"
-    state: directory
-  loop:
-  - "{{ reppath }}/sql"
-  - "{{ reppath }}/nextflow"
+    - runpath|string|length > 0
+    - runpath|string != 'SetMe'
+    fail_msg: You must provide a 'deployment', and default run path where files will be stored.
 
 - block:
+
+  - import_tasks: initialise.yaml
   - import_tasks: gen-nonisomol-inchi-database.yaml
   - import_tasks: load-nonisomol-inchi.yaml
   - import_tasks: gen-isomol-inchi-database.yaml

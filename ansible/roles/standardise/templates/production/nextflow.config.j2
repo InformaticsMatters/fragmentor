@@ -1,10 +1,10 @@
 process {
-    executor = 'slurm'
+    executor = 'condor'
     container = 'busybox:latest'
 }
 singularity {
     enabled = true
-    cacheDir = "$HOME/singularity-containers"
+    cacheDir = "{{ runpath }}/singularity-containers"
     autoMounts = true
 }
 executor {
