@@ -1,8 +1,9 @@
 ---
 
-# This performs any finalisation steps required for the standardisation process:
+# This performs any finalisation steps required for the fragmentattion process:
 # 1. Removes any working files no longer required (production only).
-# 2. Copies any reports to save location in S3 identified by vendor/version/standardisation (production only)
+# 2. Copies any reports to save location in S3 identified by vendor/version/fragment (production only)
+# 3. Files to be copied also include zipped rejected nodes.
 
 - name: remove working files
   shell: "rm -f {{ item }}"

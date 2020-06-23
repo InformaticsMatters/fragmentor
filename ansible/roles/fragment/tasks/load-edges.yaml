@@ -4,6 +4,14 @@
 # and then call on the 'chunk' loader
 # for each file created to load into the database
 
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {fragmentation-edge-nodes} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    block: |
+      <h2>Step: Load Fragmented Edges</h2>
+      <p>Begin: {{ now(utc=True).isoformat() }}</p>
+
 - name: Variable sanity-check
   assert:
     that:
@@ -31,6 +39,18 @@
 - name: Display number of edges
   debug:
     var: edge_count
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {fragmentation-edge-nodes} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    block: |
+      <p><table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>Fragmented Edges to process</td><td>{{ edge_count }}</td></tr>
+      <tr><td>Edge Chunk Size</td><td>{{ edgechunk }}</td></tr>
+      <tr><td>Edge Index Threshold</td><td>{{ edgeindexthreshold }}</td></tr>
+      </table></p>
 
 - name: Split edge file
   shell: >-
@@ -62,3 +82,10 @@
     query: CREATE INDEX ix_edge_parent_id ON public.edge USING btree (parent_id)
     autocommit: yes
   when: edge_count|int > edgeindexthreshold
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {fragmentation-edge-nodes} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    block: |
+      <p>Load: {{ now(utc=True).isoformat() }}</p>

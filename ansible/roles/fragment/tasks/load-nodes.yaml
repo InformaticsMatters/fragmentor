@@ -4,6 +4,15 @@
 # and then call on the 'chunk' loader
 # for each file created to load into the database
 
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {fragmentation-load-nodes} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    block: |
+      <h2>Step: Load Fragmented Molecules</h2>
+      <p>Begin: {{ now(utc=True).isoformat() }}</p>
+
+
 - name: Variable sanity-check
   assert:
     that:
@@ -19,6 +28,29 @@
     that:
     - fragnodefile_result.stat.exists
 
+- name: Count nodes
+  shell: wc -l < {{ fragpath }}/fragment/{{ fragnodefile }}
+  register: nodecount_result
+
+- name: Set node_count
+  set_fact:
+    node_count: "{{ nodecount_result.stdout }}"
+
+- name: Display number of edges
+  debug:
+    var: node_count
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {fragmentation-load-nodes} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    block: |
+      <p><table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>Fragmented Nodes to process</td><td>{{ node_count }}</td></tr>
+      <tr><td>Node Chunk Size</td><td>{{ nodechunk }}</td></tr>
+      </table></p>
+
 - name: Split nodes file
   shell: >-
     cat {{ fragnodefile }} | split -d -l {{ nodechunk }} - nodechunk_
@@ -29,3 +61,10 @@
   include_tasks: load-nodes-chunk.yaml
   with_fileglob:
   - "{{ fragpath }}/fragment/nodechunk_*"
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {fragmentation-load-nodes} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ fragpath }}/fragment/fragmentation_summary_report.html"
+    block: |
+      <p>Load: {{ now(utc=True).isoformat() }}</p>

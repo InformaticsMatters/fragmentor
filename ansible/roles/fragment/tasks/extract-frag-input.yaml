@@ -1,5 +1,7 @@
 ---
-
+# Extract unfragmented smiles.
+# Note that this total also includes records in the database from previous runs that have no edges - i.e.
+# Nonisomols with a child count of zero. These existing molecules will are filtered out later.
 - name: Extract unfragmented smiles for this source_id to fragsmifile
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
