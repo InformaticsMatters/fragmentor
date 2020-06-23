@@ -460,6 +460,12 @@ alter table ONLY public.source
 alter table ONLY public.source
     ADD CONSTRAINT uq_source UNIQUE (name, version);
 
+--
+-- Name: vendor_name uq_supplier_node_name; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+alter table ONLY public.vendor_name
+    ADD CONSTRAINT uq_supplier_node_name UNIQUE (supplier_node_name);
 
 --
 -- Name: ix_edge_parent_id; Type: INDEX; Schema: public; Owner: postgres
