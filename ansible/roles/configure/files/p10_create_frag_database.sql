@@ -386,7 +386,7 @@ alter table ONLY public.edge
 --
 
 alter table ONLY public.inchi
-    ADD CONSTRAINT inchi_inchis_key UNIQUE (inchis);
+    ADD CONSTRAINT inchi_inchik_key UNIQUE (inchik);
 
 
 --

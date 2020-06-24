@@ -28,7 +28,7 @@
     SOURCEIDS: "{{ source_ids }}"
     NEONODEFILE: "{{ copy_root }}/extract/{{ neonodefile }}"
 
-- name: Extract NEO4J node information for these source_id(s) to neoedgefile
+- name: Extract NEO4J node information for these source_id(s) to neonodefile
   postgresql_query:
     path_to_script: "{{ reppath }}/sql/f100_neo4j_nodes_extract.sql"
     autocommit: no

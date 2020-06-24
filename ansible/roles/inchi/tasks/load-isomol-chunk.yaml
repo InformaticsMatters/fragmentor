@@ -17,7 +17,7 @@
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
      --set AUTOCOMMIT=on --set ON_ERROR_STOP=on
-     -c "\COPY i_iso_inchi(smiles, ninchik, ninchis)
+     -c "\COPY i_iso_inchi(smiles, ninchis, ninchik)
          FROM '{{ item }}' (FORMAT csv, DELIMITER E'\t');"
     {{ database[deployment].db }}
   environment:

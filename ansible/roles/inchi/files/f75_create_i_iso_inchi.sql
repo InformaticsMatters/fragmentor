@@ -7,14 +7,12 @@
  *
  */
 
-
-
 /*
  * Create i_node             
  */
 DROP TABLE IF EXISTS i_iso_inchi;
 CREATE TABLE i_iso_inchi (
   smiles TEXT,
-  ninchik TEXT,
-  ninchis TEXT
+  ninchis TEXT,
+  ninchik TEXT
 );

@@ -13,8 +13,8 @@
 DROP TABLE IF EXISTS i_noniso_inchi;
 CREATE TABLE i_noniso_inchi (
   smiles TEXT,
-  sinchik TEXT,
   sinchis TEXT,
-  ninchik TEXT,
-  ninchis TEXT
+  sinchik TEXT,
+  ninchis TEXT,
+  ninchik TEXT
 );

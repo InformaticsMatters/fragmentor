@@ -11,19 +11,15 @@
  * Insert INCHI tables.
  */
 begin;
-SELECT clock_timestamp();
-
 INSERT INTO inchi (inchik, inchis)
   SELECT sinchik, sinchis from i_noniso_inchi
-  ON CONFLICT ON CONSTRAINT inchi_inchis_key DO NOTHING;
+  ON CONFLICT ON CONSTRAINT inchi_inchik_key DO NOTHING;
 commit;
 
 /*
  * Update inchi key for nonisomols.
  */
 begin;
-SELECT clock_timestamp();
-
 WITH s
     AS (SELECT i.smiles, i.ninchik, i.ninchis, inc.id
   FROM i_noniso_inchi i

@@ -13,7 +13,7 @@
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
      --set AUTOCOMMIT=on --set ON_ERROR_STOP=on
-     -c "\COPY i_noniso_inchi(smiles, sinchik, sinchis, ninchik, ninchis)
+     -c "\COPY i_noniso_inchi(smiles, sinchis, sinchik, ninchis, ninchik)
          FROM '{{ item }}';"
     {{ database[deployment].db }}
   environment:

@@ -11,8 +11,6 @@
  * Update isomol from i_node with the inchi key.
  */
 begin;
-SELECT clock_timestamp();
-
 WITH s
     AS (SELECT i.smiles, i.ninchik, i.ninchis
   FROM i_iso_inchi i
