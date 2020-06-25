@@ -43,6 +43,9 @@ project playbooks.
 
     $ ansible -m ping all
 
+Some ansible playbook postgres tasks require the postgres client (psql) to be installed on the head machine.
+Details can be found here: https://www.postgresql.org/download/linux/redhat/
+
 You will also need AWS credentials for S3 to set up the following parameters. 
 
 ```
@@ -376,14 +379,17 @@ Chemspace it was possible to increase it to 2000.
 
 Numbers are given below were achieved using the maximum fragmentation cycles parameter set to 12. 
 
-| Vendor/Lib   | Version     | Molecules   | Nodes       |Edges        |
-| ------------ | ----------- | ----------- | ----------- | ----------- | 
-| Xchem_dsip   | v1          | 768         | 5099        | 14421       |
-| Molport      | 2020-02     | 7118865     | 104407052   | 582264651   |
-| Chemspace_bb | December2019| 17257752    | 27265866    | 111716670   |
-| Enamine_ro5  | Jun2018     | 39765321    | 178240230   | 1130306251  |
-| Xchem_spot   | v1          | 96          | 576         | 1388        |
-| Xchem_probe  | v1          | 239         | 857         | 2396        |
+| Vendor/Lib       | Version     | Molecules   | Nodes       |Edges        |
+| ---------------- | ----------- | ----------- | ----------- | ----------- | 
+| Xchem_dsip       | v1          | 768         | 5099        | 14421       |
+| Molport          | 2020-02     | 7118865     | 104407052   | 582264651   |
+| Chemspace_bb     | December2019| 17257752    | 27265866    | 111716670   |
+| Enamine_ro5      | Jun2018     | 39765321    | 178240230   | 1130306251  |
+| Xchem_spot       | v1          | 96          | 576         | 1388        |
+| Xchem_probe      | v1          | 239         | 857         | 2396        |
+| Full Combination | 20200623    | ---         | 307499949   | 1754938701  |
+
+Note that the full combination deduplicates nodes and edges found in more than one library.
 
 The combined datasets resulted in a postgres database size of approximately 1.5TB. Diskspace must, however, allow for
 future increases and for temporary workspace for queries so a minimum of 3TB is recommended for the main and backup 
