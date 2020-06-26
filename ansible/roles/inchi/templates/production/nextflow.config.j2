@@ -4,7 +4,7 @@ process {
 }
 singularity {
     enabled = true
-    cacheDir = "$HOME/singularity-containers"
+    cacheDir = "{{ runpath }}/singularity-containers"
     autoMounts = true
 }
 executor {
