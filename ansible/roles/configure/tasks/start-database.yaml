@@ -18,6 +18,7 @@
       -c 'synchronous_commit=on'
       -c 'logging_collector=true'
       -c 'log_min_messages=notice'
+      -c 'max_wal_size={{ db_max_wal_size_g }}GB'
     shm_size: "{{ db_shared_buffers_g|int * 2 }}G"
     state: started
     restart_policy: on-failure
