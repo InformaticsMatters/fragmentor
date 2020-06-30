@@ -30,6 +30,5 @@ db_shared_buffers_g: 32
 db_work_mem_m: 256
 
 # The max_wal_size size (Gi)
-# The deployment sets the container shm_mem to twice this value
-# so make sure your host has sufficient root-volume space.
-db_max_wal_size_g: 8
+# This is used to improve the speed of the write-ahead-log and relates to how the /pgwal volume is used.
+db_max_wal_size_g: 16
