@@ -3,21 +3,23 @@
 [![Build Status](https://travis-ci.com/InformaticsMatters/fragmentor.svg?branch=master)](https://travis-ci.com/InformaticsMatters/fragmentor)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/informaticsmatters/fragmentor)
 
-Optimisation of fragmentation process through the use of a postgres database to store already fragmented data. This 
+Optimisation of fragmentation process through the use of a postgres database to proviously already fragmented data. This 
 will allow delta changes to an existing database rather than having to completely re-fragment the input files - 
-speeding up the loading of extracts to the Neo4j database.
+speeding up the loading of extracts to the Neo4j database used by fragment search. 
 
 Summary of Contents:
 
-- Ansible playbooks to: create postgres database, standardisation, fragmentation and inchi creation to populate the database 
-- A further playbook to extract datasets of single and combinations of vendors for import into the Fragnet Search Neo4j database.
+- Ansible playbooks to populate the database: standardisation, fragmentation and inchi creation. 
+- A playbook to extract datasets of single and combinations of vendors for import into the Fragnet Search Neo4j database.
 - Standardise and fragmentation code based on the Fragalysis Repository 
 - Nextflow scripts to control cluster for Standardisation and Fragmentation steps.
-- Automatic parameter controlled chunking of input files at various stages to control throughput to the sql database.  
+- Automatic parameter controlled chunking of input files at various stages to control and optimase throughput to the sql
+database. For updating exising datasets, this is mostly automatic.   
 - Processing is automated but can be adjusted with control parameters.
 - Processing starts/ends with an AWS S3 repository - assumed to contain the smiles data from vendors to be imported 
 into the process and will be the destination for Neo4j compatible extract files - and where they can be picked up by 
 Fragnet Search.  
+- Playbooks are also provided to create, start, stop, and backup the database. 
 
 The libraries currently supported are as follows:
 - Xchem: dsip, probing library, spotfinder
