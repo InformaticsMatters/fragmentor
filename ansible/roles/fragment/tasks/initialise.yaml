@@ -94,8 +94,8 @@
       <tr><td>Source-id</td><td>{{ source_id }}</td></tr>
       <tr><td>User</td><td>{{ ansible_hostname }}</td></tr>
       <tr><td>Deployment</td><td>{{ deployment }}</td></tr>
-      <tr><td>Heavy Atom Count</td><td>{{ vendors[vendor].fraghac}}</td></tr>
-      <tr><td>Minimum Heavy Atom Count</td><td>{{ vendors[vendor].fragminhac}}</td></tr>
+      <tr><td>Heavy Atom Count</td><td>{{ vendors[vendor].fraghac }}</td></tr>
+      <tr><td>Minimum Heavy Atom Count</td><td>{{ vendors[vendor].fragminhac }}</td></tr>
       <tr><td>Maximum Fragmentation Passes</td><td>{{ vendors[vendor].fragmaxfrags }}</td></tr>
       <tr><td>Fragmentation Limit</td><td>{{ vendors[vendor].fraglimit }}</td></tr>
       <tr><td>Working Directory</td><td>{{ runpath }}</td></tr>
