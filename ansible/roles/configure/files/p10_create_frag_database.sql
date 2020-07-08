@@ -660,7 +660,7 @@ BEGIN
                 select se.parent_id, se.child_id, se.label
                   from source_edges se
                 order by 1,2,3
-           ON CONFLICT (parent_id, child_id, label) DO NOTHING;' using src_id, chunk_size, (run_offset+(chunk_size*chunk_nr));
+           ON CONFLICT (parent_id, child_id, label) DO NOTHING;
        if chunks_count >= commit_rate then
           chunks_count := 0;
           commit;
@@ -669,4 +669,3 @@ BEGIN
        end if;
     END LOOP;
 end $edges$ ;
-

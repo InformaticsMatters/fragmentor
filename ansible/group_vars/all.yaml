@@ -119,7 +119,7 @@ vendors:
     fragmaxfrags: 12
     fraglimit: 0
     indexchunksize: 300
-    index_build_time: 2160
+    index_build_time: 4320
   enamine_ro5:
     approx_vendor_molecules: 40000000
     est_total_fragmentation_time: 720000
