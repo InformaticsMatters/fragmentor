@@ -17,11 +17,6 @@
  * Drop all tables if they exist (NB Order because of table key constrants) 
  */
 
-
-drop view IF EXISTS v_edge;
-
-drop view IF EXISTS v_edge_node;
-
 drop table IF EXISTS edge;
 
 drop table IF EXISTS price;
@@ -514,6 +509,11 @@ create INDEX ix_mol_source_source_id ON public.mol_source USING btree (source_id
 
 
 --
+-- Name: ix_nonisomol_child_count; Type: INDEX; Schema: public; Owner: postgres
+--
+create INDEX ix_nonisomol_child_count ON public.nonisomol USING btree (id, child_count);
+
+--
 -- Name: edge edge_child_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -577,35 +577,6 @@ alter table ONLY public.price
     ADD CONSTRAINT price_molsource_id_fkey FOREIGN KEY (molsource_id) REFERENCES public.mol_source(id) ON delete CASCADE;
 
 --
--- View Used in extracting data for Neo4j database - only used in old recursive extract process
---
-
-create view v_edge as
-    SELECT e.id, e.parent_id, e.child_id,
-           p.smiles as parent_smiles,
-           c.smiles as child_smiles,
-           e.label
-      FROM edge e
-INNER JOIN nonisomol p ON e.parent_id = p.id
-INNER JOIN nonisomol c ON e.child_id = c.id;
-
-create view v_edge_node as
-    SELECT e.id, e.parent_id, e.child_id,
-           p.smiles as parent_smiles,
-           c.smiles as child_smiles,
-           p.hac as hac,
-           p.rac as rac,
-           p.ring_smiles as ring_smiles,
-           c.hac as child_hac,
-           c.rac as child_rac,
-           c.ring_smiles as child_ring_smiles,
-           c.child_count as child_child_count,
-           e.label
-      FROM edge e
-INNER JOIN nonisomol p ON e.parent_id = p.id
-INNER JOIN nonisomol c ON e.child_id = c.id;
-
---
 -- Tuning Parameters
 --
 
@@ -618,11 +589,9 @@ alter table edge set (autovacuum_vacuum_cost_limit = 2000);
 alter table mol_source set (autovacuum_vacuum_scale_factor = 0.01);
 alter table mol_source set (autovacuum_vacuum_cost_limit = 2000);
 
-
 --
 -- Stored Procedure for loading o_edge_<vendor>
 --
-
 
 CREATE OR REPLACE PROCEDURE extract_o_edge_vendor(
    src_id INTEGER,

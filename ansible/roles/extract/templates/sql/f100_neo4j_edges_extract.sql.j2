@@ -14,4 +14,3 @@ COPY (select distinct np.smiles, nc.smiles, label, 'FRAG'
         join nonisomol np ON np.id = os.parent_id
         join nonisomol nc ON nc.id = os.child_id)
   TO '{{  NEOEDGEFILE }}' DELIMITER ',' CSV;
-
