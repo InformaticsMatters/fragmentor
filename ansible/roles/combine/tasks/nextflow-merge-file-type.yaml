@@ -97,7 +97,7 @@
   stat:
     path: "{{ combiner_path }}/nodes.csv.gz"
   register: nodes_gz_file
-  changed_when: False
+  changed_when: false
 
 - name: Move combined nodes
   command: mv {{ workflow_path }}/results/all-nodes.csv {{ combiner_path }}/nodes.csv
@@ -108,21 +108,3 @@
   args:
     chdir: "{{ combiner_path }}"
   when: not nodes_gz_file.stat.exists
-
-# Move and compress the edges...
-
-- name: Check deduplicated Edges
-  stat:
-    path: "{{ combiner_path }}/edges.csv.gz"
-  register: edges_gz_file
-  changed_when: False
-
-- name: Move combined nodes
-  command: mv {{ workflow_path }}/results/all-edges.csv {{ combiner_path }}/edges.csv
-  when: not edges_gz_file.stat.exists
-
-- name: Compress combined nodes
-  command: gzip edges.csv
-  args:
-    chdir: "{{ combiner_path }}"
-  when: not edges_gz_file.stat.exists

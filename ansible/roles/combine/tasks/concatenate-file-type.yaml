@@ -7,7 +7,7 @@
   stat:
     path: "{{ combine_path }}/{{ file_type }}.gz"
   register: combined_file
-  changed_when: False
+  changed_when: false
 
 # For each file type given in the parameters file, concatenate all files named <index>-<file_type>
 # This is skipped if it is already there.

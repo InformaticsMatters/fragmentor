@@ -8,7 +8,7 @@
   stat:
     path: "{{ combine_path }}/{{ file_type }}.gz"
   register: combined_file
-  changed_when: False
+  changed_when: false
 
 - name: Translate nextflow files
   template:
@@ -72,7 +72,7 @@
   stat:
     path: "{{ combine_path }}/{{ file_type }}.gz"
   register: file_type_file
-  changed_when: False
+  changed_when: false
 
 - name: Move deduplicated files
   command: mv {{ nextflow_path }}/results/all-{{ file_type }} {{ combine_path }}/{{ file_type }}

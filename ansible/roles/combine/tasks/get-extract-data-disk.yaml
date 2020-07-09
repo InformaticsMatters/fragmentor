@@ -24,7 +24,7 @@
   stat:
     path: "{{ work_path }}/{{ extract_index }}-nodes.csv.gz"
   register: nodes_gz_data_file
-  changed_when: False
+  changed_when: false
 
 # This is the equivalent of a download from s3
 - name: Copy extract data into data directory
