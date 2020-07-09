@@ -1,0 +1,47 @@
+---
+
+# Variables that a user might want to change
+# through the command-line or a parameter file.
+
+# Neo4j Extract Parameters
+
+# Nodes and Edges Neo4j Files loaded from database.
+supnodefile: supplier-nodes.csv
+supmolnodefile: suppliermol-nodes.csv
+isosupmoledgefile: isomol-suppliermol-edges.csv
+supmolsupedgefile: suppliermol-supplier-edges.csv
+molsupmoledgefile: molecule-suppliermol-edges.csv
+
+neonodefile: nodes.csv
+isomolnodefile: isomol-nodes.csv
+
+neoedgefile: edges.csv
+inchiidfile: inchi-nodes.csv
+molinchiedgefile: molecule-inchi-edges.csv
+isomoledgefile: isomol-molecule-edges.csv
+
+# Processing definition
+# These lists define which files will be processed by which method.
+# File names will be identfied by their extract index 0,1,2 and their file name when copied to the work volume.
+# E.g. nodes.csv from extract [0] will be
+concat: [ '{{ supnodefile }}', '{{ supmolnodefile }}', '{{ isosupmoledgefile }}', '{{ supmolsupedgefile }}','{{ molsupmoledgefile }}' ]
+merge: ['{{ neonodefile }}', '{{ isomolnodefile }}']
+deduplicate: [ '{{ neoedgefile }}','{{ inchiidfile }}','{{ molinchiedgefile }}','{{ isomoledgefile }}' ]
+
+# The (AWS S3) location of vendor RAW data
+# a source for standardisation.
+bucket: im-fragnet
+
+# AWS credentials for bucket access
+aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
+
+# The maximum execution time
+# and poll period for the (asynchronous) Nextflow process
+# Timeouts (minutes):  2880 (2 days)
+#                      7200 (5 days)
+#                     10080 (7 days)
+#                     14400 (10 days)
+nextflow_timeout_minutes: 10080
+nextflow_poll_period_minutes: 20

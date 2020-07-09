@@ -1,0 +1,75 @@
+---
+
+# Graph combination process.
+#
+# Given one or more vendor or combination extracts this process creates a new Neo4j combination
+# (a de-duplicated combination of the various node and edge files)
+#
+# The playbook: -
+#
+# - Downloads the individual or combined dataset
+# - Then depending on the file, processing will:
+# - - Concatenates files that contain non-duplicate data.
+# - - Merges files that contain data that must be de-duplicated and combined.
+# - - De-duplicate files that contain data where no combining is necessary.
+# - Processes combined de-duplicated build.
+# - Uploads the result as a new combination to S3
+#
+# Check that required command line parameters have been set:
+# - deployment
+# - Parameter file file containing vendor(s) and version(s) has been created.
+#
+#  e.g.
+#   extracts:
+#       - lib:
+#           vendor: 'enamine_ro5'
+#           version: 'jun2018'
+#           regenerate_index: 'no'
+#       - lib:
+#           vendor: 'molport'
+#           version: '2020-02'
+#           regenerate_index: 'yes'
+#
+#   ansible-playbook site-combine \
+#     -e @parameters \
+#     -e deployment=development|production
+#     -e use_s3 yes/no
+#  The use_s3 flag indicates whether files should be downloaded from and uploaded to S3.
+#  If this is set to no then the assumption is that a local data directory is used.
+#  For deployment=development this would normally be set to "N".
+
+- name: Assert user-variable definitions
+  assert:
+    that:
+    - deployment|string|length > 0
+    - deployment|string != 'SetMe'
+    - "{{ extracts[0].lib.path|string != 'SetMe'}}"
+    - "{{ extracts[0].lib.use_s3|string != 'SetMe'}}"
+    fail_msg: You must provide a 'deployment', and a list of extracts in a parameter file to combine.
+
+- name: List input extracts
+  debug:
+    msg: "{{ item.lib }}"
+  loop: "{{ extracts }}"
+
+- import_tasks: initialise.yaml
+
+#- include_tasks: "{{ role_path }}/../utils/tasks/send-mail.yaml"
+#  vars:
+#    mail_subject: >-
+#      Play no. {{ cylc_play_number }} -
+#      COLLECTING (1/4) - combination {{ combination_number }}
+
+- import_tasks: download-datasets.yaml
+- import_tasks: concatenate.yaml
+#- import_tasks: nextflow-merge.yaml
+- import_tasks: deduplicate.yaml
+#- import_tasks: finalise.yaml
+
+# Finalise report
+- name: Write line to report
+  blockinfile:
+    marker: "<!-- {combination-init} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Combine play ended on: {{ now(utc=True).isoformat() }}</p>

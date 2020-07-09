@@ -26,36 +26,17 @@
     path_to_script: "{{ reppath }}/sql/f100_neo4j_supporting_info_extract.sql"
     autocommit: no
 
-# Vendor specific extract scripts
+# Supplier molecule extract scripts
 
-#- name: Extract vendor specific supporting information for this source_id / extract
-#  postgresql_query:
-#    path_to_script: "{{ role_path }}/files/{{ vendor }}/f100-neo4j-vendor-suppliermol.sql"
-#    named_args:
-#      SOURCEID: "{{ source_id|int }}"
-#      SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
-#    autocommit: no
-
-- name: Template the vendor specific extract script where a single vendor is defined
+- name: Template the supplier molecule extract script
   template:
-    src: sql/{{ extracts[0].lib.vendor }}/f100-neo4j-vendor-suppliermol.sql.j2
+    src: sql/f100-neo4j-vendor-suppliermol.sql.j2
     dest: "{{ reppath }}/sql/f100-neo4j-vendor-suppliermol.sql"
   vars:
     SOURCEIDS: "{{ source_ids }}"
     SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
-  when: source_id_lst|length == 1
 
-# This uses the combined_vendor parameter when the number of sourced requested is greater than 1.
-- name: Template the vendor specific extract script where multiple vendors are defined
-  template:
-    src: sql/{{ combined_vendor }}/f100-neo4j-vendor-suppliermol.sql.j2
-    dest: "{{ reppath }}/sql/f100-neo4j-vendor-suppliermol.sql"
-  vars:
-    SOURCEIDS: "{{ source_ids }}"
-    SUPMOLSUPEDGEFILE: "{{ copy_root }}/extract/{{ supmolsupedgefile }}"
-  when: source_id_lst|length > 1
-
-- name: Extract supporting information for this source_id / extract to various files
+- name: Extract the supplier molecule information for these source_ids
   postgresql_query:
     path_to_script: "{{ reppath }}/sql/f100-neo4j-vendor-suppliermol.sql"
     autocommit: no

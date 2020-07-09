@@ -1,0 +1,34 @@
+---
+
+# All the things to do when the processing is complete.
+#
+# This essentially means saving the 'combination' to S3.
+
+- name: Check Combination Done File
+  stat:
+    path: "{{ combiner_done_file }}"
+  register: done_file
+
+- name: Save combination files (combination {{ combination_number }})
+  command: ./graph_put_combination_files.py {{ combiner_path }} {{ combination_number }}
+  args:
+    chdir: "{{ scripts }}"
+  environment:
+    AWS_S3_BUCKET: "{{ aws_s3_bucket }}"
+  when:
+  - done_file.stat.exists
+  - aws_s3_write|bool
+
+# Clean-up?
+#
+# This step removes the working directories,
+# providing valuable free-space on the control host.
+
+- name: Clean up
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - "{{ combiner_path }}"
+  become: yes
+  when: clean_finish|bool

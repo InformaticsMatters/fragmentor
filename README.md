@@ -299,6 +299,16 @@ Note that for the larger extracts to complete there needs to be sufficient tempo
 directory for the database queries to complete. In the case of the complete extract including enamine and molport, for
 example, around 900GB if temporary space is required.
 
+
+## Combining Neo4 Datasets from S3/local disk.
+
+This playbook can be used to combine existing Neo4j datasets to produce a new dataset. For example, if datasets were
+produced using more than one database, this playbook can combine them allowing a combination of public/propriatory data.  
+
+```
+$ ansible-playbook site-combine.yaml -e @parameters -e deployment=production -e runpath=/data/share-2/run01 
+```
+
 ## Backing up the Database
 
 A simple backup play can be used to copy the database files to the

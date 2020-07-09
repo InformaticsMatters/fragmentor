@@ -1,0 +1,41 @@
+---
+
+# Variables that a user might want to change
+# through the command-line or a parameter file.
+#
+# Less common variables can be found in vars/main.yaml
+
+reppath: "{{ role_path }}/../../.."
+
+# Base path for all folders used in the combinataion.
+# This should be created by the user before the run
+# It should normally be different to the repo path and ideally should start with a "/".
+runpath: SetMe
+
+# The following is used (amongst other things)
+# to load vendor-specific variables from a specified parameters file - see extract-parameters.template...
+extracts:
+- lib:
+    path: 'SetMe'
+    use_s3: 'SetMe'
+
+# Workflow directories
+# Note that files will be kept zipped all the way through.
+
+# If the user wants to add extracts from disk they should be placed here
+extract_path: "{{ runpath }}/extract"
+
+# The data path defined where S3 files are originally copied to and where local files are copied to.
+data_path: "{{ runpath }}/data"
+# Files are them moved to the work path renamed to <extract_no><file_name>
+work_path: "{{ runpath }}/work"
+# Following the combination exercise, result files will be stored here
+combine_path: "{{ runpath }}/combine"
+# This contains log files.
+log_path: "{{ runpath }}/logs"
+# Directory for nextflow work files
+next_path: "{{ runpath }}/nextflow"
+
+# Save the extract
+# (typically compressing and saving to S3)
+use_s3: no

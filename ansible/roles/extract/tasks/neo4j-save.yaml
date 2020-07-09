@@ -119,30 +119,6 @@
   - header-*
   become: yes
 
-- name: Copy vendor specific suppliermol-supplier-edges header file if single vendor
-  copy:
-    src: "{{ item }}"
-    dest: "{{ copy_root }}/extract/{{ item|basename }}"
-    mode: 0444
-    owner: "{{ database[deployment].db_user_account }}"
-    group: "{{ database[deployment].db_user_account }}"
-  with_fileglob:
-  - "{{ extracts[0].lib.vendor }}/header-*"
-  become: yes
-  when: source_id_lst|length == 1
-
-- name: Copy combined suppliermol-supplier-edges header file if combination
-  copy:
-    src: "{{ item }}"
-    dest: "{{ copy_root }}/extract/{{ item|basename }}"
-    mode: 0444
-    owner: "{{ database[deployment].db_user_account }}"
-    group: "{{ database[deployment].db_user_account }}"
-  with_fileglob:
-  - "{{ combined_vendor }}/header-*"
-  become: yes
-  when: source_id_lst|length > 1
-
 - name: Remove node and edge text files
   command: rm node-files.txt edge-files.txt
   args:

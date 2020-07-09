@@ -19,7 +19,7 @@ clean_start: yes
 
 # The tag of the fragmentation container,
 # used for a number of nextflow workflows.
-nextflow_container_tag: molport-04
+nextflow_container_tag: combination-01
 
 # The process id is the commit id of the fragmentation container,
 # Used in the extract file
@@ -39,6 +39,7 @@ database:
     login_user: postgres
     login_password: 1234
     copy_directory: /var/lib/postgresql/data
+    home_directory: /home/user/project/postgresql/data
     db_user_account: postgres
   production:
     login_host: 130.246.214.154
@@ -132,3 +133,17 @@ vendors:
 
 # The tag of the fragmentation container,
 neo4j_graph_version: 2019-12-18.2
+
+# Email configuration
+#
+# Credentials to enable SMTP email transmission.
+# All of there are expected to be defined in the user's parameters file
+# or, via the environment.
+# If any of them are unset/blank, mail is not sent.
+# Username is the owner of the email account, not a recipient.
+# mail_recipients is a comma-separated list of email addresses.
+mail_host: "{{ lookup('env', 'GRAPH_MAIL_HOST') }}"
+mail_port: "{{ lookup('env', 'GRAPH_MAIL_PORT') or '587' }}"
+mail_username: "{{ lookup('env', 'GRAPH_MAIL_USERNAME') }}"
+mail_password: "{{ lookup('env', 'GRAPH_MAIL_PASSWORD') }}"
+mail_recipients: "{{ lookup('env', 'GRAPH_MAIL_RECIPIENTS') }}"

@@ -1,0 +1,30 @@
+---
+
+# The following files contain data that must be deduplicated,
+# - edges.csv
+# - inchi-nodes
+# - isomol-molecule-edges.csv
+# - molecule-inchi-edges.csv
+# These will be merged using the nextflow deduplication process.
+#
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-deduplicate} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Start: {{ now(utc=True).isoformat() }}</p>
+
+# For each extract file type in the list - deduplicate the files from the different extracts
+- name: Deduplicate each file type in the deduplication list
+  include_tasks: nextflow-dedup-file-type.yaml
+  loop: "{{ deduplicate }}"
+  loop_control:
+    loop_var: file_type
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-deduplicate} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>End: {{ now(utc=True).isoformat() }}</p>

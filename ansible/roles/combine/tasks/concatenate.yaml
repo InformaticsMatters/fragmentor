@@ -1,0 +1,33 @@
+---
+
+# The following files contain data that does not contain duplicates,
+# - Supplier-nodes.csv
+# - Suppliermol-nodes.csv
+# - isomol-suppliermol-edges.csv
+# - molecule-suppliermol-edges.csv
+# - suppliermol-supplier-edges.csv
+# These will be concatenated.
+#
+# For each file type in the concatenate list, concatenate into a single file.
+#
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-concatenate} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Start: {{ now(utc=True).isoformat() }}</p>
+
+# For each extract file type in the list - concatenate the files from the different extracts
+- name: Concatenate each file type in the concat list
+  include_tasks: concatenate-file-type.yaml
+  loop: "{{ concat }}"
+  loop_control:
+    loop_var: file_type
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-concatenate} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>End: {{ now(utc=True).isoformat() }}</p>

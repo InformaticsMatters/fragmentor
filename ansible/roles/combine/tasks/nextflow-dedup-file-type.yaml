@@ -1,0 +1,85 @@
+---
+
+# These files contain data that contain duplicates but no merging needs to occur,
+# Files are grouped by file type: e.g. 0-edges.csv.gz, 1-edges.csv.gz
+# These are combined into a single deduplicated edges.csv.gz file on the combine directory.
+
+- name: Check if result file is already on combine path
+  stat:
+    path: "{{ combine_path }}/{{ file_type }}.gz"
+  register: combined_file
+  changed_when: False
+
+- name: Translate nextflow files
+  template:
+    src: "{{ item }}"
+    dest: "{{ workflow_path }}/{{ item|regex_replace('.j2') }}"
+  loop:
+  - "deduplicate.nf.j2"
+  - "{{ deployment }}/nextflow.config.j2"
+  when:
+  - not combined_file.stat.exists
+
+- name: Set nextflow command
+  set_fact:
+    nextflow_cmd: >-
+      nextflow run -c {{ reppath }}/nextflow/nextflow.config
+      {{ reppath }}/nextflow/depulicate.nf
+      -w {{ nextpath }}
+      -with-report {{ log_path }}/deduplicate_{{ file_type }}_report.html
+      -with-tower
+      -with-trace
+      --input {{ file_type }}
+  when:
+  - not combined_file.stat.exists
+
+- name: Display nextflow command
+  debug:
+    var: nextflow_cmd
+  when:
+  - not combined_file.stat.exists
+
+- name: Run nextflow (async)
+  command: "{{ nextflow_cmd }}"
+  async: "{{ nextflow_timeout_minutes|int * 60 }}"
+  poll: 0
+  register: nextflow_async
+  when:
+  - not combined_file.stat.exists
+
+- name: Wait for nextflow (async)
+  async_status:
+    jid: "{{ nextflow_async.ansible_job_id }}"
+  register: nextflow_result
+  until: nextflow_result.finished
+  delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
+  retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
+  when:
+  - not combined_file.stat.exists
+
+# Copy nextflow trace/report files to the combiner
+# directory (if they exist). These will be stored on S3
+# when (if) the combination is saved.
+
+- name: Copy nextflow debug files
+  shell: cp {{ nextflow_path }}/trace.txt {{ log_path }}/{{ file_type }}-trace.txt | true
+  when:
+  - not combined_file.stat.exists
+
+# Move and compress the file-type (XXX why do I need to do this? )...
+
+- name: Check deduplicated file_type
+  stat:
+    path: "{{ combine_path }}/{{ file_type }}.gz"
+  register: file_type_file
+  changed_when: False
+
+- name: Move deduplicated files
+  command: mv {{ nextflow_path }}/results/all-{{ file_type }} {{ combine_path }}/{{ file_type }}
+  when: not file_type_file.stat.exists
+
+- name: Compress deduplicated files
+  command: gzip {{ file_type }}
+  args:
+    chdir: "{{ combine_path }}"
+  when: not file_type_file.stat.exists

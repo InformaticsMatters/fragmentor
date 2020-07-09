@@ -1,0 +1,33 @@
+---
+# A template of the Parameter file that must be supplied for the combine playbook.
+# Please copy this to a file called parameters, edit the file and then...
+#
+# ansible-playbook site-combine.yaml -e @parameters -e deployment=development|production
+
+# Vendors to be combined will come from a single or combination database that is available on S3.
+# Combinations will be added to a new combination database.
+# A map of deafults based on the vendor and library.
+
+
+buckets:
+     - s3-1:
+        bucket:
+        aws_access_key: ''
+        aws_secret_key: ''
+
+extracts:
+    - lib:
+        path: 'xchem_dsip/v1'
+        use_s3: no
+    - lib:
+        path: 'xchem_spot/v1'
+        use_s3: no
+        bucket: s3-1
+    - lib:
+        path: 'chemspace/bb'
+        use_s3: yes
+        bucket: s3-1
+
+output:
+    - bucket: s3-1
+    - path: 'xchem_spot/v1'

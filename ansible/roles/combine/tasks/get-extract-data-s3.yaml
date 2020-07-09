@@ -1,0 +1,75 @@
+---
+# Gets 'raw' data from an AWS S3 path
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {standardise-get} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ standpath }}/standardise/standardise_report.html"
+    block: |
+      <h2>Step: Get Raw Data from S3</h2>
+      <p>Begin: {{ now(utc=True).isoformat() }}</p>
+
+- name: Set raw path
+  set_fact:
+    raw_path: raw/vendor/{{ vendor|regex_replace('_', '/') }}/{{ version }}
+
+- name: Display raw path
+  debug:
+    msg: bucket={{ bucket }} raw_path={{ raw_path }}
+
+- name: List raw data
+  aws_s3:
+    bucket: "{{ bucket }}"
+    mode: list
+    prefix: "{{ raw_path }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+  register: raw_result
+
+- name: Display result
+  debug:
+    var: raw_result
+
+# There has to be at least two keys in the result...
+# The first key is always the directory the files are in,
+# e.g.: "s3_keys": [
+#           "raw/vendor/xchem/v1/",
+#           "raw/vendor/xchem/v1/dsip.txt.gz"
+#        ]
+
+- name: Check raw data
+  assert:
+    that: raw_result.s3_keys|length > 1
+
+- name: Display raw file count
+  debug:
+    msg: Found {{ raw_result.s3_keys|length - 1 }} raw files
+
+- name: Set destination path
+  set_fact:
+    destination: "{{ datapath }}/data/{{ vendor }}"
+
+# Get the files, ignoring the first entry in the list (always a directory)...
+
+- name: Get raw data
+  aws_s3:
+    bucket: "{{ bucket }}"
+    mode: get
+    object: "{{ item }}"
+    dest: "{{ destination }}/{{ item|basename }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+  loop: "{{ raw_result.s3_keys[1:] }}"
+
+# Now hand over the get logic to vendor-specific
+# un-packing code. It may need to do nothing but
+# this is where we do vendor-specific presentation...
+
+- include_tasks: unpack-raw-data-{{ vendor }}.yaml
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {standardise-get} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ standpath }}/standardise/standardise_report.html"
+    block: |
+      <p>End: {{ now(utc=True).isoformat() }}</p>

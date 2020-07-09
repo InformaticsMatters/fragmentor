@@ -1,0 +1,24 @@
+---
+# 1. Gets all the build files for all the builds to the data location
+# 2. Moves the files to the work location, remaining them accordingly according to the index.
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-download} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Start: {{ now(utc=True).isoformat() }}</p>
+
+# For each extract id given in the parameters file, do some sanity checks
+- name: Validate input/Get source data for each extract
+  include_tasks: get-extract-data-{{ item.lib.use_s3 }}.yaml
+  loop: "{{ extracts }}"
+  loop_control:
+    index_var: extract_index
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-download} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>End: {{ now(utc=True).isoformat() }}</p>

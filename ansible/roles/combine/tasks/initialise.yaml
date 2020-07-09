@@ -1,0 +1,120 @@
+---
+
+# Check run path
+- name: Ensure runpath is present
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ runpath }}"
+
+# Install the required modules to be able to synchronise the data from S3 and use ansible python modules
+# Note that on prod this is done as "sudo" (become = yes)
+- name: Install requirements
+  pip:
+    name:
+    - python-dateutil==2.8.1
+    - boto3==1.12.49
+    - psycopg2-binary==2.8.5
+  become: yes
+  when: deployment=="production"
+
+- name: Install requirements
+  pip:
+    name:
+    - python-dateutil==2.8.1
+    - boto3==1.12.49
+    - psycopg2-binary==2.8.5
+  when: deployment=="development"
+
+#- name: Check available cores
+#  assert:
+#    that:
+#    - cluster_cores > 0
+#    - cluster_nodes > 0
+
+# Check AWS credentials
+
+- name: Check credentials
+  assert:
+    that:
+    - aws_access_key|string|length > 0
+    - aws_secret_key|string|length > 0
+    fail_msg: You must provide AWS credentias so that I can save the data
+  when: use_s3|bool
+
+# Clean-up before the run...
+# The following task does not run if 'clean_start' is false.
+
+- name: Remove existing directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - "{{ data_path }}"
+  - "{{ work_path }}"
+  - "{{ combine_path }}"
+  - "{{ log_path }}"
+  - "{{ next_path }}"
+  when: clean_start|bool
+
+# Now ensure that the working directories exist
+# and write some provenance information to the combination directory
+# (which will eventually be uploaded to S3)
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ data_path }}"
+  - "{{ work_path }}"
+  - "{{ combine_path }}"
+  - "{{ log_path }}"
+  - "{{ next_path }}"
+
+- name: Ensure sql, nextflow directories are present
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ reppath }}/sql"
+  - "{{ reppath }}/nextflow"
+
+- name: Get Fragmentor commit reference
+  command: git log --pretty=format:'%h' -n 1
+  args:
+    chdir: "{{ reppath }}"
+  register: fragmentor_commit_result
+  changed_when: false
+
+- name: Set Fragmentor Facts
+  set_fact:
+    fragmentor_commit_ref: "{{ fragmentor_commit_result.stdout }}"
+
+- name: Collect environment
+  command: env
+  register: env_result
+
+- name: Write environment provenance
+  copy:
+    content: "{{ env_result.stdout }}"
+    dest: "{{ log_path }}/env.prov"
+
+# Create Combination Summary Report. This is saved with the playbook results.
+- name: Create Combination HTML log report
+  blockinfile:
+    path: "{{ log_path }}/combination_report.html"
+    create: yes
+    marker: "<!-- {combination-init} ANSIBLE MANAGED BLOCK -->"
+    insertafter: "<body>"
+    block: |
+      <h1>Ansible Combination Playbook</h1>
+      <p><table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>User</td><td>{{ ansible_hostname }}</td></tr>
+      <tr><td>Deployment</td><td>{{ deployment }}</td></tr>
+      <tr><td>Fragmentor Commit Ref</td><td>{{ fragmentor_commit_ref }}</td></tr>
+      </table></p>
+      <p>Combine play started on: {{ now(utc=True).isoformat() }}</p>
+  when: clean_start|bool

@@ -1,0 +1,128 @@
+---
+
+# The following files contain data that must be merged,
+# - nodes.csv
+# - isomol-nodes.csv
+# These will be merged using the nextflow merge process.
+#
+
+- name: Translate nextflow files
+  template:
+    src: "{{ item }}"
+    dest: "{{ workflow_path }}/{{ item|regex_replace('.j2') }}"
+  loop:
+  - "merge.nf.j2"
+  - "{{ deployment }}/nextflow.config.j2"
+  when:
+  - not current_nextflow_log_file.stat.exists
+  - not nextflow_is_running
+  - nextflow_run|bool
+
+- name: Set nextflow command
+  set_fact:
+    nextflow_cmd: >-
+      nextflow -C config run workflow.nf
+      --shatterFiles {{ cluster_nodes }}
+      -with-trace
+      -with-report report.html
+      {{ nextflow_extra_args }}
+      {{ nextflow_debug_args }}
+  when:
+  - not current_nextflow_log_file.stat.exists
+  - not nextflow_is_running
+
+- name: Display nextflow command
+  debug:
+    var: nextflow_cmd
+  when:
+  - not current_nextflow_log_file.stat.exists
+  - not nextflow_is_running
+
+- name: Display nextflow version
+  debug:
+    var: nextflow_version
+  when:
+  - not current_nextflow_log_file.stat.exists
+  - not nextflow_is_running
+
+- name: Run nextflow (async)
+  command: "{{ nextflow_cmd }}"
+  args:
+    chdir: "{{ workflow_path }}"
+  environment:
+    NXF_VER: "{{ nextflow_version }}"
+  async: "{{ nextflow_timeout_minutes|int * 60 }}"
+  poll: 0
+  register: nextflow_async
+  when:
+  - not current_nextflow_log_file.stat.exists
+  - not nextflow_is_running
+  - nextflow_run|bool
+
+# Optionally wait for nextflow, polling at a user-defined interval...
+# If the playbook is restarted the 'Wait' will not work,
+# as it expects an 'ansible_job_id' which will have been lost.
+# So we cannot run this if nextflow was found to be running
+
+- name: Wait for nextflow (async)
+  async_status:
+    jid: "{{ nextflow_async.ansible_job_id }}"
+  register: nextflow_result
+  until: nextflow_result.finished
+  delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
+  retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
+  when:
+  - not current_nextflow_log_file.stat.exists
+  - not nextflow_is_running
+  - nextflow_run|bool
+
+# Copy nextflow trace/report files to the combiner
+# directory (if they exist). These will be stored on S3
+# when (if) the combination is saved.
+
+- name: Copy nextflow debug files
+  shell: cp {{ workflow_path }}/{{ item }} {{ combiner_path }} | true
+  loop:
+  - report.html
+  - timeline.html
+  - trace.txt
+  when:
+  - not current_nextflow_log_file.stat.exists
+  - not nextflow_is_running
+  - nextflow_run|bool
+
+# Move and compress the nodes...
+
+- name: Check deduplicated Nodes
+  stat:
+    path: "{{ combiner_path }}/nodes.csv.gz"
+  register: nodes_gz_file
+  changed_when: False
+
+- name: Move combined nodes
+  command: mv {{ workflow_path }}/results/all-nodes.csv {{ combiner_path }}/nodes.csv
+  when: not nodes_gz_file.stat.exists
+
+- name: Compress combined nodes
+  command: gzip nodes.csv
+  args:
+    chdir: "{{ combiner_path }}"
+  when: not nodes_gz_file.stat.exists
+
+# Move and compress the edges...
+
+- name: Check deduplicated Edges
+  stat:
+    path: "{{ combiner_path }}/edges.csv.gz"
+  register: edges_gz_file
+  changed_when: False
+
+- name: Move combined nodes
+  command: mv {{ workflow_path }}/results/all-edges.csv {{ combiner_path }}/edges.csv
+  when: not edges_gz_file.stat.exists
+
+- name: Compress combined nodes
+  command: gzip edges.csv
+  args:
+    chdir: "{{ combiner_path }}"
+  when: not edges_gz_file.stat.exists

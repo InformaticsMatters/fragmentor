@@ -1,0 +1,100 @@
+// Fragalysis Graph Deduplication Processing
+//
+// This workflow de-duplicates the 'combined' node and edge files.
+// by first 'shattering' them over a number of files before sorting them
+// in parallel to and re-combing them into a grand nodes and edges file.
+//
+// There are a number of chained processes here. Briefly: -
+//
+// - nShatter : Shatters the node files to be combined into
+//              files based on their hash
+// - nMerge   : Merge each node-shattered file ('shard'),
+// - nCat     : Concatenates the deduplicated node shards
+//              to form a _grand_ 'all-nodes.csv'
+
+params.shatterFiles = 80
+
+nodes = Channel.fromPath("./*-nodes.csv.gz")
+
+// Shatter (all) fragment node files into a hash-based of files.
+// -------
+// The shattering is based on the individual line's hash
+// so potential duplicates are guaranteed to be written
+// to the same file. The output of this process is
+// a number of files named 'n-shatter-NNN.csv'.
+process nShatter {
+
+    container 'informaticsmatters/fragalysis:{{ fragalysis_version }}'
+    publishDir 'results/', mode: 'symlink'
+    scratch false
+
+    input:
+    file node from nodes.toList()
+
+    output:
+    file 'n-shatter-*.csv' into shattered_nodes mode flatten
+
+    """
+    python /usr/local/fragalysis/frag/network/scripts/csv_shatter.py \
+        . nodes.csv.gz ${params.shatterFiles} n-shatter \
+        --delete-input
+    """
+
+}
+
+// Node merge
+// ------------------
+// Here we process a small (shattered) file.
+// If a node has a duplicate it will reside in the same shattered file.
+// We ensure that cpus equals the number of cores on a node,
+// so we get an entire node.
+process nMerge {
+
+    container 'informaticsmatters/fragalysis:{{ fragalysis_version }}'
+    cpus {{ cluster_cores_per_node }}
+    publishDir 'results/', mode: 'symlink'
+    scratch false
+
+    input:
+    file shard from shattered_nodes
+
+    output:
+    file '*.d-nodes' into merged_nodes
+
+    shell:
+    '''
+    sort --temporary-directory=. -u !{shard} > !{shard}.d-nodes
+    rm !{shard}
+    '''
+
+}
+
+// Concatenate the deduplicated nodes
+// -----------
+// This results in a 'grand' node deduplication file 'all-nodes.csv'.
+// We do not need to de-duplicate here, all potential duplicates
+// will have been co-located and de-duplicated in their respective
+// shattered file.
+//
+// As 'nCat' is the last process (for Nodes) in this workflow
+// we publish by moving the output file in order to save valuable time
+// with a potentially very large file.
+process nCat {
+
+    container 'informaticsmatters/fragalysis:{{ fragalysis_version }}'
+    publishDir 'results/', mode: 'move'
+    scratch false
+
+    input:
+    file merge from merged_nodes.toList()
+
+    output:
+    file 'all-nodes.csv'
+
+    """
+    find . -name '*.d-nodes' | xargs cat > all-nodes.csv
+    find . -name '*.d-nodes' -delete
+    """
+
+}
+
