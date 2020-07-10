@@ -27,11 +27,13 @@
     - psycopg2-binary==2.8.5
   when: deployment=="development"
 
-#- name: Check available cores
-#  assert:
-#    that:
-#    - cluster_cores > 0
-#    - cluster_nodes > 0
+# Cluster size variables must be set.
+
+- name: Check available cores
+  assert:
+    that:
+    - cluster_cores > 0
+    - cluster_nodes > 0
 
 # Check AWS credentials
 

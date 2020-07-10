@@ -62,6 +62,11 @@ hardware:
     parallel_jobs: 500
     postgres_jobs: 18
 
+# XXX These need to be combined in the hardware section above.
+cluster_cores_per_node: 1
+cluster_cores: 1
+cluster_nodes: 1
+
 # Vendor defaults.
 # A map of defaults based on the vendor and library.
 vendors:

@@ -26,7 +26,8 @@ isomoledgefile: isomol-molecule-edges.csv
 # E.g. nodes.csv from extract [0] will be
 concat: [ '{{ supnodefile }}', '{{ supmolnodefile }}', '{{ isosupmoledgefile }}', '{{ supmolsupedgefile }}', '{{ molsupmoledgefile }}' ]
 merge: ['{{ neonodefile }}', '{{ isomolnodefile }}']
-deduplicate: [ '{{ neoedgefile }}', '{{ inchiidfile }}', '{{ molinchiedgefile }}', '{{ isomoledgefile }}' ]
+#deduplicate: [ '{{ neoedgefile }}', '{{ inchiidfile }}', '{{ molinchiedgefile }}', '{{ isomoledgefile }}' ]
+deduplicate: [ '{{ neoedgefile }}' ]
 
 # The (AWS S3) location of vendor RAW data
 # a source for standardisation.
@@ -43,5 +44,5 @@ aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true
 #                      7200 (5 days)
 #                     10080 (7 days)
 #                     14400 (10 days)
-nextflow_timeout_minutes: 10080
-nextflow_poll_period_minutes: 20
+nextflow_timeout_minutes: 10
+nextflow_poll_period_minutes: 1

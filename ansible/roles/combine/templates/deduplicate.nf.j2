@@ -1,8 +1,8 @@
-// Fragalysis Graph Deduplication Processing
+// Fragmentor Graph Deduplication Processing
 //
-// This workflow de-duplicates the 'combined' node and edge files.
-// by first 'shattering' them over a number of files before sorting them
-// in parallel to and re-combing them into a grand nodes and edges file.
+// This nextflow process de-duplicates node and edge files of format <extract no>-<file type>
+// into a single de-duplicated file of format <file type> by first 'shattering' them over a number of files before
+// sorting them in parallel to and re-combing them into a grand nodes and edges file.
 //
 // There are a number of chained processes here. Briefly: -
 //
@@ -13,6 +13,7 @@
 //              to form a _grand_ 'all-nodes.csv'
 
 params.shatterFiles = 80
+
 edges = Channel.fromPath("./*-edges.csv.gz")
 
 // Shatter (all) fragment edge files into a hash-based of files.
@@ -21,9 +22,10 @@ edges = Channel.fromPath("./*-edges.csv.gz")
 // so potential duplicates are guaranteed to be written
 // to the same file. The output of this process is
 // a number of files named 'n-shatter-NNN.csv'.
+
 process eShatter {
 
-    container 'informaticsmatters/fragalysis:{{ fragalysis_version }}'
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
     publishDir 'results/', mode: 'symlink'
     scratch false
 
@@ -47,9 +49,10 @@ process eShatter {
 // If a node has a duplicate it will reside in the same shattered file.
 // We ensure that cpus equals the number of cores on a node,
 // so we get an entire node.
+
 process eDedup {
 
-    container 'informaticsmatters/fragalysis:{{ fragalysis_version }}'
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
     cpus {{ cluster_cores_per_node }}
     publishDir 'results/', mode: 'symlink'
     scratch false
@@ -76,9 +79,10 @@ process eDedup {
 // As 'eCat' is the last process (for Edges) in this workflow
 // we publish by moving the output file in order to save valuable time
 // with a potentially very large file.
+
 process eCat {
 
-    container 'informaticsmatters/fragalysis:{{ fragalysis_version }}'
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
     publishDir 'results/', mode: 'move'
     scratch false
 

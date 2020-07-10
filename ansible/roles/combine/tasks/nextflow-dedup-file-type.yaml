@@ -10,10 +10,13 @@
   register: combined_file
   changed_when: false
 
+# Move the nextflow workflow and config into place (from templates)
+# so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
+
 - name: Translate nextflow files
   template:
     src: "{{ item }}"
-    dest: "{{ workflow_path }}/{{ item|regex_replace('.j2') }}"
+    dest: "{{ reppath }}/nextflow/{{ item|regex_replace(deployment + '/')|regex_replace('.j2') }}"
   loop:
   - "deduplicate.nf.j2"
   - "{{ deployment }}/nextflow.config.j2"
@@ -24,12 +27,10 @@
   set_fact:
     nextflow_cmd: >-
       nextflow run -c {{ reppath }}/nextflow/nextflow.config
-      {{ reppath }}/nextflow/depulicate.nf
-      -w {{ nextpath }}
+      {{ reppath }}/nextflow/deduplicate.nf
+      -w {{ next_path }}
       -with-report {{ log_path }}/deduplicate_{{ file_type }}_report.html
       -with-tower
-      -with-trace
-      --input {{ file_type }}
   when:
   - not combined_file.stat.exists
 
@@ -62,7 +63,7 @@
 # when (if) the combination is saved.
 
 - name: Copy nextflow debug files
-  shell: cp {{ nextflow_path }}/trace.txt {{ log_path }}/{{ file_type }}-trace.txt | true
+  shell: cp {{ next_path }}/trace.txt {{ log_path }}/{{ file_type }}-trace.txt | true
   when:
   - not combined_file.stat.exists
 
@@ -75,7 +76,7 @@
   changed_when: false
 
 - name: Move deduplicated files
-  command: mv {{ nextflow_path }}/results/all-{{ file_type }} {{ combine_path }}/{{ file_type }}
+  command: mv {{ next_path }}/results/all-{{ file_type }} {{ combine_path }}/{{ file_type }}
   when: not file_type_file.stat.exists
 
 - name: Compress deduplicated files
