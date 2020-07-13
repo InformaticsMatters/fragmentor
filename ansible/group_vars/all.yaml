@@ -17,6 +17,10 @@ deployment: SetMe
 # it's simply about a clean 'disk'.
 clean_start: yes
 
+# If set to yes this tends to remove temporary/work data directories.
+# Not essential files.
+clean_finish: no
+
 # The tag of the fragmentation container,
 # used for a number of nextflow workflows.
 nextflow_container_tag: combine-06

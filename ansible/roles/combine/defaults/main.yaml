@@ -18,6 +18,7 @@ extracts:
 - lib:
     path: 'SetMe'
     use_s3: 'SetMe'
+output_use_s3: 'SetMe'
 
 # Workflow directories
 # Note that files will be kept zipped all the way through.

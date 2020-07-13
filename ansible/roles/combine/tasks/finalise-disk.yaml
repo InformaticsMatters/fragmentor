@@ -1,0 +1,108 @@
+---
+
+# All the things to do when the processing is complete.
+# This essentially means
+# 1. Creating a loader file for the nodes and edges files in a similar way to the extract play. This involves using
+#    the same header files.
+# 2. Saving the combined extract back to S3
+# 3. Saving log files from the combination
+# 4. Tidying up the remaining files.
+#
+# For the loadfile, the assumption is that a combination has been done and a number of compressed (.gz) node and edge
+# (relationship) files exist on the {{ combine }} directory. The essential property of the extracted files is that
+# their file-names contain the text 'nodes' or 'edges' (but not both) and they end '.gz'.
+#
+# Every '.gz' file we expect to find must have a corresponding 'header-' file in extract role's 'files' directory.
+# So, if there's an 'x.csv.gz' in the extract there must be a 'header-x.csv' in 'extract/files'.
+#
+
+# List all the node files into ' node-files.txt'.
+# This is a 1-file-per-line list of extracted nodes.
+
+- name: Collect node files
+  shell: ls -1 *nodes*.gz > node-files.txt
+  args:
+    chdir: "{{ combine_path }}"
+
+# Create the 'node_text' variable that will be used when templating
+# the loader script. This is essentially a '--nodes' directive for
+# each line in 'node-files.txt'. If 'node-files.txt'
+# is: -
+#
+#    nodes.csv.gz
+#    isomol-nodes.csv.gz
+#
+# Then the 'nodes' variable should look like this
+# (with each line indented by 8 spaces)...
+#
+#    --nodes "header-nodes.csv,nodes.csv.gz" \
+#    --nodes "header-isomol-nodes.csv,isomol-nodes.csv.gz" \
+
+- name: Form node_result
+  shell: >-
+    paste -d , node-files.txt node-files.txt
+    | sed 's/.gz,/,/g'
+    | sed 's/^/        --nodes "header-/g'
+    | sed 's/$/" \\/g'
+  register: node_result
+  args:
+    chdir: "{{ combine_path }}"
+
+- name: Set node_text
+  set_fact:
+    node_text: "{{ node_result.stdout }}"
+
+# List all the edge files into 'edge-files.txt'.
+# This is a 1-file-per-line list of extracted edges.
+
+- name: Collect edge files
+  shell: ls -1 *edges*.gz > edge-files.txt
+  args:
+    chdir: "{{ combine_path }}"
+
+- name: Form relationship_result
+  shell: >-
+    paste -d , edge-files.txt edge-files.txt
+    | sed 's/.gz,/,/g'
+    | sed 's/^/        --relationships "header-/g'
+    | sed 's/$/" \\/g'
+    | sed '$ s/.$//'
+  register: relationship_result
+  args:
+    chdir: "{{ combine_path }}"
+
+- name: Set relationship_text
+  set_fact:
+    relationship_text: "{{ relationship_result.stdout }}"
+
+# Now template the script using the node & relationship variables
+# and copy all the header files we have
+# (some may not be used - just copy them all anyway)...
+
+- name: Install the loader script
+  template:
+    src: load-neo4j.sh.j2
+    dest: "{{ combine_path }}/load-neo4j.sh"
+    mode: 0555
+
+- name: Copy header files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ combine_path }}/{{ item|basename }}"
+    mode: 0444
+  with_fileglob:
+  - "{{ role_path }}/../extract/files/header-*"
+
+- name: Remove node and edge text files
+  command: rm node-files.txt edge-files.txt
+  args:
+    chdir: "{{ combine_path }}"
+
+- name: Clean up
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - "{{ work_path }}"
+  - "{{ nextflow_path }}"
+  when: clean_finish|bool

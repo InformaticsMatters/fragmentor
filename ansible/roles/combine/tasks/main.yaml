@@ -45,9 +45,10 @@
     - deployment|string != 'SetMe'
     - "{{ extracts[0].lib.path|string != 'SetMe'}}"
     - "{{ extracts[0].lib.use_s3|string != 'SetMe'}}"
-    fail_msg: You must provide a 'deployment', and a list of extracts in a parameter file to combine.
+    - "{{ output_use_s3|string != 'SetMe'}}"
+    fail_msg: You must provide a 'deployment', a list of extracts in a parameter file to combine and an output location.
 
-- name: List input extracts
+- name: List input datasets
   debug:
     msg: "{{ item.lib }}"
   loop: "{{ extracts }}"
@@ -64,7 +65,8 @@
 - import_tasks: concatenate.yaml
 - import_tasks: merge.yaml
 - import_tasks: deduplicate.yaml
-#- import_tasks: finalise.yaml
+
+- import_tasks: finalise-{{ output_use_s3 }}.yaml
 
 # Finalise report
 - name: Write line to report
