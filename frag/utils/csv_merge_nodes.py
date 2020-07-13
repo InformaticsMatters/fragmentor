@@ -15,6 +15,8 @@ As the nodes.csv and isomol-nodes.csv files have a similar format, the script as
 4. If a field differs, then the second field is appended to the first field, separated by a semi-colon.
 5. The merged row is written to the output file.
 
+Note that the program expects the input files to be sorted.
+
 Duncan Peacock
 July 2020
 """
@@ -46,7 +48,7 @@ def processlines(csvinfile, csvoutfile):
                     # to eliminate duplicate values.
                     set_val = set(val.split(';'))
                     set_stored = set(stored_row[idx].split(';'))
-                    if len(set_stored) > 0:
+                    if len (set_stored) > 0 and set_stored != {''}:
                         set_stored.update(set_val)
                         stored_row[idx] = ";".join(set_stored)
                     else:

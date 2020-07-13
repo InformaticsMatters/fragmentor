@@ -25,8 +25,7 @@ isomoledgefile: isomol-molecule-edges.csv
 # File names will be identfied by their extract index 0,1,2 and their file name when copied to the work volume.
 # E.g. nodes.csv from extract [0] will be
 concat: [ '{{ supnodefile }}', '{{ supmolnodefile }}', '{{ isosupmoledgefile }}', '{{ supmolsupedgefile }}', '{{ molsupmoledgefile }}' ]
-merge: ['{{ neonodefile }}']
-# merge: ['{{ neonodefile }}', '{{ isomolnodefile }}']
+merge: ['{{ neonodefile }}', '{{ isomolnodefile }}']
 deduplicate: [ '{{ neoedgefile }}', '{{ inchiidfile }}', '{{ molinchiedgefile }}', '{{ isomoledgefile }}' ]
 
 # The (AWS S3) location of vendor RAW data
