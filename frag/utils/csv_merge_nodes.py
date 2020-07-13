@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 
 """A utility to merge/deduplicate shattered non-compressed (or compressed) nodes files.
@@ -8,90 +8,80 @@ guaranteed to co-exists in the same (smaller) output files. A sort'
 can be run in a distributed fashion and the results processed to merge
 nodes with the same smiles.
 
-As the nodes.csv and isomol-nodes.csv files have different columns, a parameter is passed
-in with the columns to merge.
+As the nodes.csv and isomol-nodes.csv files have a similar format, the script assumes:
+1. A comparison is done on the first column (say this is the smiles)
+2. If two consecutive rows have identical smiles then:
+3. The other columns will be compared field by field. If they are the same, the first field is retained
+4. If a field differs, then the second field is appended to the first field, separated by a semi-colon.
+5. The merged row is written to the output file.
 
 Duncan Peacock
 July 2020
 """
 
 import argparse
-import glob
 import gzip
 import os
+import csv
+import logging
 
+logger = logging.getLogger(__name__)
 
-def shatter(input_dir, input_suffix, num_files, output_basename,
-            recursive=False, delete_input=False):
-    """Given a list of filenames this utility places lines with the same
-    hash into the same file.
+def processlines(csvinfile, csvoutfile):
 
-    :param input_dir: The directory to find the input files
-    :param input_suffix: Input file suffix (how each filename ends)
-    :param num_files: The number of files to shatter to
-    :param output_basename: The basename of the output file (i.e. 'nodes')
-    :param recursive: True to search recursively
-    :param delete_input: Deletes input files as they're scattered
-    """
-    assert os.path.exists(input_dir)
-    assert os.path.isdir(input_dir)
+    num_processed = 0
+    matching_smiles = False
+    stored_row = ['SetMe']
+    csvwriter = csv.writer(csvoutfile)
 
-    output_files = []
-    for file_id in range(0, num_files):
-        output_filename = '%s-%03d.csv' % (output_basename, file_id + 1)
-        output_files.append(open(output_filename, 'wt'))
+    for row in csv.reader(csvinfile):
+        num_processed += 1
 
-    # Recursive search for input files?
-    # Because we're in Python 2 we can't use the simpler Python 3 glob...
-    input_files = []
-    if recursive:
-        for root, dirs, files in os.walk(input_dir):
-            for i_file in files:
-                if i_file.endswith(input_suffix):
-                    input_files.append(os.path.join(root, i_file))
-    else:
-        input_files = glob.glob('%s/*%s' % (input_dir, input_suffix))
-
-    # For each file, scatter the lines amongst the uncompressed output files
-    # based on the hash of each line (coping with .gz files if required)
-    for input_file in input_files:
-        if input_file.endswith('.gz'):
-            with gzip.open(input_file, 'rt') as i_file:
-                for line in i_file:
-                    file_index = hash(line) % num_files
-                    output_files[file_index].write(line)
+        if row[0]==stored_row[0]:
+        #Matching smiles. Compare/merge rest of columns.
+            matching_smiles = True
+            for idx, val in enumerate(row):
+                if val != stored_row[idx]:
+                    # Non-matching fields are assumed to be lists that should be merged. This is done as a union of sets
+                    # to eliminate duplicate values.
+                    set_val = set(val.split(';'))
+                    set_idx = set(stored_row[idx].split(';'))
+                    set_idx.update(set_val)
+                    stored_row[idx] = ";".join(set_idx)
         else:
-            with open(input_file, 'rt') as i_file:
-                for line in i_file:
-                    file_index = hash(line) % num_files
-                    output_files[file_index].write(line)
-        if delete_input:
-            os.remove(input_file)
+            if matching_smiles:
+                csvwriter.writerow(stored_row)
+                matching_smiles = False
+            stored_row = row
 
-    # Close all the output files
-    for output_file in output_files:
-        output_file.close()
+    if matching_smiles:
+        csvwriter.writerow(stored_row)
 
+    logger.warning("Processed %s rows", num_processed)
+
+def merge(input, output):
+    """Given an input file, will merge any duplicate fields and write to the output file.
+
+    :param input: The input file
+    :param output: Output file to use
+    """
+    assert os.path.isfile(input)
+    global logger
+
+    if input.endswith('.gz'):
+        with gzip.open(input, 'rt') as csvinfile, open(output, 'w') as csvoutfile:
+            processlines(csvinfile, csvoutfile)
+    else:
+        with open(input, 'rt') as csvinfile, open(output, 'w') as csvoutfile:
+            processlines(csvinfile, csvoutfile)
+
+    csvoutfile.close()
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser('Shatter lines amongst'
-                                     ' hash-determined CSV files')
-    parser.add_argument('inputDir', type=str,
-                        help='The input directory')
-    parser.add_argument('suffix', type=str,
-                        help='The file suffix,'
-                             ' Only files with this suffix'
-                             ' will be processed (i.e. "nodes.csv")')
-    parser.add_argument('numFiles', type=int,
-                        help='The number of files to shatter to')
-    parser.add_argument('outputBasename', type=str,
-                        help='The basename for the output files')
-    parser.add_argument("--delete-input", action='store_true',
-                        help='Delete input files as they are scattered')
-    parser.add_argument("--recursive", action='store_true',
-                        help='Search for files recursively')
+    parser = argparse.ArgumentParser(description="Merge records in input file with same ID")
+    parser.add_argument("-i", "--input")
+    parser.add_argument("-o", "--output")
 
     args = parser.parse_args()
-    shatter(args.inputDir, args.suffix, args.numFiles, args.outputBasename,
-            args.recursive, args.delete_input)
+    merge(args.input, args.output)

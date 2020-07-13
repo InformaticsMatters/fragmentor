@@ -1,8 +1,11 @@
 ---
-
 # These files contain data that contain duplicates but no merging needs to occur,
 # Files are grouped by file type: e.g. 0-edges.csv.gz, 1-edges.csv.gz
 # These are combined into a single deduplicated edges.csv.gz file on the combine directory.
+
+- name: Display file-type to be deduplicated
+  debug:
+    var: file_type
 
 - name: Check if result file is already on combine path
   stat:

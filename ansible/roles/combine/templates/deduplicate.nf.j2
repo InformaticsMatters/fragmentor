@@ -1,32 +1,37 @@
-// Fragmentor Graph Deduplication Processing
-//
-// This nextflow process de-duplicates node and edge files of format <extract no>-<file type>
-// into a single de-duplicated file of format <file type> by first 'shattering' them over a number of files before
-// sorting them in parallel to and re-combing them into a grand nodes and edges file.
-//
-// There are a number of chained processes here. Briefly: -
-//
-// - eShatter : Shatters the edge files to be combined into
-//              files based on their hash
-// - eDedup   : De-duplicates each edge-shattered file ('shard')
-// - eCat     : Concatenates the deduplicated edge shards
-//              to form a _grand_ 'all-nodes.csv'
+/*
+ * Fragmentor Graph Deduplication Nextflow process
+ *
+ * This nextflow process de-duplicates node and edge files of format <extract no>-<file type>
+ * into a single de-duplicated file of format <file type> by first 'shattering' them over a number of files before
+ * sorting them in parallel and re-combining them into a single file.
+ *
+ * There are a number of chained processes here. Briefly: -
+ *
+ * - eShatter : Shatters the edge files to be combined into
+ *              files based on their hash
+ * - eDedup   : De-duplicates each edge-shattered file ('shard')
+ * - eCat     : Concatenates the deduplicated edge shards
+ *              to form a _grand_ 'all-<file type>'
+ */
 
+params.script = 'frag.utils.csv_shatter'
 params.shatterFiles = 80
 
-edges = Channel.fromPath("./*-edges.csv.gz")
+edges = Channel.fromPath('{{ work_path }}/[0-9]-{{ file_type }}.gz')
 
-// Shatter (all) fragment edge files into a hash-based of files.
-// -------
-// The shattering is based on the individual line's hash
-// so potential duplicates are guaranteed to be written
-// to the same file. The output of this process is
-// a number of files named 'n-shatter-NNN.csv'.
+/*
+ * Shatter (all) fragment edge files into a hash-based of files.
+ * -------
+ * The shattering is based on the individual line's hash
+ * so potential duplicates are guaranteed to be written
+ * to the same file. The output of this process is
+ * a number of files named 'n-shatter-NNN.csv'.
+ */
 
 process eShatter {
 
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
-    publishDir 'results/', mode: 'symlink'
+    publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
 
     input:
@@ -36,25 +41,25 @@ process eShatter {
     file 'e-shatter-*.csv' into shattered_edges mode flatten
 
     """
-    python /usr/local/fragalysis/frag/network/scripts/csv_shatter.py \
-        . edges.csv.gz ${params.shatterFiles} e-shatter \
-        --delete-input
+    python -m $params.script . {{ file_type }}.gz ${params.shatterFiles} e-shatter --delete-input
     """
 
 }
 
-// Edge deduplication
-// ------------------
-// Here we process a small (shattered) file.
-// If a node has a duplicate it will reside in the same shattered file.
-// We ensure that cpus equals the number of cores on a node,
-// so we get an entire node.
+/*
+ * Edge deduplication
+ * ------------------
+ * Here we process a small (shattered) file.
+ * If an edge has a duplicate it will reside in the same shattered file.
+ * We ensure that cpus equals the number of cores on a node,
+ * so we get an entire node.
+ */
 
 process eDedup {
 
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
     cpus {{ cluster_cores_per_node }}
-    publishDir 'results/', mode: 'symlink'
+    publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
 
     input:
@@ -71,29 +76,30 @@ process eDedup {
 
 }
 
-// Concatenate the deduplicated edges
-// -----------
-// This results in a 'grand' edge deduplication file 'all-edges.csv'.
-// See 'nConcat' process above.
-//
-// As 'eCat' is the last process (for Edges) in this workflow
-// we publish by moving the output file in order to save valuable time
-// with a potentially very large file.
+/*
+ * Concatenate the deduplicated edges
+ * -----------
+ * This results in a 'grand' edge deduplication file 'all-edges.csv'.
+ *
+ * As 'eCat' is the last process (for Edges) in this workflow
+ * we publish by moving the output file in order to save valuable time
+ * with a potentially very large file.
+ */
 
 process eCat {
 
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
-    publishDir 'results/', mode: 'move'
+    publishDir '{{ next_path }}/results/', mode: 'move'
     scratch false
 
     input:
     file dedup from dedup_edges.toList()
 
     output:
-    file 'all-edges.csv'
+    file 'all-{{ file_type }}'
 
     """
-    find . -name '*.d-edges' | xargs cat > all-edges.csv
+    find . -name '*.d-edges' | xargs cat > all-{{ file_type }}
     find . -name '*.d-edges' -delete
     """
 

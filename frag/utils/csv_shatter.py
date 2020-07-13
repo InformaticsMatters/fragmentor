@@ -19,9 +19,8 @@ import glob
 import gzip
 import os
 
-
 def shatter(input_dir, input_suffix, num_files, output_basename,
-            recursive=False, delete_input=False):
+            recursive=False, delete_input=False, hashIndexOnly=True):
     """Given a list of filenames this utility places lines with the same
     hash into the same file.
 
@@ -31,6 +30,7 @@ def shatter(input_dir, input_suffix, num_files, output_basename,
     :param output_basename: The basename of the output file (i.e. 'nodes')
     :param recursive: True to search recursively
     :param delete_input: Deletes input files as they're scattered
+    :param hashIndexOnly: Use the first (index) column of the CSV file to generate the hash - not the whole row.
     """
     assert os.path.exists(input_dir)
     assert os.path.isdir(input_dir)
@@ -57,13 +57,22 @@ def shatter(input_dir, input_suffix, num_files, output_basename,
         if input_file.endswith('.gz'):
             with gzip.open(input_file, 'rt') as i_file:
                 for line in i_file:
-                    file_index = hash(line) % num_files
+                    if hashIndexOnly:
+                        str_list = line.split(',')
+                        file_index = hash(str_list[0]) % num_files
+                    else:
+                        file_index = hash(line) % num_files
                     output_files[file_index].write(line)
         else:
             with open(input_file, 'rt') as i_file:
                 for line in i_file:
-                    file_index = hash(line) % num_files
+                    if hashIndexOnly:
+                        str_list = line.split(',')
+                        file_index = hash(str_list[0]) % num_files
+                    else:
+                        file_index = hash(line) % num_files
                     output_files[file_index].write(line)
+
         if delete_input:
             os.remove(input_file)
 
@@ -90,7 +99,9 @@ if __name__ == '__main__':
                         help='Delete input files as they are scattered')
     parser.add_argument("--recursive", action='store_true',
                         help='Search for files recursively')
+    parser.add_argument("--hashIndexOnly", action='store_true',
+                        help='Only hash first (index) column')
 
     args = parser.parse_args()
     shatter(args.inputDir, args.suffix, args.numFiles, args.outputBasename,
-            args.recursive, args.delete_input)
+            args.recursive, args.delete_input, args.hashIndexOnly)

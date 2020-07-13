@@ -1,68 +1,55 @@
 ---
+# These files contain data that contain duplicates but no merging needs to occur,
+# Files are grouped by file type: e.g. 0-edges.csv.gz, 1-edges.csv.gz
+# These are combined into a single deduplicated edges.csv.gz file on the combine directory.
 
-# The following files contain data that must be merged,
-# - nodes.csv
-# - isomol-nodes.csv
-# These will be merged using the nextflow merge process.
-#
+- name: Display file-type to be merged
+  debug:
+    var: file_type
+
+- name: Check if result file is already on combine path
+  stat:
+    path: "{{ combine_path }}/{{ file_type }}.gz"
+  register: combined_file
+  changed_when: false
+
+# Move the nextflow workflow and config into place (from templates)
+# so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
 
 - name: Translate nextflow files
   template:
     src: "{{ item }}"
-    dest: "{{ workflow_path }}/{{ item|regex_replace('.j2') }}"
+    dest: "{{ reppath }}/nextflow/{{ item|regex_replace(deployment + '/')|regex_replace('.j2') }}"
   loop:
   - "merge.nf.j2"
   - "{{ deployment }}/nextflow.config.j2"
   when:
-  - not current_nextflow_log_file.stat.exists
-  - not nextflow_is_running
-  - nextflow_run|bool
+  - not combined_file.stat.exists
 
 - name: Set nextflow command
   set_fact:
     nextflow_cmd: >-
-      nextflow -C config run workflow.nf
-      --shatterFiles {{ cluster_nodes }}
-      -with-trace
-      -with-report report.html
-      {{ nextflow_extra_args }}
-      {{ nextflow_debug_args }}
+      nextflow run -c {{ reppath }}/nextflow/nextflow.config
+      {{ reppath }}/nextflow/merge.nf
+      -w {{ next_path }}
+      -with-report {{ log_path }}/deduplicate_{{ file_type }}_report.html
+      -with-tower
   when:
-  - not current_nextflow_log_file.stat.exists
-  - not nextflow_is_running
+  - not combined_file.stat.exists
 
 - name: Display nextflow command
   debug:
     var: nextflow_cmd
   when:
-  - not current_nextflow_log_file.stat.exists
-  - not nextflow_is_running
-
-- name: Display nextflow version
-  debug:
-    var: nextflow_version
-  when:
-  - not current_nextflow_log_file.stat.exists
-  - not nextflow_is_running
+  - not combined_file.stat.exists
 
 - name: Run nextflow (async)
   command: "{{ nextflow_cmd }}"
-  args:
-    chdir: "{{ workflow_path }}"
-  environment:
-    NXF_VER: "{{ nextflow_version }}"
   async: "{{ nextflow_timeout_minutes|int * 60 }}"
   poll: 0
   register: nextflow_async
   when:
-  - not current_nextflow_log_file.stat.exists
-  - not nextflow_is_running
-  - nextflow_run|bool
-
-# Optionally wait for nextflow, polling at a user-defined interval...
-# If the playbook is restarted the 'Wait' will not work,
-# as it expects an 'ansible_job_id' which will have been lost.
-# So we cannot run this if nextflow was found to be running
+  - not combined_file.stat.exists
 
 - name: Wait for nextflow (async)
   async_status:
@@ -72,39 +59,31 @@
   delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
   retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
   when:
-  - not current_nextflow_log_file.stat.exists
-  - not nextflow_is_running
-  - nextflow_run|bool
+  - not combined_file.stat.exists
 
 # Copy nextflow trace/report files to the combiner
 # directory (if they exist). These will be stored on S3
 # when (if) the combination is saved.
 
 - name: Copy nextflow debug files
-  shell: cp {{ workflow_path }}/{{ item }} {{ combiner_path }} | true
-  loop:
-  - report.html
-  - timeline.html
-  - trace.txt
+  shell: cp {{ next_path }}/trace.txt {{ log_path }}/{{ file_type }}-trace.txt | true
   when:
-  - not current_nextflow_log_file.stat.exists
-  - not nextflow_is_running
-  - nextflow_run|bool
+  - not combined_file.stat.exists
 
-# Move and compress the nodes...
+# Move and compress the file-type (XXX why do I need to do this? )...
 
-- name: Check deduplicated Nodes
+- name: Check deduplicated file_type
   stat:
-    path: "{{ combiner_path }}/nodes.csv.gz"
-  register: nodes_gz_file
+    path: "{{ combine_path }}/{{ file_type }}.gz"
+  register: file_type_file
   changed_when: false
 
-- name: Move combined nodes
-  command: mv {{ workflow_path }}/results/all-nodes.csv {{ combiner_path }}/nodes.csv
-  when: not nodes_gz_file.stat.exists
+- name: Move deduplicated files
+  command: mv {{ next_path }}/results/all-{{ file_type }} {{ combine_path }}/{{ file_type }}
+  when: not file_type_file.stat.exists
 
-- name: Compress combined nodes
-  command: gzip nodes.csv
+- name: Compress deduplicated files
+  command: gzip {{ file_type }}
   args:
-    chdir: "{{ combiner_path }}"
-  when: not nodes_gz_file.stat.exists
+    chdir: "{{ combine_path }}"
+  when: not file_type_file.stat.exists

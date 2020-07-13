@@ -62,8 +62,8 @@
 
 #- import_tasks: download-datasets.yaml
 #- import_tasks: concatenate.yaml
-#- import_tasks: nextflow-merge.yaml
-- import_tasks: deduplicate.yaml
+- import_tasks: merge.yaml
+#- import_tasks: deduplicate.yaml
 #- import_tasks: finalise.yaml
 
 # Finalise report

@@ -19,7 +19,7 @@ clean_start: yes
 
 # The tag of the fragmentation container,
 # used for a number of nextflow workflows.
-nextflow_container_tag: combine-02
+nextflow_container_tag: combine-03
 
 # The process id is the commit id of the fragmentation container,
 # Used in the extract file
