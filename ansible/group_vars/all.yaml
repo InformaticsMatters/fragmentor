@@ -19,7 +19,7 @@ clean_start: yes
 
 # The tag of the fragmentation container,
 # used for a number of nextflow workflows.
-nextflow_container_tag: combine-05
+nextflow_container_tag: combine-06
 
 # The process id is the commit id of the fragmentation container,
 # Used in the extract file
@@ -63,6 +63,7 @@ hardware:
     postgres_jobs: 18
 
 # XXX These need to be combined in the hardware section above.
+nextflow_queue_size: 280
 cluster_cores_per_node: 1
 cluster_cores: 1
 cluster_nodes: 1

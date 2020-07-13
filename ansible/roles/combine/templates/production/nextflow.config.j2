@@ -8,7 +8,7 @@ singularity {
     autoMounts = true
 }
 executor {
-    queueSize = 280
+    {{ nextflow_queue_size }}
 }
 
 tower {

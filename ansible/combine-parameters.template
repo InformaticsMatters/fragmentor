@@ -8,7 +8,6 @@
 # Combinations will be added to a new combination database.
 # A map of deafults based on the vendor and library.
 
-
 buckets:
      - s3-1:
         bucket:
@@ -17,16 +16,11 @@ buckets:
 
 extracts:
     - lib:
-        path: 'xchem_dsip/v1'
-        use_s3: no
+        path: 'extract/xchem_dsip/v1'
+        use_s3: s3
     - lib:
-        path: 'xchem_spot/v1'
-        use_s3: no
-        bucket: s3-1
-    - lib:
-        path: 'chemspace/bb'
-        use_s3: yes
-        bucket: s3-1
+        path: 'extract/xchem_spot/v1'
+        use_s3: s3
 
 output:
     - bucket: s3-1

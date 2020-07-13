@@ -60,10 +60,10 @@
 #      Play no. {{ cylc_play_number }} -
 #      COLLECTING (1/4) - combination {{ combination_number }}
 
-#- import_tasks: download-datasets.yaml
-#- import_tasks: concatenate.yaml
+- import_tasks: download-datasets.yaml
+- import_tasks: concatenate.yaml
 - import_tasks: merge.yaml
-#- import_tasks: deduplicate.yaml
+- import_tasks: deduplicate.yaml
 #- import_tasks: finalise.yaml
 
 # Finalise report
