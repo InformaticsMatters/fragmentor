@@ -14,7 +14,7 @@
 
 # For each extract file type in the list - merge the files from the different extracts
 - name: Merge each file type in the merge list
-  include_tasks: nextflow-dedup-file-type.yaml
+  include_tasks: nextflow-merge-file-type.yaml
   loop: "{{ merge }}"
   loop_control:
     loop_var: file_type

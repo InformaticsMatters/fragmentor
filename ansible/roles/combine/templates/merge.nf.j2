@@ -16,8 +16,6 @@
 
 params.shatterFiles = 80
 params.script = 'frag.utils.csv_shatter'
-params.mergescript = 'frag.utils.csv_merge'
-
 
 nodes = Channel.fromPath('{{ work_path }}/[0-9]-{{ file_type }}.gz')
 /*
@@ -71,17 +69,15 @@ process nMerge {
 
     shell:
     '''
-    sort --temporary-directory=. -u !{shard} > !{shard}.temp
-    python -m $params.mergescript {shard}.temp {shard}.d-nodes
-    rm !{shard}
-    rm !{shard}.temp
+    sort --temporary-directory=. -u !{shard} > !temp.{shard}
+    python -m frag.utils.csv_merge_nodes -i !temp.{shard} -o !{shard}.d-nodes
     '''
 
 }
 /*
  * Concatenate the deduplicated nodes
  * -----------
- * This results in a 'grand' nodes merge file 'all-edges.csv'.
+ * This results in a 'grand' nodes merge file 'all-nodes.csv'.
  *
  * As 'nCat' is the last process (for Nodes) in this workflow
  * we publish by moving the output file in order to save valuable time
@@ -106,4 +102,3 @@ process nCat {
     """
 
 }
-

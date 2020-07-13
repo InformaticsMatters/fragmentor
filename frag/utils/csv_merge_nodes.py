@@ -31,7 +31,7 @@ def processlines(csvinfile, csvoutfile):
 
     num_processed = 0
     matching_smiles = False
-    stored_row = ['SetMe']
+    stored_row = ['FirstRow']
     csvwriter = csv.writer(csvoutfile)
 
     for row in csv.reader(csvinfile):
@@ -45,16 +45,20 @@ def processlines(csvinfile, csvoutfile):
                     # Non-matching fields are assumed to be lists that should be merged. This is done as a union of sets
                     # to eliminate duplicate values.
                     set_val = set(val.split(';'))
-                    set_idx = set(stored_row[idx].split(';'))
-                    set_idx.update(set_val)
-                    stored_row[idx] = ";".join(set_idx)
+                    set_stored = set(stored_row[idx].split(';'))
+                    if len(set_stored) > 0:
+                        set_stored.update(set_val)
+                        stored_row[idx] = ";".join(set_stored)
+                    else:
+                        stored_row[idx] = val
         else:
             if matching_smiles:
-                csvwriter.writerow(stored_row)
                 matching_smiles = False
+            if stored_row != ['FirstRow']:
+                csvwriter.writerow(stored_row)
             stored_row = row
 
-    if matching_smiles:
+    if stored_row != ['FirstRow']:
         csvwriter.writerow(stored_row)
 
     logger.warning("Processed %s rows", num_processed)
