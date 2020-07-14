@@ -84,6 +84,9 @@
 
 - name: Compress merged files
   command: gzip {{ file_type }}
+  async: "{{ compress_timeout_minutes|int * 60 }}"
+  poll: 0
   args:
     chdir: "{{ combine_path }}"
+  register: compress_tasks
   when: not file_type_file.stat.exists

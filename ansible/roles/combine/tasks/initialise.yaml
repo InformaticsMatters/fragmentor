@@ -32,8 +32,9 @@
 - name: Check available cores
   assert:
     that:
-    - cluster_cores > 0
-    - cluster_nodes > 0
+    - "{{ hardware[deployment].cluster_cores|int > 0 }}"
+    - "{{ hardware[deployment].cluster_nodes|int > 0 }}"
+    - "{{ hardware[deployment].cluster_cores_per_node|int > 0 }}"
 
 # Check AWS credentials
 

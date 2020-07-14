@@ -15,7 +15,7 @@
  */
 
 params.script = 'frag.utils.csv_shatter'
-params.shatterFiles = 80
+params.shatterFiles = {{ shatterfiles }}
 
 edges = Channel.fromPath('{{ work_path }}/[0-9]-{{ file_type }}.gz')
 
@@ -58,7 +58,7 @@ process eShatter {
 process eDedup {
 
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
-    cpus {{ cluster_cores_per_node }}
+    cpus {{ hardware[deployment].cluster_cores_per_node }}
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
 

@@ -11,6 +11,9 @@ reppath: "{{ role_path }}/../../.."
 # This should be created by the user before the run
 # It should normally be different to the repo path and ideally should start with a "/".
 runpath: SetMe
+# Assumption is the singularity path will be for all runs, so can be one level up (this saves time as docker
+# containers do not have to be downloaded for each run.
+singularity_path: "{{ runpath }}/.."
 
 # The following is used (amongst other things)
 # to load vendor-specific variables from a specified parameters file - see extract-parameters.template...
@@ -40,3 +43,7 @@ next_path: "{{ runpath }}/nextflow"
 # Save the extract
 # (typically compressing and saving to S3)
 use_s3: no
+
+# How many shatter files are used by the merge and deduplicate shatter processes.
+# I think this can be the same as the cluster nodes, but we may want to vary it.
+shatterfiles: "{{ hardware[deployment].cluster_nodes }}"

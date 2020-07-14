@@ -62,9 +62,17 @@
 #      COLLECTING (1/4) - combination {{ combination_number }}
 
 - import_tasks: download-datasets.yaml
-- import_tasks: concatenate.yaml
-- import_tasks: merge.yaml
 - import_tasks: deduplicate.yaml
+- import_tasks: merge.yaml
+- import_tasks: concatenate.yaml
+
+- name: Check compress tasks finished.
+  async_status: jid={{ compress_tasks.ansible_job_id }}
+  register: job_result
+  until: job_result.finished
+  retries: "{{ (compress_timeout_minutes|int /
+            compress_poll_period_minutes|int )|int }}"
+  delay: "{{ compress_poll_period_minutes|int * 60 }}"
 
 - import_tasks: finalise-{{ output_use_s3 }}.yaml
 

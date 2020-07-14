@@ -43,13 +43,6 @@
   when:
   - not nodes_gz_data_file.stat.exists
 
-# There has to be at least two keys in the result...
-# The first key is always the directory the files are in,
-# e.g.: "s3_keys": [
-#           "raw/vendor/xchem/v1/",
-#           "raw/vendor/xchem/v1/dsip.txt.gz"
-#        ]
-
 - name: Check extract data
   assert:
     that: extract_result.s3_keys|length > 1
@@ -68,7 +61,7 @@
   when:
   - not nodes_gz_data_file.stat.exists
 
-# Get the files, ignoring the first entry in the list (always a directory)...
+# Get the files, this time not ignoring the first entry in the list as full directory is provided...
 
 - name: Get extract data
   aws_s3:
@@ -78,7 +71,7 @@
     dest: "{{ destination }}/{{ file_item|basename }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
-  loop: "{{ extract_result.s3_keys[1:] }}"
+  loop: "{{ extract_result.s3_keys[0:] }}"
   loop_control:
     loop_var: file_item
   when:

@@ -45,3 +45,9 @@ aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true
 #                     14400 (10 days)
 nextflow_timeout_minutes: 2880
 nextflow_poll_period_minutes: 1
+
+compress_timeout_minutes: 2880
+compress_poll_period_minutes: 1
+
+# job queue for use in parallel running file deduplication/merging
+queue_lst: []

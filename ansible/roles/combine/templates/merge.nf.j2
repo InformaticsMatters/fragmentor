@@ -14,7 +14,7 @@
  *              to form a _grand_ 'all-<file type>'
  */
 
-params.shatterFiles = 80
+params.shatterFiles = {{ shatterfiles }}
 params.script = 'frag.utils.csv_shatter'
 
 nodes = Channel.fromPath('{{ work_path }}/[0-9]-{{ file_type }}.gz')
@@ -57,7 +57,7 @@ process nShatter {
 process nMerge {
 
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
-    cpus {{ cluster_cores_per_node }}
+    cpus {{ hardware[deployment].cluster_cores_per_node }}
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
 
