@@ -86,6 +86,3 @@
     loop_var: file_item
   when:
   - not nodes_gz_data_file.stat.exists
-
-
-
