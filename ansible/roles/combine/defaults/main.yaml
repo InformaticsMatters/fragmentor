@@ -43,7 +43,3 @@ next_path: "{{ runpath }}/nextflow"
 # Save the extract
 # (typically compressing and saving to S3)
 use_s3: no
-
-# How many shatter files are used by the merge and deduplicate shatter processes.
-# I think this can be the same as the cluster nodes, but we may want to vary it.
-shatterfiles: "{{ hardware[deployment].cluster_nodes }}"

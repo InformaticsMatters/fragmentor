@@ -115,9 +115,8 @@
       <h1>Ansible Combination Playbook</h1>
       <p><table>
       <tr><th>Parameter</th><th>Value</th></tr>
-      <tr><td>User</td><td>{{ ansible_hostname }}</td></tr>
-      <tr><td>Deployment</td><td>{{ deployment }}</td></tr>
-      <tr><td>Fragmentor Commit Ref</td><td>{{ fragmentor_commit_ref }}</td></tr>
+      <tr><td>User: </td><td>{{ ansible_hostname }}</td></tr>
+      <tr><td>Deployment: </td><td>{{ deployment }}</td></tr>
+      <tr><td>Fragmentor Commit Ref: </td><td>{{ fragmentor_commit_ref }}</td></tr>
       </table></p>
       <p>Combine play started on: {{ now(utc=True).isoformat() }}</p>
-  when: clean_start|bool

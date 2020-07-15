@@ -7,11 +7,44 @@
   debug:
     var: file_type
 
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-merge} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Merging: {{ file_type }} - Timestamp {{ now(utc=True).isoformat() }}</p>
+
 - name: Check if result file is already on combine path
   stat:
     path: "{{ combine_path }}/{{ file_type }}.gz"
   register: combined_file
   changed_when: false
+
+# Count rows in all input files. Note that command does not work with a glob as a standinputfile template.
+- name: Count rows in input files
+  shell: zcat {{ work_path }}/[0-9]-{{ file_type }}.gz | wc -l # noqa 305
+  register: rowcount_result
+  when:
+  - not combined_file.stat.exists
+
+- name: Set row_count
+  set_fact:
+    row_count: "{{ rowcount_result.stdout }}"
+  when:
+  - not combined_file.stat.exists
+
+- name: Set default shatterfiles
+  set_fact:
+    shatterfiles: "{{ shatterfiles_small }}"
+  when:
+  - not combined_file.stat.exists
+
+- name: Alter default shatterfiles if exceed threshhold
+  set_fact:
+    shatterfiles: "{{ shatterfiles_large }}"
+  when:
+  - not combined_file.stat.exists
+  - row_count|int > shatterfile_large_threshold|int
 
 # Move the nextflow workflow and config into place (from templates)
 # so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
@@ -56,8 +89,8 @@
     jid: "{{ nextflow_async.ansible_job_id }}"
   register: nextflow_result
   until: nextflow_result.finished
-  delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
-  retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
+  delay: "{{ nextflow_poll_period_seconds|int }}"
+  retries: "{{ (nextflow_timeout_minutes|int / (nextflow_poll_period_seconds|int / 60))|int }}"
   when:
   - not combined_file.stat.exists
 
@@ -94,3 +127,4 @@
 - name: Add this tasy to the list of compress tasks
   set_fact:
     compress_tasks: "{{ compress_tasks + [ compress_task ] }}"
+  when: not file_type_file.stat.exists

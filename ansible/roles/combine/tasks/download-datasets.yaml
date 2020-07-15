@@ -7,11 +7,12 @@
     marker: "<!-- {combine-download} ANSIBLE MANAGED BLOCK -->"
     path: "{{ log_path }}/combination_report.html"
     block: |
+      <h2>Step: Download Dataset</h2>
       <p>Start: {{ now(utc=True).isoformat() }}</p>
 
 # For each extract id given in the parameters file, do some sanity checks
 - name: Validate input/Get source data for each extract
-  include_tasks: get-extract-data-{{ item.lib.use_s3 }}.yaml
+  include_tasks: get-extract-data-{{ item.lib.data_source }}.yaml
   loop: "{{ extracts }}"
   loop_control:
     index_var: extract_index

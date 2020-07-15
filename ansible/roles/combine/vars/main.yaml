@@ -37,14 +37,19 @@ aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
 aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
 aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
 
+# Shatterfile control. It only makes sense to use the complete cluster for very large files.
+# Otherwise the overhead of using the cluster is too great.
+# The code does a workcount on the input files. If linecount > threshold use whole cluster.
+shatterfiles_small: 80
+shatterfiles_large: "{{ hardware[deployment].cluster_nodes }}"
+#shatterfile_large_threshold: 50000000
+shatterfile_large_threshold: 10000
+
 # The maximum execution time
 # and poll period for the (asynchronous) Nextflow process
 # Timeouts (minutes):  2880 (2 days)
-#                      7200 (5 days)
-#                     10080 (7 days)
-#                     14400 (10 days)
 nextflow_timeout_minutes: 2880
-nextflow_poll_period_minutes: 1
+nextflow_poll_period_seconds: 30
 
 compress_timeout_minutes: 2880
 compress_poll_period_minutes: 1

@@ -12,6 +12,13 @@
   debug:
     msg: bucket={{ bucket }} extract_path={{ item.lib.path }}
 
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-download} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Add file: {{ bucket }}/{{ item.lib.path }}</p>
+
 - name: Create data directory
   file:
     path: "{{ data_path }}/{{ item.lib.path }}"

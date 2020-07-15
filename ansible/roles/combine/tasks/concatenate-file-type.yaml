@@ -3,6 +3,17 @@
 # Files are grouped by file type: e.g. 0-supplier-nodes.csv.gz, 1-supplier-nodes.csv.gz
 # These are combined into a single supplier-nodes.csv.gz file on the combine directory.
 
+- name: Display file-type to be concatenated
+  debug:
+    var: file_type
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-concatenate} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Merging: {{ file_type }} - Timestamp: {{ now(utc=True).isoformat() }}</p>
+
 - name: Check if result file is already on combine path
   stat:
     path: "{{ combine_path }}/{{ file_type }}.gz"

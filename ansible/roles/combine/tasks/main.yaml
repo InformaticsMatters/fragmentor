@@ -44,8 +44,8 @@
     - deployment|string|length > 0
     - deployment|string != 'SetMe'
     - "{{ extracts[0].lib.path|string != 'SetMe'}}"
-    - "{{ extracts[0].lib.use_s3|string != 'SetMe'}}"
-    - "{{ output_use_s3|string != 'SetMe'}}"
+    - "{{ extracts[0].lib.data_source|string != 'SetMe'}}"
+    - "{{ output_data_source|string != 'SetMe'}}"
     fail_msg: You must provide a 'deployment', a list of extracts in a parameter file to combine and an output location.
 
 - name: List input datasets
@@ -81,8 +81,6 @@
   loop_control:
     loop_var: compress_result
 
-- import_tasks: finalise-{{ output_use_s3 }}.yaml
-
 # Finalise report
 - name: Write line to report
   blockinfile:
@@ -90,3 +88,5 @@
     path: "{{ log_path }}/combination_report.html"
     block: |
       <p>Combine play ended on: {{ now(utc=True).isoformat() }}</p>
+
+- import_tasks: finalise-{{ output_data_source }}.yaml

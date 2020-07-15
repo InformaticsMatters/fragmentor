@@ -4,9 +4,7 @@
 # This essentially means
 # 1. Creating a loader file for the nodes and edges files in a similar way to the extract play. This involves using
 #    the same header files.
-# 2. Saving the combined extract back to S3
-# 3. Saving log files from the combination
-# 4. Tidying up the remaining files.
+# 2. Tidying up the remaining files.
 #
 # For the loadfile, the assumption is that a combination has been done and a number of compressed (.gz) node and edge
 # (relationship) files exist on the {{ combine }} directory. The essential property of the extracted files is that

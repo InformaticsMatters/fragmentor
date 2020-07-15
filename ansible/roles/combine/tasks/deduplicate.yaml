@@ -12,6 +12,7 @@
     marker: "<!-- {combine-deduplicate} ANSIBLE MANAGED BLOCK -->"
     path: "{{ log_path }}/combination_report.html"
     block: |
+      <h2>Step: Deduplicate Files</h2>
       <p>Start: {{ now(utc=True).isoformat() }}</p>
 
 # For each extract file type in the list - deduplicate the files from the different extracts

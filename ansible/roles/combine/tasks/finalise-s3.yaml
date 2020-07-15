@@ -40,13 +40,11 @@
 
 - name: Form node_result
   shell: >-
-    set -o pipefail &&
     paste -d , node-files.txt node-files.txt
     | sed 's/.gz,/,/g'
     | sed 's/^/        --nodes "header-/g'
     | sed 's/$/" \\/g'
   register: node_result
-  become: yes
   args:
     chdir: "{{ combine_path }}"
 
@@ -70,9 +68,8 @@
     | sed 's/$/" \\/g'
     | sed '$ s/.$//'
   register: relationship_result
-  become: yes
   args:
-    chdir: "{{ combine_path }}/extract"
+    chdir: "{{ combine_path }}"
 
 - name: Set relationship_text
   set_fact:
@@ -95,7 +92,6 @@
     mode: 0444
   with_fileglob:
   - "{{ role_path }}/../extract/files/header-*"
-  become: yes
 
 - name: Remove node and edge text files
   command: rm node-files.txt edge-files.txt
@@ -107,7 +103,7 @@
   s3_sync:
     bucket: "{{ bucket }}"
     key_prefix: extract/combination/{{ output_name }}
-    file_root: "{{ copy_root }}/extract"
+    file_root: "{{ combine_path }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
