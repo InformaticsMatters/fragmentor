@@ -63,6 +63,7 @@ hardware:
     cluster_cores: 8
     cluster_nodes: 8
     cluster_cores_per_node: 1
+    sort_memory: 8 MB
 # Number of connections to postgres - note that this should be less than max_worker_processes in start-database.yaml.
     postgres_jobs: 6
   production:
@@ -70,6 +71,7 @@ hardware:
     cluster_cores: 500
     cluster_nodes: 140
     cluster_cores_per_node: 8
+    sort_memory: 8GB
     postgres_jobs: 18
 
 # Vendor defaults.

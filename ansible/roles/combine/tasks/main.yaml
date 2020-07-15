@@ -66,13 +66,20 @@
 - import_tasks: merge.yaml
 - import_tasks: concatenate.yaml
 
+- name: Display compress_tasks
+  debug:
+    var: compress_tasks
+
 - name: Check compress tasks finished.
-  async_status: jid={{ compress_tasks.ansible_job_id }}
+  async_status: jid={{ compress_result.ansible_job_id }}
   register: job_result
   until: job_result.finished
   retries: "{{ (compress_timeout_minutes|int /
             compress_poll_period_minutes|int )|int }}"
   delay: "{{ compress_poll_period_minutes|int * 60 }}"
+  loop: "{{ compress_tasks }}"
+  loop_control:
+    loop_var: compress_result
 
 - import_tasks: finalise-{{ output_use_s3 }}.yaml
 

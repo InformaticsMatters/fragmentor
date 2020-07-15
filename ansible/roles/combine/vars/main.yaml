@@ -49,5 +49,5 @@ nextflow_poll_period_minutes: 1
 compress_timeout_minutes: 2880
 compress_poll_period_minutes: 1
 
-# job queue for use in parallel running file deduplication/merging
-queue_lst: []
+# Results of compress commands.
+compress_tasks: []

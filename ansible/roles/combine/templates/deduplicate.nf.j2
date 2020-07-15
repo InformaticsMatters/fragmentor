@@ -58,7 +58,7 @@ process eShatter {
 process eDedup {
 
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
-    cpus {{ hardware[deployment].cluster_cores_per_node }}
+    memory '{{ hardware[deployment].sort_memory }}'
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
 

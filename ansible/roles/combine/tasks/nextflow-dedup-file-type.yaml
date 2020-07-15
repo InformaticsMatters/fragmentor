@@ -88,5 +88,9 @@
   poll: 0
   args:
     chdir: "{{ combine_path }}"
-  register: compress_tasks
+  register: compress_task
   when: not file_type_file.stat.exists
+
+- name: Add this tasy to the list of compress tasks
+  set_fact:
+    compress_tasks: "{{ compress_tasks + [ compress_task ] }}"

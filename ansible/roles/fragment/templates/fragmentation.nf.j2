@@ -42,7 +42,7 @@ process fragment {
 
 process collect_nodes {
 
-    container 'informaticsmatters/fragmentor:molport-04'
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
     cpus params.cpus
     publishDir params.out_dir, mode: params.out_mode
 
