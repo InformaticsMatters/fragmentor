@@ -40,6 +40,8 @@
 - name: Display total_size
   debug:
     var: total_size
+  when:
+  - not combined_file.stat.exists
 
 - name: Set default shatterfiles
   set_fact:
@@ -57,6 +59,8 @@
 - name: Display shatterfiles
   debug:
     var: shatterfiles
+  when:
+  - not combined_file.stat.exists
 
 # Move the nextflow workflow and config into place (from templates)
 # so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
