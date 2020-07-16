@@ -30,6 +30,8 @@
 - name: size_result
   debug:
     var: size_result
+  when:
+  - not combined_file.stat.exists
 
 - name: Set total_size
   set_fact:

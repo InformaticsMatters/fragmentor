@@ -42,6 +42,8 @@
 - name: Display total_size
   debug:
     var: total_size
+  when:
+  - not combined_file.stat.exists
 
 - name: Set default shatterfiles
   set_fact:
