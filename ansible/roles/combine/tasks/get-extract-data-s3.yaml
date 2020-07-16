@@ -30,6 +30,10 @@
 - name: Check if nodes file is already on work path
   stat:
     path: "{{ work_path }}/{{ extract_index }}-nodes.csv.gz"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
   register: nodes_gz_data_file
   changed_when: false
 

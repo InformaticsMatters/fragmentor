@@ -32,6 +32,8 @@ process nShatter {
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
+    errorStrategy = 'retry'
+    maxErrors = 3
 
     input:
     file node from nodes.toList()
@@ -60,6 +62,8 @@ process nMerge {
     memory '{{ hardware[deployment].sort_memory }}'
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
+    errorStrategy = 'retry'
+    maxErrors = 3
 
     input:
     file shard from shattered_nodes
@@ -89,6 +93,8 @@ process nCat {
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
     publishDir '{{ next_path }}/results/', mode: 'move'
     scratch false
+    errorStrategy = 'retry'
+    maxErrors = 3
 
     input:
     file merge from merged_nodes.toList()

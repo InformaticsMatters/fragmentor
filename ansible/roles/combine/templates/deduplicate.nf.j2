@@ -33,6 +33,8 @@ process eShatter {
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
+    errorStrategy = 'retry'
+    maxErrors = 3
 
     input:
     file edge from edges.toList()
@@ -61,6 +63,8 @@ process eDedup {
     memory '{{ hardware[deployment].sort_memory }}'
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
+    errorStrategy = 'retry'
+    maxErrors = 3
 
     input:
     file shard from shattered_edges
@@ -91,6 +95,8 @@ process eCat {
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
     publishDir '{{ next_path }}/results/', mode: 'move'
     scratch false
+    errorStrategy = 'retry'
+    maxErrors = 3
 
     input:
     file dedup from dedup_edges.toList()
