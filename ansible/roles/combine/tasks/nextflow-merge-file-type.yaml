@@ -17,6 +17,10 @@
 - name: Check if result file is already on combine path
   stat:
     path: "{{ combine_path }}/{{ file_type }}.gz"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
   register: combined_file
   changed_when: false
 
@@ -123,9 +127,13 @@
 
 # Move and compress the file-type (XXX why do I need to do this? )...
 
-- name: Check deduplicated file_type
+- name: Check merges file_type
   stat:
     path: "{{ combine_path }}/{{ file_type }}.gz"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
   register: file_type_file
   changed_when: false
 
