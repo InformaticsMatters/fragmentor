@@ -42,8 +42,7 @@ aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true
 # The code does a workcount on the input files. If linecount > threshold use whole cluster.
 shatterfiles_small: 80
 shatterfiles_large: "{{ hardware[deployment].cluster_cores }}"
-#shatterfile_large_threshold: 50000000
-shatterfile_large_threshold: 10000
+shatterfile_large_threshold_kb: 1048576
 
 # The maximum execution time
 # and poll period for the (asynchronous) Nextflow process

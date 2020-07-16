@@ -21,21 +21,25 @@
   changed_when: false
 
 # Count rows in all input files. Note that command does not work with a glob as a standinputfile template.
-- name: Count rows in input files
-  shell: zcat {{ work_path }}/[0-9]-{{ file_type }}.gz | wc -l # noqa 305
-  register: rowcount_result
+- name: Get size of files to be shattered
+  shell: du -c  {{ work_path }}/[0-9]-{{ file_type }}.gz | tail -n 1
+  register: size_result
   when:
   - not combined_file.stat.exists
 
-- name: Set row_count
-  set_fact:
-    row_count: "{{ rowcount_result.stdout }}"
-  when:
-  - not combined_file.stat.exists
-
-- name: Display rowcount
+- name: size_result
   debug:
-    var: row_count
+    var: size_result
+
+- name: Set total_size
+  set_fact:
+    total_size: "{{ size_result.stdout.split('\t')[0]|int }}"
+  when:
+  - not combined_file.stat.exists
+
+- name: Display total_size
+  debug:
+    var: total_size
 
 - name: Set default shatterfiles
   set_fact:
@@ -47,7 +51,7 @@
   set_fact:
     shatterfiles: "{{ shatterfiles_large }}"
   when:
-  - row_count|int > shatterfile_large_threshold|int
+  - total_size|int > shatterfile_large_threshold_kb|int
   - not combined_file.stat.exists
 
 - name: Display shatterfiles
