@@ -55,8 +55,8 @@
   set_fact:
     shatterfiles: "{{ shatterfiles_large }}"
   when:
-  - total_size|int > shatterfile_large_threshold_kb|int
   - not combined_file.stat.exists
+  - total_size|int > shatterfile_large_threshold_kb|int
 
 - name: Display shatterfiles
   debug:
