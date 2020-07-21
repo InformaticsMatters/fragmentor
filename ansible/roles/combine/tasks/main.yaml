@@ -53,6 +53,8 @@
     - "{{ extracts[0].lib.path|string != 'SetMe'}}"
     - "{{ extracts[0].lib.data_source|string != 'SetMe'}}"
     - "{{ data_source_out|string != 'SetMe'}}"
+    - runpath|string|length > 0
+    - runpath|string != 'SetMe'
     fail_msg: You must provide a 'deployment', a list of extracts in a parameter file to combine and an output location.
 
 - name: List input datasets
