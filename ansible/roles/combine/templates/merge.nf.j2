@@ -1,0 +1,110 @@
+/*
+ * Fragmentor Graph Merges Nextflow process
+ *
+ * This nextflow process de-duplicates and merges node and edge files of format <extract no>-<file type>
+ * into a single de-duplicated file of format <file type> by first 'shattering' them over a number of files before
+ * sorting and merging duplicate smiles in parallel and re-combining them into a single file.
+ *
+ * There are a number of chained processes here. Briefly: -
+ *
+ * - nShatter : Shatters the node files to be combined into
+ *              files based on the hash of the smiles
+ * - nMerge   : De-duplicates and merges each shattered file ('shard')
+ * - nCat     : Concatenates the deduplicated node shards
+ *              to form a _grand_ 'all-<file type>'
+ */
+
+params.shatterFiles = {{ shatterfiles }}
+params.script = 'frag.utils.csv_shatter'
+
+nodes = Channel.fromPath('{{ work_path }}/[0-9]-{{ file_type }}.gz')
+/*
+ * Shatter (all) fragment node files into a hash-based of files.
+ * -------
+ * The shattering is based on the individual line's hash
+ * so potential duplicates are guaranteed to be written
+ * to the same file. The output of this process is
+ * a number of files named 'n-shatter-NNN.csv'.
+ */
+
+process nShatter {
+
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+    publishDir '{{ next_path }}/results/', mode: 'symlink'
+    scratch false
+    errorStrategy = 'retry'
+    maxErrors = 3
+
+    input:
+    file node from nodes.toList()
+
+    output:
+    file 'n-shatter-*.csv' into shattered_nodes mode flatten
+
+    """
+    python -m $params.script . {{ file_type }}.gz ${params.shatterFiles} n-shatter --delete-input --hashIndexOnly
+    """
+
+}
+
+/*
+ * Nodes merge
+ * ------------------
+ * Here we process a small (shattered) file.
+ * If an node has a duplicate smiles it will reside in the same shattered file.
+ * We ensure that cpus equals the number of cores on a node,
+ * so we get an entire node.
+ */
+
+process nMerge {
+
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+    memory '{{ hardware[deployment].sort_memory }}'
+    publishDir '{{ next_path }}/results/', mode: 'symlink'
+    scratch false
+    errorStrategy = 'retry'
+    maxErrors = 3
+
+    input:
+    file shard from shattered_nodes
+
+    output:
+    file '*.d-nodes' into merged_nodes
+
+    shell:
+    '''
+    sort --temporary-directory=. -u !{shard} > !temp.{shard}
+    python -m frag.utils.csv_merge_nodes -i !temp.{shard} -o !{shard}.d-nodes
+    '''
+
+}
+/*
+ * Concatenate the deduplicated nodes
+ * -----------
+ * This results in a 'grand' nodes merge file 'all-nodes.csv'.
+ *
+ * As 'nCat' is the last process (for Nodes) in this workflow
+ * we publish by moving the output file in order to save valuable time
+ * with a potentially very large file.
+ */
+
+process nCat {
+
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+    publishDir '{{ next_path }}/results/', mode: 'move'
+    scratch false
+    errorStrategy = 'retry'
+    maxErrors = 3
+
+    input:
+    file merge from merged_nodes.toList()
+
+    output:
+    file 'all-{{ file_type }}'
+
+    """
+    find . -name '*.d-nodes' | xargs cat > all-{{ file_type }}
+    find . -name '*.d-nodes' -delete
+    """
+
+}

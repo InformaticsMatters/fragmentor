@@ -31,10 +31,31 @@
       <tr><td>Standardisation Load Chunk Size</td><td>{{ standchunk }}</td></tr>
       </table></p>
 
+# In this case the data upload is part way through ans an error has occurred. Upload should continue from from
+# the as-yet unused files.
+- name: Check if done files exists is already on standardise path
+  stat:
+    path: "{{ item }}"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  with_fileglob:
+  - "{{ standpath }}/standardise/done-chunk_*"
+  register: done_file
+  changed_when: false
+
+- debug:
+    var: done_file
+
+# Do not perform the chunking if a "done" file exists. This indicates that a partial rerun is being done where an
+# error occurred uploading chunks.
 - name: Extract standard header
   shell: head -1 standardised-compounds.tab > standardheader
   args:
     chdir: "{{ standpath }}/standardise"
+  when:
+  - done_file.results|length == 0
 
 - name: Split standard file
   shell: >-
@@ -42,6 +63,8 @@
     | split -d -l {{ standchunk }} - chunk_
   args:
     chdir: "{{ standpath }}/standardise"
+  when:
+  - done_file.results|length == 0
 
 - name: Load chunk
   include_tasks: load-standardised-data-chunk.yaml

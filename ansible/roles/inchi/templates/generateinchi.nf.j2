@@ -36,6 +36,8 @@ chunks = Channel.from(file(params.input))
 process generate {
 
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+    errorStrategy = 'retry'
+    maxErrors = 3
 
     input:
     file chunks

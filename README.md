@@ -10,15 +10,8 @@ speeding up the loading of extracts to the Neo4j database used by fragment searc
 Summary of Contents:
 
 - Ansible playbooks to populate the database: standardisation, fragmentation and inchi creation. 
-- A playbook to extract datasets of single and combinations of vendors for import into the Fragnet Search Neo4j database.
-- Standardise and fragmentation code based on the Fragalysis Repository 
-- Nextflow scripts to control cluster for Standardisation and Fragmentation steps.
-- Automatic parameter controlled chunking of input files at various stages to control and optimase throughput to the sql
-database. For updating exising datasets, this is mostly automatic.   
-- Processing is automated but can be adjusted with control parameters.
-- Processing starts/ends with an AWS S3 repository - assumed to contain the smiles data from vendors to be imported 
-into the process and will be the destination for Neo4j compatible extract files - and where they can be picked up by 
-Fragnet Search.  
+- A playbook to extract datasets of single and combinations of vendors from the database for import into the Fragnet Search Neo4j database.
+- A playbook to combine different extracted datasets (from, say, different databases) to create new Fragnet search Neo4j databases.
 - Playbooks are also provided to create, start, stop, and backup the database. 
 
 The libraries currently supported are as follows:
@@ -26,6 +19,18 @@ The libraries currently supported are as follows:
 - Molport
 - Chemspace: bb
 - Enamine: ro5
+
+Further datasets are planned.
+
+> Notes:
+
+- Standardise and fragmentation code based on the Fragalysis Repository 
+- Nextflow scripts are used to control a cluster for Standardisation, Fragmentation, Inchi calculation and combine plays.
+- The scripts contain parameter controlled chunking of input files at various stages to control and optimase throughput to the sql
+database. This can be tuned to the hardware/cluster.   
+- Processing normally starts and ends with an AWS S3 repository - assumed to contain the smiles data from vendors to be imported 
+into the process and will be the destination for Neo4j compatible extract files - and where they can be picked up by 
+Fragnet Search.  
 
 ## Prerequisites
 
@@ -96,31 +101,6 @@ Example: navigate to the ansible directory
 
     $ ansible-playbook site-configure_create-database.yaml -e deployment=development
 
-
-## Process Description
-
-The sequence diagram below shows the basic steps in the new end-to-end fragmentation 
-process including a fragmentation database called FairMolecules. The advantage of the database 
-approach over the current process is that each time a new dataset of molecules is provided by 
-the vendor, the relatively lightweight standardisation step must still be performed - but only 
-new molecules will  have to go through the fragmentation step. As this is hardware intensive, 
-large time/cost savings should be possible. 
-
-- The process is run by an operator. The operator configures the process and place the input 
-files in the correct location on AWS S3. 
-- The Controller is the head node where the fragmentor repository is installed. All Ansible 
-playbooks are run from the head node.
-- The Cluster is a Cluster-group used by nextflow for the standardisation, fragmentation and 
-inchi key generation steps. Ansible handles these machines.
-- Fairmolecules is the postgres database containing standardisation and fragmentation data as
- well as indexes used by the extraction playbook. Extracted Neo4j datasets are uploaded from 
- here back to S3 to complete the process.   
-
-![Fragmentor Sequence Diagram](images/FragmentorSequence.png)
-
-
-
-
 ## Configuring the AWS S3 Directory Structure
 
 For a production deployemnt, the ansible playbook site-standardise is configured to import vendor data files from a tree 
@@ -162,6 +142,28 @@ request) is exported to directory:
 ```
 combination/xchem_dsip/2020-01-01 
 ```
+
+## Fragmentation Process Description
+
+The sequence diagram below shows the basic steps in the fragmentation process including a fragmentation database called 
+FairMolecules. The advantage of the database approach is that each time a new dataset of molecules is provided by 
+the vendor, the relatively lightweight standardisation step must still be performed - but only 
+new molecules will have to go through the hardware intensive fragmentation step.  
+
+- The process is run by an operator. The operator configures the process and place the input 
+files in the correct location on AWS S3. 
+- The Controller is the head node where the fragmentor repository is installed. All Ansible 
+playbooks are run from the head node.
+- The Cluster is a Cluster-group used by nextflow for the standardisation, fragmentation and 
+inchi key generation steps. Ansible handles these machines.
+- Fairmolecules is the postgres database containing standardisation and fragmentation data as
+ well as indexes used by the extraction playbook. Extracted Neo4j datasets are uploaded from 
+ here back to S3 to complete the process. 
+- Once a new library has been added to the database, processing to extract and combine datasets are done via the
+extract and combine plays. See below for more details.      
+
+![Fragmentor Sequence Diagram](images/FragmentorSequence.png)
+
 
 
 ## Process a Vendor Library
@@ -254,6 +256,9 @@ vendor/libraries followed by a single create_inchi step.
 
 ## Extract a Neo4j Dataset to S3.
 
+![Extract Sequence Diagram](images/ExtractSequence.png)
+
+
 The Extract Neo4j Dataset playbook will create a dataset exportable to Neo4j containing either a single vendor or 
 combination of vendors from information contained in the database. The export is based on parameters provided in a 
 parameter file containing vendor(s) and version(s) in the following example format:
@@ -281,23 +286,86 @@ The command is:
 ansible-playbook site-extract \
      -e <@parameters> \
      -e deployment=<development|production> \
-     (-e save_extract=<yes|no>)
+     -e runpath=<path to run directory 
 ```
 
 Example: navigate to the ansible directory
 
 ```
-$ ansible-playbook site-extract.yaml -e @parameters -e deployment=production  
+$ ansible-playbook site-extract.yaml -e @parameters -e deployment=production -e runpath=/data/share-2/run01  
 ```
-
-> Optional parameter save_extract: default: yes
-
-The save_extract flag indicates whether files should be zipped and uploaded to AWS S3. For 
-deployment=development this would normally be set to "N".
 
 Note that for the larger extracts to complete there needs to be sufficient temporary space on the postgres pgdata 
 directory for the database queries to complete. In the case of the complete extract including enamine and molport, for
 example, around 900GB if temporary space is required.
+
+## Combining Neo4 Datasets from S3/local disk.
+
+![Combine Sequence Diagram](images/CombineSequence.png)
+
+
+This playbook can be used to combine existing Neo4j datasets to produce one new Neo4j dataset. For example, if datasets 
+were produced using more than one database, this playbook can combine them allowing a combination of public/propriatory 
+data. Datasets can be downloaded from up to two AWS S3 repositories or directly from disk. The export can either be to 
+disk or saved up to AWS S3. The combination is based on parameters provided in a parameter file containing extracts(s) 
+and version(s) in the following example format:
+
+
+```
+extracts:
+    - lib:
+        path: 'xchem_dsip'
+        data_source: disk
+    - lib:
+        path: 'extract/xchem_spot/v1'
+        data_source: s3
+        bucket: "{{ bucket_in_1 }}"
+        aws_access_key: "{{ aws_access_key_in_1 }}"
+        aws_secret_key: "{{ aws_secret_key_in_1 }}"
+    - lib:
+        path: 'extract/xchem_probe/v1'
+        data_source: s3
+        bucket: "{{ bucket_in_2 }}"
+        aws_access_key: "{{ aws_access_key_in_2 }}"
+        aws_secret_key: "{{ aws_secret_key_in_2 }}"
+
+# The path_out parameter defines the subdirector in "combinations" that will be used for the output.
+path_out: 'xchem_combi_20200715'
+
+# The AWS credentials for exporting the combinations.
+data_source_out: disk
+#bucket_out: {{ bucket_out }}
+#aws_access_key_out: "{{ aws_access_key_out }}"
+#aws_secret_key_out: "{{ aws_access_key_out }}"
+```
+
+> Notes
+
+The AWS access keys are provided as external parameters to the script in a similar way to the other playbooks. In the
+respository configuration, they are all set to AWS_ACCESS_KEY_ID and AWS_SECRET_KEY_ID, but this mapping can be 
+changed in the file roles/combine/defaults/main.yaml. A template (combination-parameters.template) is provided.
+
+For data source S3, the path if the full path to the dataset in the bucket rather than the vendor. This allows existing
+combinations to also be used as input sources.
+
+For data source disk - files are expected (by default) to be in a directory called "extract" (configurable) in the 
+runpath. If data_source_out is set to disk, then the combained extract will be available in the "combine" directory on 
+the runpath. 
+
+The command is:
+
+```
+ansible-playbook site-combine \
+     -e <@parameters> \
+     -e deployment=<development|production> \
+     -e runpath=<path to run directory. 
+```
+
+Example: navigate to the ansible directory
+
+```
+$ ansible-playbook site-combine.yaml -e @parameters -e deployment=production -e runpath=/data/share-2/run01 
+```
 
 ## Backing up the Database
 
@@ -332,12 +400,22 @@ For example:
 ```
 hardware:
   development:
-# Number of CPUs available for nextflow parallel jobs.
+# Parallel_jobs is used in calculating chunk sizes for processing - the normal assumption is that twice as many
+# jobs are created as cores are used. If this is less than cluster_cores, then not all the cluster will be used.
+# It is usually safe to set the parallel_jobs and cluster_cores to the same value.
     parallel_jobs: 8
+# Cluster cores is used in the nextflow_config. It defines the size of the cluster to use.
+    cluster_cores: 8
+# Sort memory defines the minimum memory required for deduplication/sorting..
+    sort_memory: 8 MB
 # Number of connections to postgres - note that this should be less than max_worker_processes in start-database.yaml.
     postgres_jobs: 6
   production:
-    parallel_jobs: 160
+# 100 parallel jobs/cores should be sufficient to process all but the largest libraries (full enamine/molport load).
+# For role combine, ideally this might be increased when combining large databases - otherwise there might be a timeout
+    parallel_jobs: 100
+    cluster_cores: 100
+    sort_memory: 8GB
     postgres_jobs: 18
 ```
 
@@ -451,6 +529,8 @@ if using an existing format, the columns/header line must match the existing for
   with the vendor/library identifier. For example standardise/vars/xchem_spot-variables.yaml contains:
 
 ```
+# The ansible unpack tasks - can be vendor specific
+   unpacker: decompress-gz-all
 # Python script used to standardise the molecules
    standardiser: frag.standardise.scripts.dsip.standardise_xchem_compounds
 # Input file template (unzipped) expected by standardiser. If there are multiple files this can be a glob. 
@@ -461,10 +541,8 @@ if using an existing format, the columns/header line must match the existing for
    standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id
 ```
  
-- Add a new vendor/library specific yaml task file to unpack the raw data. If this is an existing format then the 
- script for that format can be simply copied and renamed. Note that the name should begin with the vendor/library 
- identifier. For example: ansible/roles/standardise/tasks/unpack-raw-data-xchem_spot.yaml. If no specific processing 
- is required then the script can simply include the tasks in unpack-raw-data-decompress-gz-all.yaml.
+- Add a new vendor/library specific yaml task file to unpack the raw data if special processing is required 
+(see chemspace for an example). If this is an existing format then the standard unpacker is referred to (as above).
 - If the new vendor input file is the same as a current format, then an existing stndardisation python script can 
  be used. If the layout varies then more customisation is required. Please see below for more details on this.
 - Add a new create script for creating the i_mols_table 
@@ -495,10 +573,7 @@ CREATE TABLE i_mols_dsip (
 - The site-inchi playbook should not require any specific changes
 - Site-extract - Add the vendor/library specific header file in extract/files. If this is an existing format than the
  scripts for that format can be copied.
-- Extract - Add the vendor/library specific sql to match the header files in templates/sql. If this is an existing 
- format than the scripts for that format can be copied.
-- Remember to also check combinations will work (combinations use the molport vendor/library specific sql as this 
- contains all the fields). 
+- The site-combine playbook should not require any specific changes.
 
 ### Implementation Changes
 

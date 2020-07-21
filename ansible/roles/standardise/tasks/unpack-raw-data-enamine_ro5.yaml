@@ -1,8 +1,0 @@
----
-
-# Invoked from get-raw-data.yaml and the
-# expectation is that 'destination' is where the (unpacked) data is stored.
-
-# Generic unpacking...
-
-- include_tasks: unpack-raw-data-decompress-gz-all.yaml

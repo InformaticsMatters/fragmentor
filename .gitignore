@@ -2,8 +2,6 @@
 .idea
 **/*.pyc
 **/__pycache__
-data/chemspace_2019_07_chunk01.smi
-data/chemspace-*
 tmp
 .nextflow*
 work
@@ -12,3 +10,4 @@ work
 /ansible/parameters/
 /nextflow/
 /sql/*.sql
+/ansible/tmp/

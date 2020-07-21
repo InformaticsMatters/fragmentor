@@ -1,0 +1,52 @@
+---
+# These files contain data that does not contain duplicates,
+# Files are grouped by file type: e.g. 0-supplier-nodes.csv.gz, 1-supplier-nodes.csv.gz
+# These are combined into a single supplier-nodes.csv.gz file on the combine directory.
+
+- name: Display file-type to be concatenated
+  debug:
+    var: file_type
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-concatenate} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Merging: {{ file_type }} - Timestamp: {{ now(utc=True).isoformat() }}</p>
+
+- name: Check if result file is already on combine path
+  stat:
+    path: "{{ combine_path }}/{{ file_type }}.gz"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  register: combined_file
+  changed_when: false
+
+# For each file type given in the parameters file, concatenate all files named <index>-<file_type>
+# This is skipped if it is already there.
+- name: Concatenate files into the combined files directory
+  shell: zcat {{ lib_item }} >> {{ combine_path }}/{{ file_type }}
+  with_fileglob:
+  - "{{ work_path }}/[0-9]-{{ file_type }}.gz"
+  loop_control:
+    loop_var: lib_item
+  when:
+  - not combined_file.stat.exists
+
+- name: Compress merged files
+  command: gzip {{ file_type }}
+  async: "{{ compress_timeout_minutes|int * 60 }}"
+  poll: 0
+  args:
+    chdir: "{{ combine_path }}"
+  register: compress_task
+  when:
+  - not combined_file.stat.exists
+
+- name: Add this task to the list of compress tasks
+  set_fact:
+    compress_tasks: "{{ compress_tasks + [ compress_task ] }}"
+  when:
+  - not combined_file.stat.exists

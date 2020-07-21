@@ -17,13 +17,13 @@ deployment: SetMe
 # it's simply about a clean 'disk'.
 clean_start: yes
 
+# If set to yes this tends to remove temporary/work data directories.
+# Not essential files.
+clean_finish: no
+
 # The tag of the fragmentation container,
 # used for a number of nextflow workflows.
-nextflow_container_tag: molport-04
-
-# The process id is the commit id of the fragmentation container,
-# Used in the extract file
-process_id: Fragmentor-6cef074
+nextflow_container_tag: combine-06
 
 # Database credentials.
 # A map of variables based on deployment target.
@@ -39,6 +39,7 @@ database:
     login_user: postgres
     login_password: 1234
     copy_directory: /var/lib/postgresql/data
+    home_directory: /home/user/project/postgresql/data
     db_user_account: postgres
   production:
     login_host: 130.246.214.154
@@ -47,18 +48,29 @@ database:
     login_user: fragmentor
     login_password: bullfinch
     copy_directory: /pgcopy
+    home_directory: /pgcopy
     db_user_account: fragmentor
 
 # Hardware sizing - used to calculate size of chunks in standardization/fragmentation.
 # A map of variables based on deployment target.
 hardware:
   development:
-# Number of CPUs available for nextflow parallel jobs.
+# Parallel_jobs is used in calculating chunk sizes for processing - the normal assumption is that twice as many
+# jobs are created as cores are used. If this is less than cluster_cores, then not all the cluster will be used.
+# It is usually safe to set the parallel_jobs and cluster_cores to the same value.
     parallel_jobs: 8
+# Cluster cores is used in the nextflow_config. It defines the size of the cluster to use.
+    cluster_cores: 8
+# Sort memory defines the minimum memory required for deduplication/sorting..
+    sort_memory: 8 MB
 # Number of connections to postgres - note that this should be less than max_worker_processes in start-database.yaml.
     postgres_jobs: 6
   production:
-    parallel_jobs: 500
+# 100 parallel jobs/cores should be sufficient to process all but the largest libraries (full enamine/molport load).
+# For role combine, ideally this might be increased when combining large databases - otherwise there might be a timeout.
+    parallel_jobs: 100
+    cluster_cores: 100
+    sort_memory: 8GB
     postgres_jobs: 18
 
 # Vendor defaults.
@@ -132,3 +144,17 @@ vendors:
 
 # The tag of the fragmentation container,
 neo4j_graph_version: 2019-12-18.2
+
+# Email configuration
+#
+# Credentials to enable SMTP email transmission.
+# All of there are expected to be defined in the user's parameters file
+# or, via the environment.
+# If any of them are unset/blank, mail is not sent.
+# Username is the owner of the email account, not a recipient.
+# mail_recipients is a comma-separated list of email addresses.
+mail_host: "{{ lookup('env', 'GRAPH_MAIL_HOST') }}"
+mail_port: "{{ lookup('env', 'GRAPH_MAIL_PORT') or '587' }}"
+mail_username: "{{ lookup('env', 'GRAPH_MAIL_USERNAME') }}"
+mail_password: "{{ lookup('env', 'GRAPH_MAIL_PASSWORD') }}"
+mail_recipients: "{{ lookup('env', 'GRAPH_MAIL_RECIPIENTS') }}"

@@ -82,13 +82,25 @@
     - "{{ vendors[vendor].fragmaxfrags|int }} > 0"
     - "{{ vendors[vendor].fraglimit|int }} >= 0"
 
+- name: Get Fragmentor commit reference
+  command: git log --pretty=format:'%h' -n 1
+  args:
+    chdir: "{{ reppath }}"
+  register: fragmentor_commit_result
+  changed_when: false
+
+- name: Set Fragmentor Facts
+  set_fact:
+    fragmentor_commit_ref: "{{ fragmentor_commit_result.stdout }}"
+
 # If add_file is no (normal situation) and the version has not been processed then add to the source table.
 - name: Insert run parameters
   postgresql_query:
     query: >-
-      insert into source (name, version, min_hac, max_hac, max_frags, frag_limit, start_datetime )
+      insert into source (name, version, min_hac, max_hac, max_frags, frag_limit, start_datetime, fragmentor_commit_ref )
       values ('{{ vendor }}', '{{ version }}',{{ vendors[vendor].fragminhac|int }},
-              {{ vendors[vendor].fraghac|int }},{{ vendors[vendor].fragmaxfrags|int }}, {{ vendors[vendor].fraglimit|int }}, now() at time zone 'utc')
+              {{ vendors[vendor].fraghac|int }},{{ vendors[vendor].fragmaxfrags|int }},
+              {{ vendors[vendor].fraglimit|int }}, now() at time zone 'utc', '{{ fragmentor_commit_ref }}' )
       returning id;
     autocommit: yes
   register: query_result

@@ -4,11 +4,11 @@ process {
 }
 singularity {
     enabled = true
-    cacheDir = "{{ runpath }}/singularity-containers"
+    cacheDir = "{{ singularity_path }}/singularity-containers"
     autoMounts = true
 }
 executor {
-    queueSize = 280
+    queueSize = {{ hardware[deployment].cluster_cores }}
 }
 
 tower {

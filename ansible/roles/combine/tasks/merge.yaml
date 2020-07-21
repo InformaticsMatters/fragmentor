@@ -1,0 +1,28 @@
+---
+# The following files contain data that must be merged,
+# - nodes.csv
+# - isomol-nodes.csv
+# These will be merged using the nextflow merge process.
+#
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-merge} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <h2>Step: Merge Files</h2>
+      <p>Start: {{ now(utc=True).isoformat() }}</p>
+
+# For each extract file type in the list - merge the files from the different extracts
+- name: Merge each file type in the merge list
+  include_tasks: nextflow-merge-file-type.yaml
+  loop: "{{ merge }}"
+  loop_control:
+    loop_var: file_type
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-merge} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>End: {{ now(utc=True).isoformat() }}</p>

@@ -1,0 +1,61 @@
+---
+
+# Variables that a user might want to change
+# through the command-line or a parameter file.
+#
+# Less common variables can be found in vars/main.yaml
+
+reppath: "{{ role_path }}/../../.."
+
+# Base path for all folders used in the combinataion.
+# This should be created by the user before the run
+# It should normally be different to the repo path and ideally should start with a "/".
+runpath: SetMe
+# Assumption is the singularity path will be for all runs, so can be one level up (this saves time as docker
+# containers do not have to be downloaded for each run.
+singularity_path: "{{ runpath }}/.."
+
+# The following is used (amongst other things)
+# to load vendor-specific variables from a specified parameters file - see extract-parameters.template...
+extracts:
+- lib:
+    path: 'SetMe'
+    use_s3: 'SetMe'
+output_use_s3: 'SetMe'
+
+# Workflow directories
+# Note that files will be kept zipped all the way through.
+
+# If the user wants to add extracts from disk they should be placed here
+extract_path: "{{ runpath }}/extract"
+
+# The data path defined where S3 files are originally copied to and where local files are copied to.
+data_path: "{{ runpath }}/data"
+# Files are them moved to the work path renamed to <extract_no><file_name>
+work_path: "{{ runpath }}/work"
+# Following the combination exercise, result files will be stored here
+combine_path: "{{ runpath }}/combine"
+# This contains log files.
+log_path: "{{ runpath }}/logs"
+# Directory for nextflow work files
+next_path: "{{ runpath }}/nextflow"
+
+# The (AWS S3) location of extract data
+bucket_in_1: im-fragnet
+# AWS credentials for bucket access
+aws_access_key_in_1: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+aws_secret_key_in_1: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+
+# The (AWS S3) location of extract data
+bucket_in_2: im-fragnet
+# AWS credentials for bucket access
+aws_access_key_in_2: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+aws_secret_key_in_2: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+
+# The (AWS S3) location of output extract data
+bucket_out: im-fragnet
+# AWS credentials for bucket access
+aws_access_key_out: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+aws_secret_key_out: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+
+aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"

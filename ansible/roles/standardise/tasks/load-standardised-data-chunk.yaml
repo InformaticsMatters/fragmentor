@@ -41,6 +41,11 @@
 - debug:
     var: query_result
 
+- name: Move chunk to list of donechunks so ignored on a restart.
+  shell: mv {{ item|basename }} done-{{ item|basename }}
+  args:
+    chdir: "{{ standpath }}/standardise"
+
 - name: Log line to report
   blockinfile:
     marker: "<!-- {standardise-load} ANSIBLE MANAGED BLOCK -->"

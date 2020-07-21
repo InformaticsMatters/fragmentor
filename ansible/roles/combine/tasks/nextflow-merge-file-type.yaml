@@ -1,0 +1,156 @@
+---
+# These files contain data that contain duplicates but no merging needs to occur,
+# Files are grouped by file type: e.g. 0-edges.csv.gz, 1-edges.csv.gz
+# These are combined into a single deduplicated edges.csv.gz file on the combine directory.
+
+- name: Display file-type to be merged
+  debug:
+    var: file_type
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-merge} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Merging: {{ file_type }} - Timestamp {{ now(utc=True).isoformat() }}</p>
+
+- name: Check if result file is already on combine path
+  stat:
+    path: "{{ combine_path }}/{{ file_type }}.gz"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  register: combined_file
+  changed_when: false
+
+# Count rows in all input files. Note that command does not work with a glob as a standinputfile template.
+- name: Get size of files to be shattered
+  shell: du -c  {{ work_path }}/[0-9]-{{ file_type }}.gz | tail -n 1
+  register: size_result
+  when:
+  - not combined_file.stat.exists
+
+- name: size_result
+  debug:
+    var: size_result
+  when:
+  - not combined_file.stat.exists
+
+- name: Set total_size
+  set_fact:
+    total_size: "{{ size_result.stdout.split('\t')[0]|int }}"
+  when:
+  - not combined_file.stat.exists
+
+- name: Display total_size
+  debug:
+    var: total_size
+  when:
+  - not combined_file.stat.exists
+
+- name: Set default shatterfiles
+  set_fact:
+    shatterfiles: "{{ shatterfiles_small }}"
+  when:
+  - not combined_file.stat.exists
+
+- name: Alter default shatterfiles if exceed threshhold
+  set_fact:
+    shatterfiles: "{{ shatterfiles_large }}"
+  when:
+  - not combined_file.stat.exists
+  - total_size|int > shatterfile_large_threshold_kb|int
+
+- name: Display shatterfiles
+  debug:
+    var: shatterfiles
+  when:
+  - not combined_file.stat.exists
+
+# Move the nextflow workflow and config into place (from templates)
+# so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
+
+- name: Translate nextflow files
+  template:
+    src: "{{ item }}"
+    dest: "{{ reppath }}/nextflow/{{ item|regex_replace(deployment + '/')|regex_replace('.j2') }}"
+  loop:
+  - "merge.nf.j2"
+  - "{{ deployment }}/nextflow.config.j2"
+  when:
+  - not combined_file.stat.exists
+
+- name: Set nextflow command
+  set_fact:
+    nextflow_cmd: >-
+      nextflow run -c {{ reppath }}/nextflow/nextflow.config
+      {{ reppath }}/nextflow/merge.nf
+      -w {{ next_path }}
+      -with-report {{ log_path }}/merge_{{ file_type }}_report.html
+      -with-tower
+  when:
+  - not combined_file.stat.exists
+
+- name: Display nextflow command
+  debug:
+    var: nextflow_cmd
+  when:
+  - not combined_file.stat.exists
+
+- name: Run nextflow (async)
+  command: "{{ nextflow_cmd }}"
+  async: "{{ nextflow_timeout_minutes|int * 60 }}"
+  poll: 0
+  register: nextflow_async
+  when:
+  - not combined_file.stat.exists
+
+- name: Wait for nextflow (async)
+  async_status:
+    jid: "{{ nextflow_async.ansible_job_id }}"
+  register: nextflow_result
+  until: nextflow_result.finished
+  delay: "{{ nextflow_poll_period_seconds|int }}"
+  retries: "{{ (nextflow_timeout_minutes|int / (nextflow_poll_period_seconds|int / 60))|int }}"
+  when:
+  - not combined_file.stat.exists
+
+# Copy nextflow trace/report files to the combiner
+# directory (if they exist). These will be stored on S3
+# when (if) the combination is saved.
+
+- name: Copy nextflow debug files
+  shell: cp {{ next_path }}/trace.txt {{ log_path }}/{{ file_type }}-trace.txt | true
+  when:
+  - not combined_file.stat.exists
+
+# Move and compress the file-type (XXX why do I need to do this? )...
+
+- name: Check merges file_type
+  stat:
+    path: "{{ combine_path }}/{{ file_type }}.gz"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  register: file_type_file
+  changed_when: false
+
+- name: Move merged files
+  command: mv {{ next_path }}/results/all-{{ file_type }} {{ combine_path }}/{{ file_type }}
+  when: not file_type_file.stat.exists
+
+- name: Compress merged files
+  command: gzip {{ file_type }}
+  async: "{{ compress_timeout_minutes|int * 60 }}"
+  poll: 0
+  args:
+    chdir: "{{ combine_path }}"
+  register: compress_task
+  when: not file_type_file.stat.exists
+
+- name: Add this tasy to the list of compress tasks
+  set_fact:
+    compress_tasks: "{{ compress_tasks + [ compress_task ] }}"
+  when: not file_type_file.stat.exists

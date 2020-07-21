@@ -1,0 +1,58 @@
+---
+# For each extract,
+# 1. Goes to the repo listed in the 'path' variable on disk and copies files to data directory (if not already present)
+# 2. Each file on the data directory should be copied to the work_path with the file prepended by the index.
+
+- name: Variable sanity-check
+  assert:
+    that:
+    - "{{ item.lib.path|string|length > 0 }}"
+
+- name: Display Extract path
+  debug:
+    msg: copy_path={{ extract_path }}/{{ item.lib.path }}
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-download} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Add file: {{ extract_path }}/{{ item.lib.path }}</p>
+
+- name: Create data directory
+  file:
+    path: "{{ data_path }}/{{ item.lib.path }}"
+    state: directory
+
+# But don't get the files (which may be large)
+# if the data files appear to already exist.
+
+- name: Check if nodes file is already on work path
+  stat:
+    path: "{{ work_path }}/{{ extract_index }}-nodes.csv.gz"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  register: nodes_gz_data_file
+  changed_when: false
+
+# This is the equivalent of a download from s3
+- name: Copy extract data into data directory
+  command: cp {{ file_item }} {{ data_path }}//{{ item.lib.path }}/.
+  with_fileglob:
+  - "{{ extract_path }}/{{ item.lib.path }}/*.gz"
+  loop_control:
+    loop_var: file_item
+  when:
+  - not nodes_gz_data_file.stat.exists
+
+# Change the name and move it to the common work directory
+- name: Move to work directory
+  command: cp {{ file_item }} {{ work_path }}/{{ extract_index }}-{{ file_item | basename }}
+  with_fileglob:
+  - "{{  data_path }}//{{ item.lib.path }}/*.gz"
+  loop_control:
+    loop_var: file_item
+  when:
+  - not nodes_gz_data_file.stat.exists

@@ -1,0 +1,94 @@
+---
+# Gets 'raw' data from an AWS S3 path
+# 1. Goes to the repo listed in the 'path' variable on disk and copies files to data directory (if not already present)
+# 2. Each file in the s3 bucket should be copied to the work_path with the file prepended by the index.
+
+- name: Display extract path
+  debug:
+    msg: bucket={{ item.lib.bucket }} extract_path={{ item.lib.path }}
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-download} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Add file: {{ item.lib.bucket }}/{{ item.lib.path }}</p>
+
+- name: Create data directory
+  file:
+    path: "{{ data_path }}/{{ item.lib.path }}"
+    state: directory
+
+# But don't get the files (which may be large)
+# if the data files appear to already exist.
+
+- name: Check if nodes file is already on work path
+  stat:
+    path: "{{ work_path }}/{{ extract_index }}-nodes.csv.gz"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  register: nodes_gz_data_file
+  changed_when: false
+
+- name: List extract data
+  aws_s3:
+    bucket: "{{ item.lib.bucket }}"
+    mode: list
+    prefix: "{{ item.lib.path }}"
+    aws_access_key: "{{ item.lib.aws_access_key }}"
+    aws_secret_key: "{{ item.lib.aws_secret_key }}"
+  register: extract_result
+  when:
+  - not nodes_gz_data_file.stat.exists
+
+- name: Display result
+  debug:
+    var: extract_result
+  when:
+  - not nodes_gz_data_file.stat.exists
+
+- name: Check extract data
+  assert:
+    that: extract_result.s3_keys|length > 1
+  when:
+  - not nodes_gz_data_file.stat.exists
+
+- name: Display extract file count
+  debug:
+    msg: Found {{ extract_result.s3_keys|length - 1 }} extract files
+  when:
+  - not nodes_gz_data_file.stat.exists
+
+- name: Set destination path
+  set_fact:
+    destination: "{{ data_path }}/{{ item.lib.path }}"
+  when:
+  - not nodes_gz_data_file.stat.exists
+
+# Get the files, this time not ignoring the first entry in the list as full directory is provided...
+
+- name: Get extract data
+  aws_s3:
+    bucket: "{{ item.lib.bucket }}"
+    mode: get
+    object: "{{ file_item }}"
+    dest: "{{ destination }}/{{ file_item|basename }}"
+    aws_access_key: "{{ item.lib.aws_access_key }}"
+    aws_secret_key: "{{ item.lib.aws_secret_key }}"
+  loop: "{{ extract_result.s3_keys[0:] }}"
+  loop_control:
+    loop_var: file_item
+  when:
+  - not nodes_gz_data_file.stat.exists
+
+# Change the name and move it to the common work directory
+- name: Move to work directory
+  command: cp {{ file_item }} {{ work_path }}/{{ extract_index }}-{{ file_item | basename }}
+  with_fileglob:
+  - "{{  data_path }}//{{ item.lib.path }}/*.gz"
+  loop_control:
+    loop_var: file_item
+  when:
+  - not nodes_gz_data_file.stat.exists

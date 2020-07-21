@@ -30,9 +30,16 @@ UPDATE i_mols_molport i SET isomol_id = iso.id
 commit;
 
 -- Load mol_source from i_mols
+-- Note: <> 'null' - it would be better to use force_null on the copy command, but this may affect other vendors.
 begin;
 INSERT INTO mol_source (smiles, code, source_id, lead_time, nonisomol_id, isomol_id)
-  (SELECT osmiles, cmpd_id, %(SOURCEID)s, lead_time, nonisomol_id, isomol_id FROM i_mols_molport);
+  (SELECT osmiles, cmpd_id, %(SOURCEID)s,
+         case
+            when lead_time <> 'null' then CAST (lead_time AS INT)
+            else 0
+         end,
+         nonisomol_id, isomol_id
+  FROM i_mols_molport);
 commit;
 
 -- Load price information from i_mols and mol_source

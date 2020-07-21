@@ -1,0 +1,32 @@
+---
+
+# Sends email (if all the key variables are defined).
+# It expects the following variables to be defined: -
+#
+# -  mail_subject
+#
+# The subject line is prefixed with the text 'Graph Processor: '
+# Optionally, the following can be defined.
+#
+# -  mail_body (if not defined the subject is used for the body)
+
+- name: Send mail
+  mail:
+    host: "{{ mail_host }}"
+    port: "{{ mail_port|int }}"
+    username: "{{ mail_username }}"
+    password: "{{ mail_password }}"
+    to: "{{ mail_recipients }}"
+    from: graph.processor@informaticsmatters.com (Graph Processor)
+    subject: "{{ mail_subject }}"
+    body: "{{ body_to_use }}"
+  vars:
+    body_to_use: "{{ mail_body if mail_body is defined else mail_subject }}"
+  when:
+  - mail_subject is defined and mail_subject|length > 0
+  - mail_host|length > 0
+  - mail_port|int > 0
+  - mail_username|length > 0
+  - mail_password|length > 0
+  - mail_recipients|length > 0
+  delegate_to: 127.0.0.1

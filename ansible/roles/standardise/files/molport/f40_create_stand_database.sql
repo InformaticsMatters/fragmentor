@@ -21,7 +21,7 @@ CREATE TABLE i_mols_molport (
   price_1 TEXT,
   price_5 TEXT,
   price_50 TEXT,
-  lead_time INTEGER,
+  lead_time TEXT,
   isomol_id INTEGER,
   nonisomol_id INTEGER
 );

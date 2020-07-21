@@ -1,6 +1,6 @@
 # Ansible playbooks
 
-Note that the ReadMe on the root directory has considerably more details.
+>  Note that the ReadMe on the root directory fully explains the process.
 
 Install requirements: -
 
@@ -28,8 +28,9 @@ You can run standardisation plays from the head node with something like: -
 
     $ ansible-playbook site-standardise.yaml \
         -e deployment=production \
-        -e vendor=dsip \
-        -e version=v1
+        -e vendor=xchem_dsip \
+        -e version=v1 \
+        -e runpath=/data/share-2/run01
 
 A simple backup play can be used to copy the database files to the
 backup volume in the DB server. It stops the database, copies the files
@@ -38,9 +39,8 @@ and then restarts the database: -
     $ ansible-playbook site-backup.yaml -e deployment=production
     
 ## Variable locations
+-   Common (global) variables can be found in `group_vars/all.yaml`
 -   Role-specific variables that a user might change often in the corresponding
     `defaults/main.yaml`
 -   Role-specific variables that a user might not change in the corresponding
     `vars/main.yaml`
--   Common (global) variables can be found in `group_vars/all.yaml`
--   Host-specific variables can be found in `host_vars`

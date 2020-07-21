@@ -269,7 +269,8 @@ create TABLE public.source (
     max_hac integer,
     max_frags integer,
     start_datetime timestamp,
-    run_summary_log BYTEA
+    run_summary_log BYTEA,
+    fragmentor_commit_ref text
 );
 
 --

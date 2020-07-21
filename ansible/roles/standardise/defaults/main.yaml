@@ -5,12 +5,15 @@
 #
 # Less common variables can be found in vars/main.yaml
 
-
 reppath: "{{ role_path }}/../../.."
 
 # Base path for all folders used in the run.
 # This should normally be different to the repo path and ideally should start with a "/".
 runpath: SetMe
+
+# Assumption is the singularity path will be for all runs, so can be one level up (this saves time as docker
+# containers do not have to be downloaded for each run.
+singularity_path: "{{ runpath }}/.."
 
 # These have been coded so that they can different to each other, but there is no obvious need at this point.
 # Hence they all default to runpath - set in the command line.
@@ -32,3 +35,12 @@ version: SetMe
 # Add this fileset to an existing source
 # (typically when inserting files from a large vendor progressively)
 add_file: no
+
+# If the user wants to add raw data from disk, it should be placed here
+# This defaults to the data directory in the repo which contains small samples of each library for testing.
+raw_data_path_disk: "{{ reppath }}/data"
+
+# This can be altered if the user wants to - for example -use disk as a source from production
+data_source:
+  development: disk
+  production: s3
