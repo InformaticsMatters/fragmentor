@@ -3,4 +3,3 @@
 # This is just a placeholder.
 # At the moment, the "extract" in this situation will be split between the header files and the local database in the
 # postgres container. These need to be merged manually.
-

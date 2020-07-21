@@ -40,4 +40,3 @@ drop_index_table: yes
 
 # Whether the index should be built in serial or parallel.
 index_build: parallel
-
