@@ -28,6 +28,8 @@ bucket: im-fragnet
 # copy_root: /pgcopy
 copy_root: "{{ database[deployment].copy_directory }}"
 
+home_root: "{{ database[deployment].home_directory }}"
+
 # AWS credentials for bucket access
 aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
 aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"

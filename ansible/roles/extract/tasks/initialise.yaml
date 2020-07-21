@@ -1,5 +1,13 @@
 ---
-# Extract initialisation scripts
+# Extract initialisation script
+
+# Check run path
+- name: Ensure runpath is present
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ runpath }}"
 
 # Install modules to Synchronise the extract to S3
 - name: Install requirements

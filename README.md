@@ -286,19 +286,14 @@ The command is:
 ansible-playbook site-extract \
      -e <@parameters> \
      -e deployment=<development|production> \
-     (-e save_extract=<yes|no>)
+     -e runpath=<path to run directory 
 ```
 
 Example: navigate to the ansible directory
 
 ```
-$ ansible-playbook site-extract.yaml -e @parameters -e deployment=production  
+$ ansible-playbook site-extract.yaml -e @parameters -e deployment=production -e runpath=/data/share-2/run01  
 ```
-
-> Optional parameter save_extract: default: yes
-
-The save_extract flag indicates whether files should be zipped and uploaded to AWS S3. For 
-deployment=development this would normally be set to "N".
 
 Note that for the larger extracts to complete there needs to be sufficient temporary space on the postgres pgdata 
 directory for the database queries to complete. In the case of the complete extract including enamine and molport, for

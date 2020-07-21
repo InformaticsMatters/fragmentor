@@ -47,7 +47,7 @@
     - aws_access_key|string|length > 0
     - aws_secret_key|string|length > 0
     fail_msg: You must provide AWS credentias so that I can save the data
-  when: save_extract|bool
+  when: data_source[deployment] == 's3'
 
 - block:
 
@@ -74,7 +74,8 @@
       login_user: "{{ database[deployment].login_user }}"
       login_password: "{{ database[deployment].login_password }}"
 
-- import_tasks: neo4j-save.yaml
+# Final destination depends on whether database is prod/dev.
+- import_tasks: neo4j-production.yaml
   delegate_to: "{{ groups['dbservers'][0] }}"
   become: yes
-  when: save_extract|bool
+  when: deployment=="production"

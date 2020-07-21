@@ -45,7 +45,7 @@
   when:
   - not combined_file.stat.exists
 
-- name: Add this tasy to the list of compress tasks
+- name: Add this task to the list of compress tasks
   set_fact:
     compress_tasks: "{{ compress_tasks + [ compress_task ] }}"
   when:

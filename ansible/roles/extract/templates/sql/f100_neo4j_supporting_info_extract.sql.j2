@@ -15,7 +15,7 @@
 -- Supplier Nodes.csv
 -- name:ID(S),graph_version,processing_version,process_id,build_number:int,limit:int,min_hac:int,max_hac:int,build_datetime:datetime,label,:LABEL
 --
-COPY (select v.supplier_node_name, '{{ GRAPHVERSION }}', '{{ PROCESSID }}',s.name || '/' || s.version, 1,
+COPY (select v.supplier_node_name, '{{ GRAPHVERSION }}',s.fragmentor_commit_ref,s.name || '/' || s.version, 1,
              s.frag_limit, s.min_hac, s.max_hac,
              trim(both '"' from to_json(s.start_datetime)::text),
              v.supplier_node_label, 'Supplier'

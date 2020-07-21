@@ -33,8 +33,6 @@
   assert:
     that:
     - "{{ hardware[deployment].cluster_cores|int > 0 }}"
-    - "{{ hardware[deployment].cluster_nodes|int > 0 }}"
-    - "{{ hardware[deployment].cluster_cores_per_node|int > 0 }}"
 
 # For each extract given in the parameters file, do some sanity checks
 - name: Check extracts to combine

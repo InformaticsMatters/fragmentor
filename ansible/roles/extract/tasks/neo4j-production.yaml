@@ -127,7 +127,7 @@
   become: true
   delegate_to: "{{ groups['dbservers'][0] }}"
 
-# Synchronise the extract to S3
+# Synchronise the extract to S3 if desired, otherwise this data is left in the extract directory on the server.
 
 # When only one vendor, use it
 - name: Synchronise extract to S3 - Single Vendor
@@ -138,7 +138,9 @@
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
-  when: source_id_lst|length == 1
+  when:
+  - data_source[deployment]=="s3"
+  - source_id_lst|length == 1
 
 # When combination, use combination/first vendor/first version
 - name: Synchronise extract to S3 - Combination
@@ -149,4 +151,27 @@
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
-  when: source_id_lst|length > 1
+  when:
+  - data_source[deployment]=="s3"
+  - source_id_lst|length > 1
+
+# When disk is chosen, simply move the data to the extract directory
+- name: Move to extract directory - single
+  command: cp {{ file_item }} {{ extract_data_path_disk }}/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}
+  with_fileglob:
+  - "{{ copy_root }}/extract"
+  loop_control:
+    loop_var: file_item
+  when:
+  - source_id_lst|length == 1
+  - data_source[deployment]=="disk"
+
+- name: Move to extract directory - combination
+  command: cp {{ file_item }} {{ extract_data_path_disk }}/combination/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}
+  with_fileglob:
+  - "{{ copy_root }}/extract"
+  loop_control:
+    loop_var: file_item
+  when:
+  - source_id_lst|length > 1
+  - data_source[deployment]=="disk"
