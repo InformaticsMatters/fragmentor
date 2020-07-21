@@ -36,15 +36,29 @@
     - "{{ hardware[deployment].cluster_nodes|int > 0 }}"
     - "{{ hardware[deployment].cluster_cores_per_node|int > 0 }}"
 
-# Check AWS credentials
+# For each extract given in the parameters file, do some sanity checks
+- name: Check extracts to combine
+  include_tasks: check_extract.yaml
+  loop: "{{ extracts }}"
 
-- name: Check credentials
+# Check output credentials
+- name: Output Path sanity-check
   assert:
     that:
-    - aws_access_key|string|length > 0
-    - aws_secret_key|string|length > 0
-    fail_msg: You must provide AWS credentias so that I can save the data
-  when: use_s3|bool
+    - '{{ path_out|length > 0 }}'
+
+- name: Data source sanity-check
+  assert:
+    that:
+    - '{{ data_source_out == "s3" or data_source_out == "disk" }}'
+
+- name: Check buckets for s3 storage
+  assert:
+    that:
+    - '{{ bucket_out|length > 0 }}'
+    - '{{ aws_access_key_out|length > 0 }}'
+    - '{{ aws_secret_key_out|length > 0 }}'
+  when: data_source_out == "s3"
 
 # Clean-up before the run...
 # The following task does not run if 'clean_start' is false.

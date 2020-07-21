@@ -101,11 +101,11 @@
 # Synchronise the extract to S3
 - name: Synchronise Combination to S3
   s3_sync:
-    bucket: "{{ bucket }}"
-    key_prefix: extract/combination/{{ output_name }}
+    bucket: "{{ bucket_out }}"
+    key_prefix: extract/combination/{{ path_out }}
     file_root: "{{ combine_path }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
+    aws_access_key: "{{ aws_access_key_out }}"
+    aws_secret_key: "{{ aws_access_key_out }}"
     region: "{{ aws_region }}"
 
 # Zip log files for transfer
@@ -117,11 +117,11 @@
 # Synchronise logs to S3
 - name: Synchronise Logs to S3
   s3_sync:
-    bucket: "{{ bucket }}"
-    key_prefix: logs/combination/{{ output_name }}
+    bucket: "{{ bucket_out }}"
+    key_prefix: logs/combination/{{ path_out }}
     file_root: "{{ log_path }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
+    aws_access_key: "{{ aws_access_key_out }}"
+    aws_secret_key: "{{ aws_access_key_out }}"
     region: "{{ aws_region }}"
 
 # Clean-up?

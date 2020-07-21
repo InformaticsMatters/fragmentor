@@ -40,6 +40,22 @@ log_path: "{{ runpath }}/logs"
 # Directory for nextflow work files
 next_path: "{{ runpath }}/nextflow"
 
-# Save the extract
-# (typically compressing and saving to S3)
-use_s3: no
+# The (AWS S3) location of extract data
+bucket_in_1: im-fragnet
+# AWS credentials for bucket access
+aws_access_key_in_1: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+aws_secret_key_in_1: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+
+# The (AWS S3) location of extract data
+bucket_in_2: im-fragnet
+# AWS credentials for bucket access
+aws_access_key_in_2: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+aws_secret_key_in_2: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+
+# The (AWS S3) location of output extract data
+bucket_out: im-fragnet
+# AWS credentials for bucket access
+aws_access_key_out: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+aws_secret_key_out: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+
+aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"

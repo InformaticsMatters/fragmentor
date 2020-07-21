@@ -10,7 +10,7 @@
     chdir: "{{ standpath }}/standardise"
 
 - name: remove working files
-  shell: rm chunk_*
+  shell: rm done-chunk_*
   args:
     chdir: "{{ standpath }}/standardise"
 

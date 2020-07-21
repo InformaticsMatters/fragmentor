@@ -58,19 +58,19 @@ database:
 # A map of variables based on deployment target.
 hardware:
   development:
-# Number of CPUs available for nextflow parallel jobs.
+# Parallel_jobs is used in calculating chunk sizes for processing - the normal assumption is that twice as many
+# jobs are created as cores are used. If this is less than cluster_cores, then not all the cluster will be used.
+# It is usually safe to set the parallel_jobs and cluster_cores to the same value.
     parallel_jobs: 8
+# Cluster cores is used in the nextflow_config. It defines the size of the cluster to use.
     cluster_cores: 8
-    cluster_nodes: 8
-    cluster_cores_per_node: 1
+# Sort memory defines the minimum memory required for deduplication/sorting..
     sort_memory: 8 MB
 # Number of connections to postgres - note that this should be less than max_worker_processes in start-database.yaml.
     postgres_jobs: 6
   production:
-    parallel_jobs: 500
-    cluster_cores: 500
-    cluster_nodes: 140
-    cluster_cores_per_node: 8
+    parallel_jobs: 200
+    cluster_cores: 200
     sort_memory: 8GB
     postgres_jobs: 18
 

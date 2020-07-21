@@ -8,21 +8,36 @@
 # Combinations will be added to a new combination database.
 # A map of deafults based on the vendor and library.
 
-buckets:
-     - s3-1:
-        bucket:
-        aws_access_key: ''
-        aws_secret_key: ''
+# The (AWS S3) locations are stored in the combine/defaults/main.yaml file
+# Two input locations and one output location are defined in the current configuration as an example.
+# The access keys are provided as external parameters to the script. These are currently defined as:
+# AWS_ACCESS_KEY_ID
+# AWS_SECRET_ACCESS_KEY
+# So are set to the same bucket.
+# To set these to different values add/set new parameters for aws_access_key_in_2 and aws_secret_key_in_2.
 
 extracts:
     - lib:
         path: 'xchem_dsip'
         data_source: disk
     - lib:
-        path: 'xchem_spot'
-        data_source: disk
+        path: 'extract/xchem_spot/v1'
+        data_source: s3
+        bucket: "{{ bucket_in_1 }}"
+        aws_access_key: "{{ aws_access_key_in_1 }}"
+        aws_secret_key: "{{ aws_secret_key_in_1 }}"
+    - lib:
+        path: 'extract/xchem_probe/v1'
+        data_source: s3
+        bucket: "{{ bucket_in_2 }}"
+        aws_access_key: "{{ aws_access_key_in_2 }}"
+        aws_secret_key: "{{ aws_secret_key_in_2 }}"
 
-# The name parameter defines the subdirector in "combinations" that will be used for the output.
-output_name: 'xchem_combi_20200715'
-output_data_source: disk
-#output_bucket: s3-1
+# The path_out parameter defines the subdirector in "combinations" that will be used for the output.
+path_out: 'xchem_combi_20200715'
+
+# The AWS credentials for exporting the combinations.
+data_source_out: disk
+#bucket_out: {{ bucket_out }}
+#aws_access_key_out: "{{ aws_access_key_out }}"
+#aws_secret_key_out: "{{ aws_access_key_out }}"

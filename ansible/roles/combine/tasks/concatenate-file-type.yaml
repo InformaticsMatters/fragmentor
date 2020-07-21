@@ -17,16 +17,36 @@
 - name: Check if result file is already on combine path
   stat:
     path: "{{ combine_path }}/{{ file_type }}.gz"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
   register: combined_file
   changed_when: false
 
 # For each file type given in the parameters file, concatenate all files named <index>-<file_type>
 # This is skipped if it is already there.
 - name: Concatenate files into the combined files directory
-  shell: cat {{ lib_item }} >> {{ combine_path }}/{{ file_type }}.gz
+  shell: zcat {{ lib_item }} >> {{ combine_path }}/{{ file_type }}
   with_fileglob:
-  - "{{ work_path }}/*-{{ file_type }}.gz"
+  - "{{ work_path }}/[0-9]-{{ file_type }}.gz"
   loop_control:
     loop_var: lib_item
+  when:
+  - not combined_file.stat.exists
+
+- name: Compress merged files
+  command: gzip {{ file_type }}
+  async: "{{ compress_timeout_minutes|int * 60 }}"
+  poll: 0
+  args:
+    chdir: "{{ combine_path }}"
+  register: compress_task
+  when:
+  - not combined_file.stat.exists
+
+- name: Add this tasy to the list of compress tasks
+  set_fact:
+    compress_tasks: "{{ compress_tasks + [ compress_task ] }}"
   when:
   - not combined_file.stat.exists

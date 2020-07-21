@@ -28,15 +28,6 @@ concat: [ '{{ supnodefile }}', '{{ supmolnodefile }}', '{{ isosupmoledgefile }}'
 merge: ['{{ neonodefile }}', '{{ isomolnodefile }}']
 deduplicate: [ '{{ neoedgefile }}', '{{ inchiidfile }}', '{{ molinchiedgefile }}', '{{ isomoledgefile }}' ]
 
-# The (AWS S3) location of vendor RAW data
-# a source for standardisation.
-bucket: im-fragnet
-
-# AWS credentials for bucket access
-aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
-aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
-
 # Shatterfile control. It only makes sense to use the complete cluster for very large files.
 # Otherwise the overhead of using the cluster is too great.
 # The code does a workcount on the input files. If linecount > threshold use whole cluster.

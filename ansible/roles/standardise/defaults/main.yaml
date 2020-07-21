@@ -12,6 +12,10 @@ reppath: "{{ role_path }}/../../.."
 # This should normally be different to the repo path and ideally should start with a "/".
 runpath: SetMe
 
+# Assumption is the singularity path will be for all runs, so can be one level up (this saves time as docker
+# containers do not have to be downloaded for each run.
+singularity_path: "{{ runpath }}/.."
+
 # These have been coded so that they can different to each other, but there is no obvious need at this point.
 # Hence they all default to runpath - set in the command line.
 # Place where raw data files are copied to.

@@ -96,31 +96,6 @@ Example: navigate to the ansible directory
 
     $ ansible-playbook site-configure_create-database.yaml -e deployment=development
 
-
-## Process Description
-
-The sequence diagram below shows the basic steps in the new end-to-end fragmentation 
-process including a fragmentation database called FairMolecules. The advantage of the database 
-approach over the current process is that each time a new dataset of molecules is provided by 
-the vendor, the relatively lightweight standardisation step must still be performed - but only 
-new molecules will  have to go through the fragmentation step. As this is hardware intensive, 
-large time/cost savings should be possible. 
-
-- The process is run by an operator. The operator configures the process and place the input 
-files in the correct location on AWS S3. 
-- The Controller is the head node where the fragmentor repository is installed. All Ansible 
-playbooks are run from the head node.
-- The Cluster is a Cluster-group used by nextflow for the standardisation, fragmentation and 
-inchi key generation steps. Ansible handles these machines.
-- Fairmolecules is the postgres database containing standardisation and fragmentation data as
- well as indexes used by the extraction playbook. Extracted Neo4j datasets are uploaded from 
- here back to S3 to complete the process.   
-
-![Fragmentor Sequence Diagram](images/FragmentorSequence.png)
-
-
-
-
 ## Configuring the AWS S3 Directory Structure
 
 For a production deployemnt, the ansible playbook site-standardise is configured to import vendor data files from a tree 
@@ -162,6 +137,28 @@ request) is exported to directory:
 ```
 combination/xchem_dsip/2020-01-01 
 ```
+
+## Fragmentation Process Description
+
+The sequence diagram below shows the basic steps in the fragmentation process including a fragmentation database called 
+FairMolecules. The advantage of the database approach is that each time a new dataset of molecules is provided by 
+the vendor, the relatively lightweight standardisation step must still be performed - but only 
+new molecules will have to go through the hardware intensive fragmentation step.  
+
+- The process is run by an operator. The operator configures the process and place the input 
+files in the correct location on AWS S3. 
+- The Controller is the head node where the fragmentor repository is installed. All Ansible 
+playbooks are run from the head node.
+- The Cluster is a Cluster-group used by nextflow for the standardisation, fragmentation and 
+inchi key generation steps. Ansible handles these machines.
+- Fairmolecules is the postgres database containing standardisation and fragmentation data as
+ well as indexes used by the extraction playbook. Extracted Neo4j datasets are uploaded from 
+ here back to S3 to complete the process. 
+- Once a new library has been added to the database, processing to extract and combine datasets are done via the
+extract and combine plays. See below for more details.      
+
+![Fragmentor Sequence Diagram](images/FragmentorSequence.png)
+
 
 
 ## Process a Vendor Library
@@ -252,6 +249,11 @@ As this step is driven by the database it it possible to run multiple standardis
 vendor/libraries followed by a single create_inchi step.
 
 
+
+## Extract Process Description
+
+![Extract Sequence Diagram](images/ExtractSequence.png)
+
 ## Extract a Neo4j Dataset to S3.
 
 The Extract Neo4j Dataset playbook will create a dataset exportable to Neo4j containing either a single vendor or 
@@ -298,6 +300,10 @@ deployment=development this would normally be set to "N".
 Note that for the larger extracts to complete there needs to be sufficient temporary space on the postgres pgdata 
 directory for the database queries to complete. In the case of the complete extract including enamine and molport, for
 example, around 900GB if temporary space is required.
+
+## Combine Process Description
+
+![Combine Sequence Diagram](images/CombineSequence.png)
 
 
 ## Combining Neo4 Datasets from S3/local disk.

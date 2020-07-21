@@ -7,36 +7,43 @@
 #
 # The playbook: -
 #
-# - Downloads the individual or combined dataset
+# - Downloads the individual or combined datasets
 # - Then depending on the file, processing will:
-# - - Concatenates files that contain non-duplicate data.
+# - - De-duplicate files that contain data where no merging is necessary.
 # - - Merges files that contain data that must be de-duplicated and combined.
-# - - De-duplicate files that contain data where no combining is necessary.
+# - - Concatenates files that contain non-duplicate data.
 # - Processes combined de-duplicated build.
 # - Uploads the result as a new combination to S3
 #
 # Check that required command line parameters have been set:
 # - deployment
-# - Parameter file file containing vendor(s) and version(s) has been created.
+# - Parameter file file containing the libraries has been created.
 #
 #  e.g.
-#   extracts:
-#       - lib:
-#           vendor: 'enamine_ro5'
-#           version: 'jun2018'
-#           regenerate_index: 'no'
-#       - lib:
-#           vendor: 'molport'
-#           version: '2020-02'
-#           regenerate_index: 'yes'
+#buckets:
+#     - s3-1:
+#        bucket: <bucket-name on s3>
+#        aws_access_key: '<access-key>'
+#        aws_secret_key: '<secret-key>'
+#
+#extracts:
+#    - lib:
+#        path: 'xchem_dsip'
+#        data_source: disk
+#    - lib:
+#        path: 'xchem_spot'
+#        data_source: s3
+#        bucket: s3-1
+#
+## The name parameter defines the subdirector in "combinations" that will be used for the output.
+#output_name: 'xchem_combi_20200715'
+#output_data_source: disk
+#output_bucket: s3-1
 #
 #   ansible-playbook site-combine \
 #     -e @parameters \
 #     -e deployment=development|production
-#     -e use_s3 yes/no
-#  The use_s3 flag indicates whether files should be downloaded from and uploaded to S3.
-#  If this is set to no then the assumption is that a local data directory is used.
-#  For deployment=development this would normally be set to "N".
+#
 
 - name: Assert user-variable definitions
   assert:
@@ -45,7 +52,7 @@
     - deployment|string != 'SetMe'
     - "{{ extracts[0].lib.path|string != 'SetMe'}}"
     - "{{ extracts[0].lib.data_source|string != 'SetMe'}}"
-    - "{{ output_data_source|string != 'SetMe'}}"
+    - "{{ data_source_out|string != 'SetMe'}}"
     fail_msg: You must provide a 'deployment', a list of extracts in a parameter file to combine and an output location.
 
 - name: List input datasets
@@ -89,4 +96,4 @@
     block: |
       <p>Combine play ended on: {{ now(utc=True).isoformat() }}</p>
 
-- import_tasks: finalise-{{ output_data_source }}.yaml
+- import_tasks: finalise-{{ data_source_out }}.yaml

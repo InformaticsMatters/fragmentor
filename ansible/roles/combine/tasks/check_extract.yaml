@@ -1,0 +1,24 @@
+---
+
+# Display extract
+- name: Display extract
+  debug:
+     msg: '{{ item.lib }}'
+
+- name: Path sanity-check
+  assert:
+    that:
+    - '{{ item.lib.path|length > 0 }}'
+
+- name: Data source sanity-check
+  assert:
+    that:
+    - '{{ item.lib.data_source == "s3" or item.lib.data_source == "disk" }}'
+
+- name: Check buckets for s3 storage
+  assert:
+    that:
+    - '{{ item.lib.bucket|length > 0 }}'
+    - '{{ item.lib.aws_access_key|length > 0 }}'
+    - '{{ item.lib.aws_secret_key|length > 0 }}'
+  when: item.lib.data_source == "s3"
