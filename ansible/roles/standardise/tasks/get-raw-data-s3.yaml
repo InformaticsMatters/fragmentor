@@ -65,7 +65,7 @@
 # un-packing code. It may need to do nothing but
 # this is where we do vendor-specific presentation...
 
-- include_tasks: unpack-raw-data-{{ vendor }}.yaml
+- include_tasks: unpack-raw-data-{{ unpacker }}.yaml
 
 - name: Log line to report
   blockinfile:

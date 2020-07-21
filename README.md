@@ -405,12 +405,22 @@ For example:
 ```
 hardware:
   development:
-# Number of CPUs available for nextflow parallel jobs.
+# Parallel_jobs is used in calculating chunk sizes for processing - the normal assumption is that twice as many
+# jobs are created as cores are used. If this is less than cluster_cores, then not all the cluster will be used.
+# It is usually safe to set the parallel_jobs and cluster_cores to the same value.
     parallel_jobs: 8
+# Cluster cores is used in the nextflow_config. It defines the size of the cluster to use.
+    cluster_cores: 8
+# Sort memory defines the minimum memory required for deduplication/sorting..
+    sort_memory: 8 MB
 # Number of connections to postgres - note that this should be less than max_worker_processes in start-database.yaml.
     postgres_jobs: 6
   production:
-    parallel_jobs: 160
+# 100 parallel jobs/cores should be sufficient to process all but the largest libraries (full enamine/molport load).
+# For role combine, ideally this might be increased when combining large databases - otherwise there might be a timeout
+    parallel_jobs: 100
+    cluster_cores: 100
+    sort_memory: 8GB
     postgres_jobs: 18
 ```
 
@@ -524,6 +534,8 @@ if using an existing format, the columns/header line must match the existing for
   with the vendor/library identifier. For example standardise/vars/xchem_spot-variables.yaml contains:
 
 ```
+# The ansible unpack tasks - can be vendor specific
+   unpacker: decompress-gz-all
 # Python script used to standardise the molecules
    standardiser: frag.standardise.scripts.dsip.standardise_xchem_compounds
 # Input file template (unzipped) expected by standardiser. If there are multiple files this can be a glob. 
@@ -534,10 +546,8 @@ if using an existing format, the columns/header line must match the existing for
    standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id
 ```
  
-- Add a new vendor/library specific yaml task file to unpack the raw data. If this is an existing format then the 
- script for that format can be simply copied and renamed. Note that the name should begin with the vendor/library 
- identifier. For example: ansible/roles/standardise/tasks/unpack-raw-data-xchem_spot.yaml. If no specific processing 
- is required then the script can simply include the tasks in unpack-raw-data-decompress-gz-all.yaml.
+- Add a new vendor/library specific yaml task file to unpack the raw data if special processing is required 
+(see chemspace for an example). If this is an existing format then the standard unpacker is referred to (as above).
 - If the new vendor input file is the same as a current format, then an existing stndardisation python script can 
  be used. If the layout varies then more customisation is required. Please see below for more details on this.
 - Add a new create script for creating the i_mols_table 
@@ -568,10 +578,7 @@ CREATE TABLE i_mols_dsip (
 - The site-inchi playbook should not require any specific changes
 - Site-extract - Add the vendor/library specific header file in extract/files. If this is an existing format than the
  scripts for that format can be copied.
-- Extract - Add the vendor/library specific sql to match the header files in templates/sql. If this is an existing 
- format than the scripts for that format can be copied.
-- Remember to also check combinations will work (combinations use the molport vendor/library specific sql as this 
- contains all the fields). 
+- The site-combine playbook should not require any specific changes.
 
 ### Implementation Changes
 

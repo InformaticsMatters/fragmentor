@@ -11,7 +11,7 @@
 
 - name: Set raw path
   set_fact:
-    raw_path: ../data/{{ vendor|regex_replace('_', '/') }}/{{ version }}
+    raw_path: "{{ raw_data_path_disk }}/{{ vendor|regex_replace('_', '/') }}/{{ version }}"
 
 - name: Display raw path
   debug:
@@ -27,10 +27,10 @@
   - "{{ raw_path }}/*.gz"
 
 # Now hand over the get logic to vendor-specific
-# un-packing code. It may need to do nothing but
+# un-packing code (see vendor var files). It may need to do nothing but
 # this is where we do vendor-specific presentation...
 
-- include_tasks: unpack-raw-data-{{ vendor }}.yaml
+- include_tasks: unpack-raw-data-{{ unpacker }}.yaml
 
 - name: Log line to report
   blockinfile:

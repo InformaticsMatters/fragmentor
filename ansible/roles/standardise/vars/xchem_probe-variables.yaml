@@ -1,4 +1,6 @@
 ---
+# The ansible unpack tasks - can be vendor specific
+unpacker: decompress-gz-all
 # Python script used to standardise the molecules
 standardiser: frag.standardise.scripts.dsip.standardise_xchem_compounds
 # Input file template (unzipped) expected by standardiser. If there are multiple files this can be a glob.

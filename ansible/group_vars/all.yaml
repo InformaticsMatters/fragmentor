@@ -69,8 +69,10 @@ hardware:
 # Number of connections to postgres - note that this should be less than max_worker_processes in start-database.yaml.
     postgres_jobs: 6
   production:
-    parallel_jobs: 200
-    cluster_cores: 200
+# 100 parallel jobs/cores should be sufficient to process all but the largest libraries (full enamine/molport load).
+# For role combine, ideally this might be increased when combining large databases - otherwise there might be a timeout.
+    parallel_jobs: 100
+    cluster_cores: 100
     sort_memory: 8GB
     postgres_jobs: 18
 

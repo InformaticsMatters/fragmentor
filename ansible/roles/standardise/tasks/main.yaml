@@ -44,7 +44,7 @@
 
   - import_tasks: initialise-frag-process.yaml
 
-  - import_tasks: get-raw-data-{{ deployment }}.yaml
+  - import_tasks: get-raw-data-{{ data_source[deployment] }}.yaml
   - import_tasks: standardise-file.yaml
   - import_tasks: load-standardised-data.yaml
   - import_tasks: finalise.yaml
