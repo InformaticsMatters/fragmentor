@@ -10,15 +10,8 @@ speeding up the loading of extracts to the Neo4j database used by fragment searc
 Summary of Contents:
 
 - Ansible playbooks to populate the database: standardisation, fragmentation and inchi creation. 
-- A playbook to extract datasets of single and combinations of vendors for import into the Fragnet Search Neo4j database.
-- Standardise and fragmentation code based on the Fragalysis Repository 
-- Nextflow scripts to control cluster for Standardisation and Fragmentation steps.
-- Automatic parameter controlled chunking of input files at various stages to control and optimase throughput to the sql
-database. For updating exising datasets, this is mostly automatic.   
-- Processing is automated but can be adjusted with control parameters.
-- Processing starts/ends with an AWS S3 repository - assumed to contain the smiles data from vendors to be imported 
-into the process and will be the destination for Neo4j compatible extract files - and where they can be picked up by 
-Fragnet Search.  
+- A playbook to extract datasets of single and combinations of vendors from the database for import into the Fragnet Search Neo4j database.
+- A playbook to combine different extracted datasets (from, say, different databases) to create new Fragnet search Neo4j databases.
 - Playbooks are also provided to create, start, stop, and backup the database. 
 
 The libraries currently supported are as follows:
@@ -26,6 +19,18 @@ The libraries currently supported are as follows:
 - Molport
 - Chemspace: bb
 - Enamine: ro5
+
+Further datasets are planned.
+
+> Notes:
+
+- Standardise and fragmentation code based on the Fragalysis Repository 
+- Nextflow scripts are used to control a cluster for Standardisation, Fragmentation, Inchi calculation and combine plays.
+- The scripts contain parameter controlled chunking of input files at various stages to control and optimase throughput to the sql
+database. This can be tuned to the hardware/cluster.   
+- Processing normally starts and ends with an AWS S3 repository - assumed to contain the smiles data from vendors to be imported 
+into the process and will be the destination for Neo4j compatible extract files - and where they can be picked up by 
+Fragnet Search.  
 
 ## Prerequisites
 
@@ -249,12 +254,10 @@ As this step is driven by the database it it possible to run multiple standardis
 vendor/libraries followed by a single create_inchi step.
 
 
-
-## Extract Process Description
+## Extract a Neo4j Dataset to S3.
 
 ![Extract Sequence Diagram](images/ExtractSequence.png)
 
-## Extract a Neo4j Dataset to S3.
 
 The Extract Neo4j Dataset playbook will create a dataset exportable to Neo4j containing either a single vendor or 
 combination of vendors from information contained in the database. The export is based on parameters provided in a 
@@ -301,15 +304,69 @@ Note that for the larger extracts to complete there needs to be sufficient tempo
 directory for the database queries to complete. In the case of the complete extract including enamine and molport, for
 example, around 900GB if temporary space is required.
 
-## Combine Process Description
+## Combining Neo4 Datasets from S3/local disk.
 
 ![Combine Sequence Diagram](images/CombineSequence.png)
 
 
-## Combining Neo4 Datasets from S3/local disk.
+This playbook can be used to combine existing Neo4j datasets to produce one new Neo4j dataset. For example, if datasets 
+were produced using more than one database, this playbook can combine them allowing a combination of public/propriatory 
+data. Datasets can be downloaded from up to two AWS S3 repositories or directly from disk. The export can either be to 
+disk or saved up to AWS S3. The combination is based on parameters provided in a parameter file containing extracts(s) 
+and version(s) in the following example format:
 
-This playbook can be used to combine existing Neo4j datasets to produce a new dataset. For example, if datasets were
-produced using more than one database, this playbook can combine them allowing a combination of public/propriatory data.  
+
+```
+extracts:
+    - lib:
+        path: 'xchem_dsip'
+        data_source: disk
+    - lib:
+        path: 'extract/xchem_spot/v1'
+        data_source: s3
+        bucket: "{{ bucket_in_1 }}"
+        aws_access_key: "{{ aws_access_key_in_1 }}"
+        aws_secret_key: "{{ aws_secret_key_in_1 }}"
+    - lib:
+        path: 'extract/xchem_probe/v1'
+        data_source: s3
+        bucket: "{{ bucket_in_2 }}"
+        aws_access_key: "{{ aws_access_key_in_2 }}"
+        aws_secret_key: "{{ aws_secret_key_in_2 }}"
+
+# The path_out parameter defines the subdirector in "combinations" that will be used for the output.
+path_out: 'xchem_combi_20200715'
+
+# The AWS credentials for exporting the combinations.
+data_source_out: disk
+#bucket_out: {{ bucket_out }}
+#aws_access_key_out: "{{ aws_access_key_out }}"
+#aws_secret_key_out: "{{ aws_access_key_out }}"
+```
+
+> Notes
+
+The AWS access keys are provided as external parameters to the script in a similar way to the other playbooks. In the
+respository configuration, they are all set to AWS_ACCESS_KEY_ID and AWS_SECRET_KEY_ID, but this mapping can be 
+changed in the file roles/combine/defaults/main.yaml. A template (combination-parameters.template) is provided.
+
+For data source S3, the path if the full path to the dataset in the bucket rather than the vendor. This allows existing
+combinations to also be used as input sources.
+
+For data source disk - files are expected (by default) to be in a directory called "extract" (configurable) in the 
+runpath. If data_source_out is set to disk, then the combained extract will be available in the "combine" directory on 
+the runpath. 
+
+The command is:
+
+```
+ansible-playbook site-combine \
+     -e <@parameters> \
+     -e deployment=<development|production> \
+     -e runpath=<path to run directory. 
+```
+
+Example: navigate to the ansible directory
 
 ```
 $ ansible-playbook site-combine.yaml -e @parameters -e deployment=production -e runpath=/data/share-2/run01 

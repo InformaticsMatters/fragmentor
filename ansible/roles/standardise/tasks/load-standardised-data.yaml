@@ -41,7 +41,7 @@
     get_mime: no
     get_attributes: no
   with_fileglob:
-   - "{{ standpath }}/standardise/done-chunk_*"
+  - "{{ standpath }}/standardise/done-chunk_*"
   register: done_file
   changed_when: false
 

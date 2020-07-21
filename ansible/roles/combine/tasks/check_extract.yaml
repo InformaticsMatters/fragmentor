@@ -3,7 +3,7 @@
 # Display extract
 - name: Display extract
   debug:
-     msg: '{{ item.lib }}'
+    msg: '{{ item.lib }}'
 
 - name: Path sanity-check
   assert:
