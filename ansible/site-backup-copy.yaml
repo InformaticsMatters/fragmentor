@@ -8,6 +8,7 @@
       tasks_from: stop-database.yaml
   - include_role:
       name: backup
+      tasks_from: copy-database.yaml
   - include_role:
       name: configure
       tasks_from: start-database.yaml

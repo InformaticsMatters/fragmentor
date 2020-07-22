@@ -7,11 +7,4 @@
     - deployment|string != 'SetMe'
     fail_msg: You must provide a 'deployment' for the backup credential settings.
 
-- name: Create directories
-  file:
-    path: "{{ item }}"
-    state: directory
-  loop:
-  - "{{ database[deployment].backup_directory }}"
-
 - import_tasks: backup-{{ deployment }}.yaml

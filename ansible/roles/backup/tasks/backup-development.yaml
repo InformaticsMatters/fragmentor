@@ -6,6 +6,13 @@
     - python-dateutil==2.8.1
     - boto3==1.12.49
 
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ database[deployment].backup_directory }}"
+
 # Backup the database - Note: this does not bring down the database so it is still possible to run queries.
 - name: Backup database schema
   postgresql_db:

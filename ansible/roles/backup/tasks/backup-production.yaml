@@ -7,6 +7,15 @@
     - boto3==1.12.49
   become: yes
 
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ database[deployment].backup_directory }}"
+  become: true
+  become_user: "{{ database[deployment].db_user_account }}"
+
 # Backup the database - Note: this does not bring down the database so it is still possible to run queries.
 - name: Backup database schema
   postgresql_db:
