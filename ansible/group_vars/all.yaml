@@ -39,7 +39,6 @@ database:
     login_user: postgres
     login_password: 1234
     copy_directory: /var/lib/postgresql/data
-    home_directory: /home/user/project/postgresql/data
     db_user_account: postgres
   production:
     login_host: 130.246.214.154
@@ -48,7 +47,6 @@ database:
     login_user: fragmentor
     login_password: bullfinch
     copy_directory: /pgcopy
-    home_directory: /pgcopy
     db_user_account: fragmentor
 
 # Hardware sizing - used to calculate size of chunks in standardization/fragmentation.

@@ -9,4 +9,3 @@
     {{ db_root }}/pgdata
     {{ db_backup_root }}
   become: yes
-

@@ -15,14 +15,6 @@ extracts:
     version: 'SetMe'
     regenerate_index: 'SetMe'
 
-# Base path for all folders used in the run.
-# This should normally be different to the repo path and ideally should start with a "/".
-runpath: SetMe
-
-# If the user wants to add raw data from disk, it should be placed here
-# This defaults to the data directory in the repo which contains small samples of each library for testing.
-extract_data_path_disk: "{{ run_path }}/extract"
-
 # This can be altered if the user wants to - for example -use disk as a source from production
 data_source:
   development: disk

@@ -15,7 +15,7 @@
       -c 'max_worker_processes=24'
       -c 'max_parallel_workers=24'
       -c 'max_parallel_workers_per_gather=12'
-      -c 'synchronous_commit=on'
+      -c 'synchronous_commit=off'
       -c 'logging_collector=true'
       -c 'log_min_messages=notice'
       -c 'max_wal_size={{ db_max_wal_size_g }}GB'

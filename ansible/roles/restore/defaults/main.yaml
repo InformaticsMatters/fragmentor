@@ -1,0 +1,7 @@
+---
+
+# The DB server's database root directory
+# (there will be a pgdata directory in here)
+db_root: /pgdata
+# Where to copy the data to
+db_backup_root: /pgdata-backup
