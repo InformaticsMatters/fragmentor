@@ -14,4 +14,4 @@
   loop:
   - "{{ database[deployment].backup_directory }}"
 
-- import_tasks: get-raw-data-{{ deployment }}.yaml
+- import_tasks: backup-{{ deployment }}.yaml
