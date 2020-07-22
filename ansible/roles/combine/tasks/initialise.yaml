@@ -36,7 +36,7 @@
 
 # For each extract given in the parameters file, do some sanity checks
 - name: Check extracts to combine
-  include_tasks: check_extract.yaml
+  include_tasks: check-extract.yaml
   loop: "{{ extracts }}"
 
 # Check output credentials

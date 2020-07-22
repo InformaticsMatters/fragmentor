@@ -1,14 +1,6 @@
 ---
 # Extract initialisation script
 
-# Check run path
-- name: Ensure runpath is present
-  file:
-    path: "{{ item }}"
-    state: directory
-  loop:
-  - "{{ runpath }}"
-
 # Install modules to Synchronise the extract to S3
 - name: Install requirements
   pip:
@@ -27,7 +19,7 @@
 
 # For each source id given in the parameters file, do some sanity checks
 - name: Check and store source_id for each vendor
-  include_tasks: check_source_id.yaml
+  include_tasks: check-source-id.yaml
   loop: "{{ extracts }}"
 
 - name: Display source_id list

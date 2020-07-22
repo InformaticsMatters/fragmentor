@@ -16,6 +16,8 @@
 /*
  * Drop all tables if they exist (NB Order because of table key constrants) 
  */
+drop view IF EXISTS v_edge;
+drop view IF EXISTS v_edge_node;
 
 drop table IF EXISTS edge;
 
@@ -630,12 +632,12 @@ BEGIN
                 select se.parent_id, se.child_id, se.label
                   from source_edges se
                 order by 1,2,3
-           ON CONFLICT (parent_id, child_id, label) DO NOTHING;
+           ON CONFLICT (parent_id, child_id, label) DO NOTHING;' using src_id, chunk_size, (run_offset+(chunk_size*chunk_nr));
        if chunks_count >= commit_rate then
           chunks_count := 0;
           commit;
           commits := commits + 1;
-          RAISE NOTICE 'offset: %, molecules processed: %', run_offset, commits * commit_rate * chunk_size;
-       end if;
+          RAISE NOTICE 'offset: %, molecules processed: %' , run_offset, commits * commit_rate * chunk_size;
+        end if;
     END LOOP;
 end $edges$ ;

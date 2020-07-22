@@ -96,6 +96,9 @@ docker container could be launched with a command something like:
 $ docker run --shm-size=1g --name psql -v /home/user/project/postgresql/data:/var/lib/postgresql/data 
   -e POSTGRES_PASSWORD=1234 -p 5432:5432 -d postgres:alpine -c 'logging_collector=true' 
 ```
+In this case, an "extract" subdirectory directory must also be created within the "data" directory for the extract 
+play to successfully run. This must have correct permissions so that ansible can write to it. 
+
 
 Example: navigate to the ansible directory
 

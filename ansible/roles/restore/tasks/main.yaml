@@ -1,11 +1,84 @@
 ---
 
-# A 'crude' backup ... we rely on the database having been stopped
-# and so we copy the database directory.
+- name: Assert user-variable definitions
+  assert:
+    that:
+    - deployment|string|length > 0
+    - deployment|string != 'SetMe'
+    - restore_file|string|length > 0
+    - restore_file|string != 'SetMe'
+    fail_msg: You must provide a 'deployment' and a restore_file from the backups to restore to the database.
 
-- name: Copy the database
-  command: >-
-    cp --force --recursive --archive
-    {{ db_root }}/pgdata
-    {{ db_backup_root }}
+- name: check backup file is present on backup directory
+  stat:
+    path: "{{ database[deployment].backup_directory }}/{{ restore_file }}"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  register: backup_result
+
+- name: Assert backup file exists
+  assert:
+    that:
+    - backup_result.stat.exists
+
+- name: Check destructive update
+  pause:
+    prompt: |-
+      Are you sure you want to restore the database?
+      This is destructive as it must recreate the database to reload it. It cannot be redone.
+      Hit RETURN to continue or, to abort, press ctrl+c and then a.
+  tags: always
+
+# Install modules to perform the backup
+- name: Install requirements
+  pip:
+    name:
+    - python-dateutil==2.8.1
+    - boto3==1.12.49
   become: yes
+  when: deployment=="production"
+
+- name: Install requirements
+  pip:
+    name:
+    - python-dateutil==2.8.1
+    - boto3==1.12.49
+  when: deployment=="development"
+
+# Delete any existing database
+- name: remove database schema
+  postgresql_db:
+    db: "{{ db }}"
+    state: absent
+    login_host: "{{ login_host }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    port: "{{ port }}"
+    target: "{{ database[deployment].backup_directory }}/{{ restore_file }}"
+  when: deployment=="development"
+
+# Delete any existing database
+- name: start database schema
+  postgresql_db:
+    db: "{{ db }}"
+    state: present
+    login_host: "{{ login_host }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    port: "{{ port }}"
+    target: "{{ database[deployment].backup_directory }}/{{ restore_file }}"
+  when: deployment=="development"
+
+# Restore schema from a backuo
+- name: restore database schema
+  postgresql_db:
+    db: "{{ db }}"
+    state: restore
+    login_host: "{{ login_host }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    port: "{{ port }}"
+    target: "{{ database[deployment].backup_directory }}/{{ restore_file }}"
+  when: deployment=="development"

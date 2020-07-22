@@ -1,0 +1,21 @@
+---
+# Install modules to perform the backup
+- name: Install requirements
+  pip:
+    name:
+    - python-dateutil==2.8.1
+    - boto3==1.12.49
+  become: yes
+
+# Backup the database - Note: this does not bring down the database so it is still possible to run queries.
+- name: Backup database schema
+  postgresql_db:
+    db: "{{ db }}"
+    state: dump
+    login_host: "{{ login_host }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    port: "{{ port }}"
+    target: "{{ database[deployment].backup_directory }}/backup-{{ ansible_date_time.iso8601_basic_short }}.sql.gz"
+  delegate_to: "{{ groups['dbservers'][0] }}"
+  become: yes

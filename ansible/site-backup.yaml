@@ -1,12 +1,12 @@
 ---
 
-- hosts: dbservers[0]
+- hosts: head
   tasks:
-  - include_role:
-      name: configure
-      tasks_from: stop-database.yaml
+#  - include_role:
+#      name: configure
+#      tasks_from: stop-database.yaml
   - include_role:
       name: backup
-  - include_role:
-      name: configure
-      tasks_from: start-database.yaml
+#  - include_role:
+#      name: configure
+#      tasks_from: start-database.yaml

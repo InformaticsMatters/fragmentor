@@ -1,0 +1,11 @@
+---
+
+# A 'crude' backup ... we rely on the database having been stopped
+# and so we copy the database directory.
+
+- name: Copy the database
+  command: >-
+    cp --force --recursive --archive
+    {{ db_root }}/pgdata
+    {{ db_backup_root }}
+  become: yes

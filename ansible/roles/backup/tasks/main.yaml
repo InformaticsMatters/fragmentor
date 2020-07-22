@@ -1,12 +1,17 @@
 ---
 
-# A 'crude' backup ... we rely on the database having been stopped
-# and so we copy the database directory.
+- name: Assert user-variable definitions
+  assert:
+    that:
+    - deployment|string|length > 0
+    - deployment|string != 'SetMe'
+    fail_msg: You must provide a 'deployment' for the backup credential settings.
 
-- name: Copy the database
-  command: >-
-    cp --force --recursive --archive
-    {{ db_root }}/pgdata
-    {{ db_backup_root }}
-  become: yes
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ database[deployment].backup_directory }}"
 
+- import_tasks: get-raw-data-{{ deployment }}.yaml

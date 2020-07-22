@@ -15,7 +15,7 @@ extracts:
     version: 'SetMe'
     regenerate_index: 'SetMe'
 
-# This can be altered if the user wants to - for example -use disk as a source from production
+# This can be altered if the user wants to - for example -use disk as the extract location on production
 data_source:
   development: disk
   production: s3

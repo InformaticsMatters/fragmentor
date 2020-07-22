@@ -1,0 +1,13 @@
+---
+# This version of backup with copy the database to the backup location.
+# It requires the container to be stopped.
+- hosts: dbservers[0]
+  tasks:
+  - include_role:
+      name: configure
+      tasks_from: stop-database.yaml
+  - include_role:
+      name: backup
+  - include_role:
+      name: configure
+      tasks_from: start-database.yaml

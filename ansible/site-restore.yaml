@@ -1,0 +1,6 @@
+---
+
+- hosts: head
+  tasks:
+  - include_role:
+      name: restore

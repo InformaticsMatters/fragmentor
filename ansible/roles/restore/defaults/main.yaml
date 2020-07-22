@@ -1,7 +1,14 @@
 ---
+# The restore file value should be a file that exists on the backup directory.
+restore_file: SetMe
 
-# The DB server's database root directory
-# (there will be a pgdata directory in here)
-db_root: /pgdata
-# Where to copy the data to
-db_backup_root: /pgdata-backup
+# The database server's backup directory.
+# This *MUST* match the directory
+# mapped into the PostgreSQL container.
+# copy_root: /pgdata-backup
+backup_root: "{{ database[deployment].backup_directory }}"
+login_host: "{{ database[deployment].login_host }}"
+port: "{{ database[deployment].port }}"
+db: "{{ database[deployment].db }}"
+login_user: "{{ database[deployment].login_user }}"
+login_password: "{{ database[deployment].login_password }}"
