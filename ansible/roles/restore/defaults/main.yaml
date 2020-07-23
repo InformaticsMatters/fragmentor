@@ -1,6 +1,10 @@
 ---
 # The restore file value should be a file that exists on the backup directory.
-restore_file: SetMe
+restore_file: LATEST
+
+# Container for backup and recovery
+recovery_container_image: informaticsmatters/sql-recovery
+recovery_container_tag: 2020.4
 
 # The database server's backup directory.
 # This *MUST* match the directory

@@ -1,0 +1,50 @@
+---
+
+- name: check backup file is present on backup directory
+  stat:
+    path: "{{ database[deployment].backup_directory }}/hourly/{{ restore_file }}"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  delegate_to: "{{ groups['dbservers'][0] }}"
+  become: yes
+  register: backup_result
+  when: restore_file|string != 'LATEST'
+
+# {{ backup_name|default('latest', true) }}
+- name: Assert backup file exists
+  assert:
+    that:
+    - backup_result.stat.exists
+  when: restore_file|string != 'LATEST'
+
+# Install modules to perform the backup
+- name: Install requirements
+  pip:
+    name:
+    - python-dateutil==2.8.1
+    - boto3==1.12.49
+  delegate_to: "{{ groups['dbservers'][0] }}"
+  become: yes
+
+# docker run -e MSHOST=172.17.0.1 \
+  #    -e MSUSER=root -e MSPASS=my-secret-pw \
+  #    -v /tmp:/backup informaticsmatters/sql-recovery:latest
+
+- name: Restore backup
+  docker_container:
+    name: db-recover
+    image: "{{ recovery_container_image }}:{{ recovery_container_tag }}"
+    state: started
+    restart_policy: no
+    env:
+      PGHOST: "{{ database[deployment].login_host }}"
+      PGUSER: "{{ database[deployment].login_user }}"
+      PGADMINPASS: "{{ database[deployment].login_password }}"
+      BACKUP_FROM: "{{ database[deployment].backup_count }}"
+    volumes:
+    - "{{ database[deployment].backup_directory }}:/backup"
+    network_mode: host
+  become: yes
+  become_user: "{{ database[deployment].db_user_account }}"

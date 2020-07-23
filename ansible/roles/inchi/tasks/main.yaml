@@ -38,3 +38,8 @@
       db: "{{ database[deployment].db }}"
       login_user: "{{ database[deployment].login_user }}"
       login_password: "{{ database[deployment].login_password }}"
+
+# Backup database if required using the site-backup play.
+- include_role:
+    name: backup
+  when: add_backup|bool

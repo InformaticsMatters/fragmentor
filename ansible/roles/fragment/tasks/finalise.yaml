@@ -45,3 +45,8 @@
 - name: Copy log files to repo
   shell: cp {{ fragpath }}/fragment/* {{ logpath }}/log/{{ vendor }}/{{ version }}/fragment
   when: deployment=="development"
+
+# Backup database if required using the site-backup play.
+- include_role:
+    name: backup
+  when: add_backup|bool

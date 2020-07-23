@@ -25,3 +25,6 @@ nextpath: "{{ runpath }}/nextflow"
 vendor: SetMe
 # The user is required tp specify the version on the command-line
 version: SetMe
+
+# When set to "yes" this will automatically back up the database at the end of the fragmentation play.
+add_backup: no

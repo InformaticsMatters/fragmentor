@@ -185,6 +185,7 @@ $ ansible-playbook site-standardise.yaml  \
           -e runpath=<work directory for this run> \
           (-e add_file=<yes|no> \)
           (-e clean_start=<yes|no>)
+          (-e add_backup=<yes|no>)
 ```
 
 Example: navigate to the ansible directory
@@ -211,7 +212,9 @@ location only contains the required files for that run.
 If set to 'No', it will not delete the contents of the previous run. This is provided only for debugging purposes and 
 should be used with caution.
 
+> Optional parameter add_backup: default: no
 
+If set to yes, this automatically backs up the database after the standardisation play. 
 
 ### Fragmentation
 
@@ -224,6 +227,7 @@ $ ansible-playbook site-fragment.yaml  \
           -e version=<version> \
           -e deployment=<development|production> \
           -e runpath=<work directory for this run> 
+          (-e add_backup=<yes|no>)
 ```
 
 Example: navigate to the ansible directory
@@ -236,6 +240,10 @@ A fragmentation step would normally be processed directly after a standardisatio
 the database it it possible to run multiple standardisation steps for a vendor/library followed by a single fragmentation
 step.
 
+> Optional parameter add_backup: default: no
+
+If set to yes, this automatically backs up the database after the fragmentation play. 
+
 
 ### Create Inchi Keys
 
@@ -246,6 +254,7 @@ It is not vendor/library specific and can be run as follows:
 $ ansible-playbook site-inchi.yaml  \ 
           -e deployment=<development|production> \
           -e runpath=<work directory for this run> 
+          (-e add_backup=<yes|no>)
 ```
 
 Example: navigate to the ansible directory
@@ -256,6 +265,10 @@ $ ansible-playbook site-inchi.yaml -e deployment=production -e runpath=/data/sha
 As this step is driven by the database it it possible to run multiple standardisation/fragmentation steps for different 
 vendor/libraries followed by a single create_inchi step.
 
+> Optional parameter add_backup: default: yes
+
+If set to yes, this automatically backs up the database after the Inchi play. Note that this defaults to "yes" as at 
+this stage the data import for a new library would be complete.
 
 ## Extract a Neo4j Dataset to S3.
 
@@ -370,25 +383,43 @@ Example: navigate to the ansible directory
 $ ansible-playbook site-combine.yaml -e @parameters -e deployment=production -e runpath=/data/share-2/run01 
 ```
 
-## Backing up the Database
+## Backing up and Restoring the Database
 
-A simple backup play can be used to copy the database files to the
-backup volume in the DB server. It stops the database, copies the files
-and then restarts the database: -
+The backup playbook can also be used in isolation from the other playbooks. It uses pg_dumpall to create a zipped copy 
+of the complete database. The play will automatically clear up all versions of backups - the number of backups retained 
+defaults to 2, but can be adjusted per database (the backup_count parameter in group_vars/all.yaml). 
 
-Example: navigate to the ansible directory
+Example: 
 
 ```
 ansible-playbook site-backup.yaml -e deployment=production 
 ```
 
-Similarly their are playbooks to stop and start the database server. The postgres startup configuration items are set 
+A backed up database can be restored with the restore playbook. It defaults to the latest saved backup. 
+Other backups can be chosen by setting the optional restore_file parameter to the name of the file in the 'hourly'
+folder.
+
+Examples: 
+
+```
+ansible-playbook site-restore.yaml -e deployment=production 
+ansible-playbook site-restore.yaml -e deployment=production -e restore_file=backup-2020-07-23T16:12:56Z-dumpall.sql.gz
+```
+
+Similarly there are playbooks to stop and start the database server. The postgres startup configuration items are set 
 up in the start-database playbook.
 ```
 ansible-playbook site-configure_stop-database.yaml -e deployment=production 
 ansible-playbook site-configure_start-database.yaml -e deployment=production   
 ```
+As an alternative to the pg_dump based backup and restore plays a simple backup play has also been created to copy the 
+database volume to the backup volume in the DB server. It stops the database, copies the files and then restarts the database: -
 
+Example: navigate to the ansible directory
+
+```
+ansible-playbook site-backup-copy.yaml -e deployment=production 
+```
 
 ## Tuning Parameters
 

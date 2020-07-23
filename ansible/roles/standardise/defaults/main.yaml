@@ -44,3 +44,6 @@ raw_data_path_disk: "{{ reppath }}/data"
 data_source:
   development: disk
   production: s3
+
+# When set to "yes" this will automatically back up the database at the end of the standardisation play.
+add_backup: no

@@ -1,4 +1,6 @@
 ---
+# NOTE - Currently unused - for future use.
+
 
 # Sends email (if all the key variables are defined).
 # It expects the following variables to be defined: -

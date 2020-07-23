@@ -14,12 +14,28 @@
   - "{{ database[deployment].backup_directory }}"
 
 # Backup the database - Note: this does not bring down the database so it is still possible to run queries.
-- name: Backup database schema
-  postgresql_db:
-    db: "{{ db }}"
-    state: dump
-    login_host: "{{ login_host }}"
-    login_user: "{{ login_user }}"
-    login_password: "{{ login_password }}"
-    port: "{{ port }}"
-    target: "{{ database[deployment].backup_directory }}/backup-{{ ansible_date_time.iso8601_basic_short }}.sql.gz"
+#- name: Backup database schema
+#  postgresql_db:
+#    db: "{{ db }}"
+#    state: dump
+#    login_host: "{{ login_host }}"
+#    login_user: "{{ login_user }}"
+#    login_password: "{{ login_password }}"
+#    port: "{{ port }}"
+#    target: "{{ database[deployment].backup_directory }}/backup-{{ ansible_date_time.iso8601_basic_short }}.sql.gz"
+
+# sudo docker run --rm -v /pgdata-backup:/backup -e PGHOST=130.246.214.154 -e PGUSER=fragmentor -e PGADMINPASS=bullfinch informaticsmatters/sql-backup:2020.4
+- name: Start backup
+  docker_container:
+    name: db-backup
+    image: "{{ backup_container_image }}:{{ backup_container_tag }}"
+    state: started
+    restart_policy: no
+    env:
+      PGHOST: "{{ database[deployment].login_host }}"
+      PGUSER: "{{ database[deployment].login_user }}"
+      PGADMINPASS: "{{ database[deployment].login_password }}"
+      BACKUP_COUNT: "{{ database[deployment].backup_count }}"
+    volumes:
+    - "{{ database[deployment].backup_directory }}:/backup"
+    network_mode: host
