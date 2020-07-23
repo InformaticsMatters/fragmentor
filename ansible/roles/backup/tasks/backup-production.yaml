@@ -5,6 +5,7 @@
     name:
     - python-dateutil==2.8.1
     - boto3==1.12.49
+  delegate_to: "{{ groups['dbservers'][0] }}"
   become: yes
 
 - name: Create directories
@@ -13,8 +14,8 @@
     state: directory
   loop:
   - "{{ database[deployment].backup_directory }}"
-  become: true
-  become_user: "{{ database[deployment].db_user_account }}"
+  delegate_to: "{{ groups['dbservers'][0] }}"
+  become: yes
 
 # Backup the database - Note: this does not bring down the database so it is still possible to run queries.
 - name: Backup database schema
