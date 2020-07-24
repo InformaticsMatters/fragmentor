@@ -47,4 +47,4 @@
     - "{{ database[deployment].backup_directory }}:/backup"
     network_mode: host
   become: yes
-  become_user: "{{ database[deployment].db_user_account }}"
+  delegate_to: "{{ groups['dbservers'][0] }}"
