@@ -10,5 +10,6 @@ all:
     dbservers:
       hosts:
         130.246.214.154:
+        130.246.214.46:
       vars:
         ansible_user: centos
