@@ -68,10 +68,45 @@
   loop: "{{ lookup('dict', db_devices) }}"
   when: item.value.device not in mounted_devices
 
+# Now create a dictionary of device names (/dev/vda)
+# against device UUID (c55fbb69-46b5-432e-a222-59ef5531923f)
+# so that we can use the UUID when mounting.
+#
+# We have to filter the devices in an attempt to ignore those
+# that don't look like /dev/vd?. Those that don't don't have a UUID
+# like /dev/sr0.
+
+- name: Display ansible_devices
+  debug:
+    var: ansible_devices
+
+- name: Get device names
+  set_fact:
+    device_names: "{{ ansible_devices.keys() }}"
+
+- name: Filter device names
+  set_fact:
+    device_names: "{{ device_names|select('match', 'vd.*')|list }}"
+
+- name: Get device UUIDs
+  set_fact:
+    device_uuids: "{{ ansible_devices|json_query('*.links.uuids')|flatten }}"
+
+- name: Create device UUID dictionary
+  set_fact:
+    device_uuids_dict: "{{ device_uuids_dict|default({})|combine({'/dev/' + item.0: item.1}) }}"
+  with_together:
+  - "{{ device_names }}"
+  - "{{ device_uuids }}"
+
+- name: Display devide UUID dictionary
+  debug:
+    var: device_uuids_dict
+
 - name: Mount DB volumes
   mount:
     path: "{{ item.value.mount_path }}"
-    src: "{{ item.value.device }}"
+    src: UUID={{ device_uuids_dict[item.value.device] }}
     fstype: ext4
     state: mounted
   loop: "{{ lookup('dict', db_devices) }}"
