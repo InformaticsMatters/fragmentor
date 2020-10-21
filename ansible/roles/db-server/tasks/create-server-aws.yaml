@@ -8,58 +8,81 @@
     - aws_secret_access_key|string|length > 0
     - aws_keypair_name|string != 'SetMe'
 
-# Select an instance AMI (Amazon, CentOS 7)...
+# Lookup potential existing server.
+# To avoid creating another instance.
 
-- name: Get CentOS AMIs
-  ec2_ami_info:
-    aws_access_key: "{{ aws_access_key_id}}"
-    aws_secret_key: "{{ aws_secret_access_key }}"
-    region: "{{ aws_default_region }}"
-    owners: 125523088429
+- name: Lookup DB server (starting or starte)
+  ec2_instance_info:
     filters:
-      state: available
-      architecture: x86_64
-      name: 'CentOS 7*'
-  register: ami_result
+      "tag:Purpose": fragmentor-database
+      instance-state-name:
+      - pending
+      - running
+  register: ec2_result
 
-- name: Assert at least one image
-  assert:
-    that: ami_result.images|length > 0
+- block:
 
-- name: Select latest AMI
-  set_fact:
-    db_ami: >-
-      {{ ami_result.images
-      | selectattr('name', 'defined')
-      | sort(attribute='creation_date')
-      | last }}
+  # Select an instance AMI (Amazon, CentOS 7)...
 
-- name: Display chosen CentOS AMI
-  debug:
-    var: db_ami.image_id
+  - name: Get CentOS AMIs
+    ec2_ami_info:
+      aws_access_key: "{{ aws_access_key_id}}"
+      aws_secret_key: "{{ aws_secret_access_key }}"
+      region: "{{ aws_default_region }}"
+      owners: 125523088429
+      filters:
+        state: available
+        architecture: x86_64
+        name: 'CentOS 7*'
+    register: ami_result
 
-# Create server
+  - name: Assert at least one image
+    assert:
+      that: ami_result.images|length > 0
 
-- name: Create DB server
-  ec2:
-    key_name: "{{ aws_keypair_name }}"
-    instance_type: "{{ aws_instance_type }}"
-    image: "{{ db_ami.image_id }}"
-    wait: yes
-    wait_timeout: 600
-    volumes:
-    - device_name: /dev/xvda
-      delete_on_termination: yes
-      volume_type: gp2
-      volume_size: "{{ db_volume_size_g }}"
-    instance_tags:
-      Purpose: fragmentor-database
-  register: server_result
+  - name: Select latest AMI
+    set_fact:
+      db_ami: >-
+        {{ ami_result.images
+        | selectattr('name', 'defined')
+        | sort(attribute='creation_date')
+        | last }}
 
-- name: Assert DB server instance exists
-  assert:
-    that: server_result.instance_ids|length == 1
+  - name: Display chosen CentOS AMI
+    debug:
+      var: db_ami.image_id
 
-- name: Display DB server instance ID
-  debug:
-    var: server_result.instance_ids[0]
+  # Create server
+
+  - name: Create DB server
+    ec2:
+      key_name: "{{ aws_keypair_name }}"
+      instance_type: "{{ aws_instance_type }}"
+      image: "{{ db_ami.image_id }}"
+      wait: yes
+      wait_timeout: 600
+      volumes:
+      - device_name: /dev/sda1
+        delete_on_termination: yes
+        volume_size: "{{ db_volume_size_g }}"
+      instance_tags:
+        Purpose: fragmentor-database
+    register: server_result
+
+  - name: Assert DB server instance exists
+    assert:
+      that: server_result.instance_ids|length == 1
+
+  - name: Display DB server instance ID
+    debug:
+      var: server_result.instance_ids[0]
+
+  - name: Display DB server address (DNS)
+    debug:
+      var: server_result.instances[0].dns_name
+
+  - name: Display DB server address (Private IP)
+    debug:
+      var: server_result.instances[0].private_ip
+
+  when: ec2_result.instances|length == 0

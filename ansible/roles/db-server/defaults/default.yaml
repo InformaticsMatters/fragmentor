@@ -1,0 +1,4 @@
+---
+
+# A default (fall-back) set of variables.
+# Used if there's no file for specific cloud provider.

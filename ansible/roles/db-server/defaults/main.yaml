@@ -3,7 +3,5 @@
 # Present or absent?
 db_server_state: present
 
-# Cloud database provider.
-# Identifies which tasks/create-server-???.yaml file to run.
-db_cloud_provider: aws
+# Root-volume size
 db_volume_size_g: 10

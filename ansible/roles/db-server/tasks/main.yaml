@@ -1,9 +1,13 @@
 ---
 
 - name: Load provider-specific variables
-  include_vars: defaults/variables-{{ db_cloud_provider }}.yaml
+  include_vars: "{{ lookup('first_found', possible_files) }}"
+  vars:
+    possible_files:
+    - defaults/variables-{{ database_cloud_provider }}.yaml
+    - defaults/default.yaml
 
-- import_tasks: create-server-{{ db_cloud_provider }}.yaml
+- import_tasks: create-server-{{ database_cloud_provider }}.yaml
   when: db_server_state == 'present'
-- import_tasks: delete-server-{{ db_cloud_provider }}.yaml
+- import_tasks: delete-server-{{ database_cloud_provider }}.yaml
   when: db_server_state != 'present'

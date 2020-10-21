@@ -13,6 +13,9 @@
   ec2_instance_info:
     filters:
       "tag:Purpose": fragmentor-database
+      instance-state-name:
+      - pending
+      - running
   register: ec2_result
 
 # Delete server
