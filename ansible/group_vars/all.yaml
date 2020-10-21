@@ -95,7 +95,7 @@ hardware:
 # For role combine, ideally this might be increased when combining large databases - otherwise there might be a timeout.
     parallel_jobs: 100
     cluster_cores: 100
-    sort_memory: 8GB
+    sort_memory: 8MB
     postgres_jobs: 18
 
 # Vendor defaults.
