@@ -1,5 +1,4 @@
 process {
-    executor = 'condor'
     container = 'busybox:latest'
 }
 singularity {
@@ -7,11 +6,6 @@ singularity {
     cacheDir = "{{ runpath }}/singularity-containers"
     autoMounts = true
 }
-executor {
-    queueSize = {{ hardware[deployment].cluster_cores }}
-}
-
-tower {
-  accessToken = '74cbe919f9839da1cb752715689bf9bf5d10c98a'
-  enabled = true
-}
+//executor {
+//    queueSize = {{ hardware[deployment].cluster_cores }}
+//}
