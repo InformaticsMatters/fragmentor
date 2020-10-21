@@ -14,7 +14,7 @@
       -c 'autovacuum_max_workers={{ db_max_parallel_workers }}'
       -c 'max_worker_processes={{ db_max_parallel_workers }}'
       -c 'max_parallel_workers={{ db_max_parallel_workers }}'
-      -c 'max_parallel_workers_per_gather={{ db_max_parallel_workers|int / 2 }}'
+      -c 'max_parallel_workers_per_gather={{ (db_max_parallel_workers|int / 2)|int }}'
       -c 'synchronous_commit=off'
       -c 'logging_collector=true'
       -c 'log_min_messages=notice'
