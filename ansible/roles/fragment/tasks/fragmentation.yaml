@@ -98,7 +98,6 @@
        {{ reppath }}/nextflow/fragmentation.nf
        -w {{ nextpath }}
        -with-report {{ fragpath }}/fragment/fragmentation_nextflow_report.html
-       -with-tower
        --input {{ fragpath }}/fragment/{{ fragsmifile }}
        --out_dir {{ fragpath }}/fragment
        --chunk_size {{ fragchunksize|int }}
