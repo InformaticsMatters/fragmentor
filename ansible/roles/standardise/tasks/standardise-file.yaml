@@ -127,7 +127,6 @@
       {{ reppath }}/nextflow/standardizer.nf
       -w {{ nextpath }}
       -with-report {{ standpath }}/standardise/standardise_nextflow_report.html
-      -with-tower
       --script {{ standardiser }}
       --inputs {{ datapath }}/data/{{ vendor }}/"{{ standinputfile }}"
       --out_dir {{ standpath }}/standardise
