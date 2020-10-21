@@ -1,8 +1,8 @@
 ---
 
 # Database server specification
-aws_keypair_name: SetMe
-aws_instance_type: t3a.micro
+aws_keypair_name: nf-pcluster
+aws_instance_type: t3a.xlarge
 
 aws_default_region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
 aws_access_key_id: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
