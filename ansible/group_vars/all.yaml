@@ -47,7 +47,7 @@ database:
     backup_count: 2
     db_user_account: postgres
   production:
-    login_host: 130.246.214.154
+    login_host: "{{ lookup('env', 'FRAGMENTOR_DB_HOST')|default('130.246.214.154', true) }}"
     port: 5432
     db: fairmolecules
     login_user: fragmentor
@@ -56,6 +56,25 @@ database:
     backup_directory: /pgdata-backup
     backup_count: 2
     db_user_account: fragmentor
+
+# A default set of devices.
+# Normally specified in a host-specific file in host_vars
+#
+# The DB server's database, backup, pgcopy and wal volume
+# devices, and mount-points
+db_devices:
+  pg_data:
+    device:
+    mount_path: /pgdata
+  pg_copy:
+    device:
+    mount_path: /pgcopy
+  pg_wal:
+    device:
+    mount_path: /pgwal
+  pg_backup:
+    device:
+    mount_path: /pgdata-backup
 
 # Hardware sizing - used to calculate size of chunks in standardization/fragmentation.
 # A map of variables based on deployment target.
