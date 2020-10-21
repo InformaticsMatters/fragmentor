@@ -95,7 +95,6 @@
       {{ reppath }}/nextflow/generateinchi.nf
       -w {{ nextpath }}
       -with-report {{ fragpath }}/isoinchi/generateinchi_report.html
-      -with-tower
       --input {{ fragpath }}/isoinchi/{{ isoinchifile }}
       --out_dir {{ fragpath }}/isoinchi
       --outputfile {{ isoinchitab }}

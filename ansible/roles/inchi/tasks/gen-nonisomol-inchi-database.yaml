@@ -88,7 +88,6 @@
       {{ reppath }}/nextflow/generateinchi.nf
       -w {{ nextpath }}
       -with-report {{ fragpath }}/inchi/generateinchi_report.html
-      -with-tower
       --input {{ fragpath }}/inchi/{{ inchifile }}
       --out_dir {{ fragpath }}/inchi
       --outputfile {{ inchitab }}
