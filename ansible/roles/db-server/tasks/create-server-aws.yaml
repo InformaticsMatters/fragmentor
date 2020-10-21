@@ -68,6 +68,7 @@
         delete_on_termination: yes
         volume_size: "{{ db_volume_size_g }}"
       instance_tags:
+        Name: FragmentorDatabase
         Purpose: fragmentor-database
     register: server_result
 
