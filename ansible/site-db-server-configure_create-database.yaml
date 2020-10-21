@@ -6,5 +6,5 @@
 - hosts: localhost
   tasks:
   - include_role:
-      name: configure
+      name: db-server-configure
       tasks_from: create-database.yaml

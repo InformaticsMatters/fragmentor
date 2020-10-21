@@ -1,5 +1,10 @@
 ---
 
+# NOTE:   This code does not (as yet) create the server.
+#         Instead it expects production and development servers
+#         at the designated locations in the database map
+#         (see group_vars/all.yaml)
+
 # In order to create the server we need to: -
 #
 # 1. Create the database service account

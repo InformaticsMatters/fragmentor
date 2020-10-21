@@ -3,5 +3,5 @@
 - hosts: dbservers[0]
   tasks:
   - include_role:
-      name: configure
+      name: db-server-configure
       tasks_from: start-database.yaml
