@@ -88,7 +88,7 @@
   - name: Create DB server
     ec2:
       key_name: "{{ aws_keypair_name }}"
-      instance_type: "{{ aws_instance_type }}"
+      instance_type: "{{ aws_db_instance_type }}"
       image: "{{ db_ami.image_id }}"
       vpc_subnet_id: "{{ aws_vpc_subnet_id}}"
       groups:

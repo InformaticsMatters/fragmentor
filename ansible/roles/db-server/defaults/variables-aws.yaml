@@ -2,7 +2,7 @@
 
 # Database server specification
 aws_keypair_name: nf-pcluster
-aws_instance_type: t3a.xlarge
+aws_db_instance_type: t3a.2xlarge
 aws_vpc_subnet_id: SetMe
 aws_vpc_id: SetMe
 
