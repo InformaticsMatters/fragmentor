@@ -79,10 +79,6 @@
         Purpose: fragmentor-database
     register: sg_result
 
-  - name: Display security group ID
-    debug:
-      msg: Database security group is {{ sg_result.group_id }}
-
   # Create server
 
   - name: Create DB server
@@ -92,7 +88,7 @@
       image: "{{ db_ami.image_id }}"
       vpc_subnet_id: "{{ aws_vpc_subnet_id}}"
       groups:
-      - "{{ sg_result.group_id }}"
+      - fragmentor-database
       wait: yes
       wait_timeout: 600
       volumes:
