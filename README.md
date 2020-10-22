@@ -652,3 +652,87 @@ Removing the environment:
 ```
 conda env remove --name fragmentor
 ```
+
+## Executing on an AWS ParallelCluster
+We can execute on an AWS ParallelCluster environment. A suitable cluster can be
+formed by following the instructions in our [nextflow-pcluster] repository.
+
+With a cluster formed you should clone this repository to the **MasterServer**
+instance where you can run our playbooks to create a postgres database server
+and then execute the fragmentor plays. From here we assume you're
+on the cluster's master instance: -
+
+>   You should have your cluster private key in ~/.ssh as described in the
+    [nextflow-pcluster] documentation
+
+    $ git clone https://github.com/InformaticsMatters/fragmentor
+    $ cd fragmentor/ansible
+    $ sudo pip install --upgrade pip
+    $ sudo pip install -r ../requirements.txt
+    $ ansible-galaxy install -r ../requirements.yaml
+
+Add the cluster private key to the SSH agent: -
+
+    $ eval `ssh-agent`
+    $ ssh-add ~/.ssh/nf-pcluster
+    
+Set your AWS credentials. You'll need these if you're creating the cluster's
+postgres database: -
+
+    $ export AWS_DEFAULT_REGION=eu-central-1
+    $ export AWS_ACCESS_KEY_ID=?????
+    $ export AWS_SECRET_ACCESS_KEY=?????
+
+Life's a lot easier using parameter files with ansible, so create file
+that provides variables that satisfy your cluster in order to create
+and configure the cluster database. Something like this: -
+
+```yaml
+---
+db_server_state: present
+aws_db_instance_type: t3a.2xlarge
+db_volume_size_g: 10
+database_cloud_provider: aws
+deployment: production
+db_shared_buffers_g: 4
+db_max_parallel_workers: 8A
+runpath: /efs/frag
+aws_vpc_subnet_id: <CLUSTER_VPC_ID>
+aws_vpc_id: <CLUSTER_PUBLIC_SUBNET_ID>
+```
+
+Now create the server: -
+
+    $ ansible-playbook site-db-server.yaml -e @parameters 
+
+Using the AWS console wait for the server to become ready (initialise) and
+then configure it. You will need to install the `ec2.py` dynamic inventory
+script, provided by ansible. The following installs thew script locally
+and then runs an ansible `ping` to ensure the database server can be found: -
+
+    $ wget https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.py
+    $ chmod +x ec2.py
+    $ export EC2_INSTANCE_FILTERS='tag:Name=FragmentorProductionDatabase'
+
+    $ ansible -i ec2.py tag_Name_FragmentorProductionDatabase -m ping
+
+Adjust your parameters to now include the address of the database server,
+i.e. add this to your parameter file: -
+
+```yaml
+database_login_host: <DATABSE_PUBLIC_IP>
+```
+
+Now you can configure the server and start and prepare the
+fragmentation database. The first two plays rely on dynamic inventory
+provided by the `ec2.py` script: -
+
+    $ ansible-playbook -i ec2.py site-db-server-configure.yaml -e @parameters
+    $ ansible-playbook -i ec2.py site-db-server-configure_start-database.yaml -e @parameters
+    $ ansible-playbook site-db-server-configure_create-database.yaml -e @parameters
+
+From here you should be able to run fragmentation plays.
+
+---
+
+[nextflow-pcluster]: https://github.com/InformaticsMatters/nextflow-pcluster
