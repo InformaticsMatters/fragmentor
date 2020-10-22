@@ -6,3 +6,4 @@ ansible == 2.9.14
 boto == 2.49.0
 boto3 == 1.15.18
 jmespath == 0.10.0
+psycopg2-binary == 2.8.6
