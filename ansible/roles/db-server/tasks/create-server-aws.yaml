@@ -89,6 +89,9 @@
       vpc_subnet_id: "{{ aws_vpc_subnet_id}}"
       groups:
       - fragmentor-database
+      user_data: |
+        #!/bin/sh
+        sudo yum install -y epel-release
       wait: yes
       wait_timeout: 600
       volumes:
