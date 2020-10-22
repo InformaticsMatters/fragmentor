@@ -26,4 +26,4 @@ sudo sed -i "${include_cluster_line_num}i${REAL_MEM_LINE}" /opt/slurm/etc/slurm.
 sudo systemctl restart slurmctld
 
 # Inform the user...
-echo "ComputeFleet memory set to ${REAL_MEM}MiB"
+echo "ComputeFleet memory set to ${REAL_MEM} MiB"
