@@ -4,9 +4,6 @@
 # It consists of a head node and database severs.
 all:
   children:
-    head:
-      hosts:
-        localhost:
     dbservers:
       hosts:
         130.246.214.154:
