@@ -9,19 +9,19 @@
 # A map of deafults based on the vendor and library.
 
 extracts:
-    - lib:
-        vendor: 'xchem_dsip'
-        version: 'v1'
-        regenerate_index: 'no'
-    - lib:
-        vendor: 'molport'
-        version: '2020-02'
-        regenerate_index: 'yes'
-    - lib:
-        vendor: chemspace_bb:
-        version: 'December2019',
-        regenerate_index: 'yes'
-    - lib:
-        vendor: enamine_r05:
-        version: 'jun2018',
-        regenerate_index: 'yes'
+- lib:
+    vendor: 'xchem_dsip'
+    version: 'v1'
+    regenerate_index: 'no'
+- lib:
+    vendor: 'molport'
+    version: '2020-02'
+    regenerate_index: 'yes'
+- lib:
+    vendor: chemspace_bb:
+    version: 'December2019',
+    regenerate_index: 'yes'
+- lib:
+    vendor: enamine_r05:
+    version: 'jun2018',
+    regenerate_index: 'yes'

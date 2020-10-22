@@ -4,6 +4,8 @@
 # by just running the appropriate play in the configure role.
 
 - hosts: localhost
+  gather_facts: no
+
   tasks:
   - include_role:
       name: db-server-configure

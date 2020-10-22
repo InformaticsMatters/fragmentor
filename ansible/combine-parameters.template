@@ -17,21 +17,21 @@
 # To set these to different values add/set new parameters for aws_access_key_in_2 and aws_secret_key_in_2.
 
 extracts:
-    - lib:
-        path: 'xchem_dsip'
-        data_source: disk
-    - lib:
-        path: 'extract/xchem_spot/v1'
-        data_source: s3
-        bucket: "{{ bucket_in_1 }}"
-        aws_access_key: "{{ aws_access_key_in_1 }}"
-        aws_secret_key: "{{ aws_secret_key_in_1 }}"
-    - lib:
-        path: 'extract/xchem_probe/v1'
-        data_source: s3
-        bucket: "{{ bucket_in_2 }}"
-        aws_access_key: "{{ aws_access_key_in_2 }}"
-        aws_secret_key: "{{ aws_secret_key_in_2 }}"
+- lib:
+    path: 'xchem_dsip'
+    data_source: disk
+- lib:
+    path: 'extract/xchem_spot/v1'
+    data_source: s3
+    bucket: "{{ bucket_in_1 }}"
+    aws_access_key: "{{ aws_access_key_in_1 }}"
+    aws_secret_key: "{{ aws_secret_key_in_1 }}"
+- lib:
+    path: 'extract/xchem_probe/v1'
+    data_source: s3
+    bucket: "{{ bucket_in_2 }}"
+    aws_access_key: "{{ aws_access_key_in_2 }}"
+    aws_secret_key: "{{ aws_secret_key_in_2 }}"
 
 # The path_out parameter defines the subdirector in "combinations" that will be used for the output.
 path_out: 'xchem_combi_20200715'

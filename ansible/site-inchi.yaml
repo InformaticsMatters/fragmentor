@@ -1,5 +1,7 @@
 ---
 
-- hosts: head
+- hosts: localhost
+  gather_facts: no
+
   roles:
   - inchi
