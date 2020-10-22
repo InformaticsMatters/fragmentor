@@ -695,7 +695,7 @@ db_volume_size_g: 10
 database_cloud_provider: aws
 deployment: production
 db_shared_buffers_g: 4
-db_max_parallel_workers: 8A
+db_max_parallel_workers: 8
 runpath: /efs/frag
 aws_vpc_subnet_id: <CLUSTER_VPC_ID>
 aws_vpc_id: <CLUSTER_PUBLIC_SUBNET_ID>
@@ -731,7 +731,11 @@ provided by the `ec2.py` script: -
     $ ansible-playbook -i ec2.py site-db-server-configure_start-database.yaml -e @parameters
     $ ansible-playbook site-db-server-configure_create-database.yaml -e @parameters
 
-From here you should be able to run fragmentation plays.
+From here you should be able to run fragmentation plays, i.e. stuff like this: -
+
+    $ ansible-playbook site-standardise.yaml -e vendor=xchem_dsip -e version=v1 -e @parameters
+    $ ansible-playbook site-fragment.yaml -e vendor=xchem_dsip -e version=v1 -e @parameters
+    $ ansible-playbook site-inchi.yaml -e @parameters
 
 ---
 
