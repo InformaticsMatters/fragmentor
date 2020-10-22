@@ -76,6 +76,6 @@
 
 # Final destination depends on whether database is prod/dev.
 - import_tasks: neo4j-production.yaml
-  delegate_to: "{{ groups['dbservers'][0] }}"
+  delegate_to: "{{ database_login_host }}"
   become: yes
   when: deployment=="production"

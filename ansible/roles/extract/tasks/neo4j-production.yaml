@@ -125,7 +125,7 @@
     chdir: "{{ copy_root }}/extract"
   become_user: "{{ database[deployment].db_user_account }}"
   become: true
-  delegate_to: "{{ groups['dbservers'][0] }}"
+  delegate_to: "{{ database_login_host }}"
 
 # Synchronise the extract to S3 if desired, otherwise this data is left in the extract directory on the server.
 
