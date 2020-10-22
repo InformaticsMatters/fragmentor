@@ -705,9 +705,26 @@ Now create the server: -
 
     $ ansible-playbook site-db-server.yaml -e @parameters 
 
-Using the AWS console wait for the server to become ready (initialise) and
-then configure it. You will need to install the `ec2.py` dynamic inventory
-script, provided by ansible. The following installs thew script locally
+Adjust your parameters so that they include the address of the database server.
+The server's IP address is printed by the above play: -
+
+    TASK [db-server : Display DB server address (Private IP)] *****************
+    Thursday 22 October 2020  18:54:00 +0000 (0:00:00.048)       0:00:24.557 ** 
+    ok: [localhost] => {
+        "server_result.instances[0].private_ip": "10.0.0.192"
+    }
+
+In this case you'd add the following ot he parameter file: -
+
+```yaml
+database_login_host: 10.0.0.192
+```
+
+Using the AWS console wait for the database server instance to become ready
+(initialise) before trying to configure it.
+
+You will need to install the `ec2.py` dynamic inventory
+script, provided by ansible. The following installs the script locally
 and then runs an ansible `ping` to ensure the database server can be found: -
 
     $ wget https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.py
@@ -715,13 +732,6 @@ and then runs an ansible `ping` to ensure the database server can be found: -
     $ export EC2_INSTANCE_FILTERS='tag:Name=FragmentorProductionDatabase'
 
     $ ansible -i ec2.py tag_Name_FragmentorProductionDatabase -m ping
-
-Adjust your parameters to now include the address of the database server,
-i.e. add this to your parameter file: -
-
-```yaml
-database_login_host: <DATABSE_PUBLIC_IP>
-```
 
 Now you can configure the server and start and prepare the
 fragmentation database. The first two plays rely on dynamic inventory

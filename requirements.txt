@@ -2,8 +2,9 @@
 # Modules for running ansible and modules used in many playbooks
 # Modules used in specific playbooks are installed at the point of use.
 #
+awscli == 1.18.162
 ansible == 2.9.14
 boto == 2.49.0
-boto3 == 1.15.18
+boto3 == 1.16.1
 jmespath == 0.10.0
 psycopg2-binary == 2.8.6

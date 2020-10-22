@@ -4,14 +4,17 @@
 # Ansible's ec2.py does this for us.
 
 - hosts: all
-
   vars:
     pip_install_packages:
     - name: docker
+
   roles:
+
   - role: geerlingguy.pip
     become: yes
   - role: geerlingguy.docker
     become: yes
+    when: hostvars[inventory_hostname].ansible_distribution != 'Amazon'
+
   - role: db-server-configure
     become: yes
