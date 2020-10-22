@@ -24,6 +24,7 @@
 - block:
 
   # Select an instance AMI (Amazon, CentOS 7)...
+  # See the blog-post: https://bit.ly/37vYUqk
 
   - name: Get CentOS AMIs
     ec2_ami_info:
