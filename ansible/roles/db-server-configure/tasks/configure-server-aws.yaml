@@ -11,6 +11,26 @@
   assert:
     that: deployment|string != 'SetMe'
 
+- block:
+
+  # Ansible Linux 2
+  # Install docker as geerlingguy.docker can't.
+
+  - name: Install docker (Amazon Linux 2)
+    command: "{{ item }}"
+    args:
+      warn: no
+    loop:
+    - yum update -y
+    - amazon-linux-extras install docker
+    - yum install -y docker
+    - service docker start
+    - usermod -a -G docker ec2-user
+
+  when:
+  - hostvars[inventory_hostname].ansible_distribution == 'Amazon'
+  - hostvars[inventory_hostname].ansible_distribution_version == '2'
+
 - name: Set DB user account
   set_fact:
     user_account: "{{ database[deployment].db_user_account }}"
@@ -30,21 +50,3 @@
     group: "{{ user_account }}"
     recurse: yes
   loop: "{{ lookup('dict', db_devices) }}"
-
-- block:
-
-  # Ansible Linux 2
-  # Install docker as geerlingguy.docker can't.
-
-  - name: Install docker (Amazon Linux 2)
-    command: "{{ item }}"
-    loop:
-    - yum update -y
-    - amazon-linux-extras install docker
-    - yum install -y docker
-    - service docker start
-    - usermod -a -G docker ec2-user
-
-  when:
-  - hostvars[inventory_hostname].ansible_distribution == 'Amazon'
-  - hostvars[inventory_hostname].ansible_distribution_version == '2'
