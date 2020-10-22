@@ -697,8 +697,8 @@ deployment: production
 db_shared_buffers_g: 4
 db_max_parallel_workers: 8
 runpath: /efs/frag
-aws_vpc_subnet_id: <CLUSTER_VPC_ID>
-aws_vpc_id: <CLUSTER_PUBLIC_SUBNET_ID>
+aws_vpc_subnet_id: <CLUSTER_PUBLIC_SUBNET_ID>
+aws_vpc_id: <CLUSTER_VPC_ID>
 ```
 
 Now create the server: -
@@ -738,7 +738,6 @@ fragmentation database. The first two plays rely on dynamic inventory
 provided by the `ec2.py` script: -
 
     $ ansible-playbook -i ec2.py site-db-server-configure.yaml -e @parameters
-    $ ansible-playbook -i ec2.py site-db-server-configure_start-database.yaml -e @parameters
     $ ansible-playbook site-db-server-configure_create-database.yaml -e @parameters
 
 >   The Slurm compute instances may be incorrectly configured with regard to
