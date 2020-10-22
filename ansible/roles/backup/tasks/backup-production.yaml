@@ -17,7 +17,7 @@
   delegate_to: "{{ database_login_host }}"
   become: yes
 
-# sudo docker run --rm -v /pgdata-backup:/backup -e PGHOST=130.246.214.154 -e PGUSER=fragmentor -e PGADMINPASS=bullfinch informaticsmatters/sql-backup:2020.4
+# sudo docker run --rm -v /pgdata-backup:/backup -e PGHOST=130.246.214.154 -e PGUSER=fragmentor -e PGADMINPASS=bullfinch informaticsmatters/sql-backup:stable
 - name: Start backup
   docker_container:
     name: db-backup

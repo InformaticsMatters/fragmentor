@@ -2,7 +2,7 @@
 
 # Container for backup and recovery
 backup_container_image: informaticsmatters/sql-backup
-backup_container_tag: 2020.4
+backup_container_tag: stable
 
 # The database server's backup directory.
 # This *MUST* match the directory

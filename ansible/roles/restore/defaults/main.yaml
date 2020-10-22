@@ -4,7 +4,7 @@ restore_file: LATEST
 
 # Container for backup and recovery
 recovery_container_image: informaticsmatters/sql-recovery
-recovery_container_tag: 2020.4
+recovery_container_tag: stable
 
 # The database server's backup directory.
 # This *MUST* match the directory

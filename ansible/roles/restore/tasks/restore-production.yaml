@@ -30,7 +30,7 @@
 
 # docker run -e MSHOST=172.17.0.1 \
   #    -e MSUSER=root -e MSPASS=my-secret-pw \
-  #    -v /tmp:/backup informaticsmatters/sql-recovery:latest
+  #    -v /tmp:/backup informaticsmatters/sql-recovery:stable
 
 - name: Restore backup
   docker_container:
