@@ -7,11 +7,6 @@
     - aws_access_key_id|string|length > 0
     - aws_secret_access_key|string|length > 0
 
-- name: Delete security group
-  ec2_group:
-    name: fragmentor-database
-    state: absent
-
 # Look for server based on expected tag
 
 - name: Lookup DB server
@@ -32,3 +27,8 @@
     state: absent
   when:
   - ec2_result.instances|length == 1
+
+- name: Delete security group
+  ec2_group:
+    name: fragmentor-database
+    state: absent
