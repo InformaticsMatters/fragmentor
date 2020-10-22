@@ -80,19 +80,25 @@ db_devices:
 # A map of variables based on deployment target.
 hardware:
   development:
-# Parallel_jobs is used in calculating chunk sizes for processing - the normal assumption is that twice as many
-# jobs are created as cores are used. If this is less than cluster_cores, then not all the cluster will be used.
-# It is usually safe to set the parallel_jobs and cluster_cores to the same value.
+    # Parallel_jobs is used in calculating chunk sizes for processing -
+    # the normal assumption is that twice as many jobs are created as cores
+    # are used. If this is less than cluster_cores, then not all the cluster
+    # will be used. It is usually safe to set the parallel_jobs and
+    # cluster_cores to the same value.
     parallel_jobs: 8
-# Cluster cores is used in the nextflow_config. It defines the size of the cluster to use.
+    # Cluster cores is used in the nextflow_config.
+    # It defines the size of the cluster to use.
     cluster_cores: 8
-# Sort memory defines the minimum memory required for deduplication/sorting..
-    sort_memory: 8 MB
-# Number of connections to postgres - note that this should be less than max_worker_processes in start-database.yaml.
+    # Sort memory defines the minimum memory required for deduplication/sorting..
+    sort_memory: 8MB
+    # Number of connections to postgres -
+    # note that this should be less than max_worker_processes in start-database.yaml.
     postgres_jobs: 6
   production:
-# 100 parallel jobs/cores should be sufficient to process all but the largest libraries (full enamine/molport load).
-# For role combine, ideally this might be increased when combining large databases - otherwise there might be a timeout.
+    # 100 parallel jobs/cores should be sufficient to process all but the
+    # largest libraries (full enamine/molport load).
+    # For role combine, ideally this might be increased
+    # when combining large databases - otherwise there might be a timeout.
     parallel_jobs: 100
     cluster_cores: 100
     sort_memory: 8MB
@@ -104,7 +110,8 @@ vendors:
   xchem_dsip:
     # Used for sizing timeouts and processing parameters
     approx_vendor_molecules: 800
-    # Total time (in minutes) across all CPUs - Used for sizing timeouts and processing parameters
+    # Total time (in minutes) across all CPUs -
+    # Used for sizing timeouts and processing parameters
     est_total_fragmentation_time: 10
     # Minimum heavy atom count for extraction/fragmentation processing
     fragminhac: 0
@@ -176,7 +183,7 @@ neo4j_graph_version: 2019-12-18.2
 # All of there are expected to be defined in the user's parameters file
 # or, via the environment.
 # If any of them are unset/blank, mail is not sent.
-# Username is the owner of the email account, not a recipient.
+# Username is the owner of the email account, not a recipient.
 # mail_recipients is a comma-separated list of email addresses.
 mail_host: "{{ lookup('env', 'GRAPH_MAIL_HOST') }}"
 mail_port: "{{ lookup('env', 'GRAPH_MAIL_PORT') or '587' }}"
