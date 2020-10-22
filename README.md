@@ -741,6 +741,26 @@ provided by the `ec2.py` script: -
     $ ansible-playbook -i ec2.py site-db-server-configure_start-database.yaml -e @parameters
     $ ansible-playbook site-db-server-configure_create-database.yaml -e @parameters
 
+>   The Slurm compute instances may be incorrectly configured with regard to
+    available memory. You need to reset the slurm manager with the correct
+    memory.
+
+The compute instances may be incorrectly configured with regard to memory.
+Run the `sinfo` command to see the `MEMORY` value. If it's `1` you need
+to fix them.
+
+    $ sinfo --exact --long -N
+    [...]
+    NODELIST              NODES PARTITION       STATE CPUS    S:C:T MEMORY TMP_DISK WEIGHT AVAIL_FE REASON               
+    compute-dy-m4large-1      1  compute*        idle 2       2:1:1      1        0      1 dynamic, none                 
+    compute-dy-m4large-2      1  compute*        idle 2       2:1:1      1        0      1 dynamic, none    
+
+Fix the compute instance memory by running the _fix_ script.
+
+If your compute instances have 16GiB RAM run: -
+
+    $ ../fix-pcluster-slurm-compute-memory.sh 16
+
 From here you should be able to run fragmentation plays, i.e. stuff like this: -
 
     $ ansible-playbook site-standardise.yaml -e vendor=xchem_dsip -e version=v1 -e @parameters
