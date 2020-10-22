@@ -27,16 +27,16 @@
   # Select an instance AMI (Amazon, CentOS 7)...
   # See the blog-post: https://bit.ly/37vYUqk
 
-  - name: Get CentOS AMIs
+  - name: Get Amazon Linux AMIs
     ec2_ami_info:
       aws_access_key: "{{ aws_access_key_id}}"
       aws_secret_key: "{{ aws_secret_access_key }}"
       region: "{{ aws_default_region }}"
-      owners: 125523088429
+      owners: amazon
       filters:
         state: available
         architecture: x86_64
-        name: 'CentOS 7*'
+        description: 'Amazon Linux 2 *'
     register: ami_result
 
   - name: Assert at least one image
@@ -51,7 +51,7 @@
         | sort(attribute='creation_date')
         | last }}
 
-  - name: Display chosen CentOS AMI
+  - name: Display chosen AMI
     debug:
       var: db_ami.image_id
 
