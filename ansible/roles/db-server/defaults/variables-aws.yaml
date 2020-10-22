@@ -4,6 +4,7 @@
 aws_keypair_name: nf-pcluster
 aws_instance_type: t3a.xlarge
 aws_vpc_subnet_id: SetMe
+aws_vpc_id: SetMe
 
 aws_default_region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
 aws_access_key_id: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"

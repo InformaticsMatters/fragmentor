@@ -7,15 +7,16 @@
     - aws_access_key_id|string|length > 0
     - aws_secret_access_key|string|length > 0
     - aws_keypair_name|string != 'SetMe'
+    - aws_vpc_id|string != 'SetMe'
     - aws_vpc_subnet_id|string != 'SetMe'
 
 # Lookup potential existing server.
 # To avoid creating another instance.
 
-- name: Lookup DB server (starting or starte)
+- name: Lookup DB server (starting or started)
   ec2_instance_info:
     filters:
-      "tag:Purpose": fragmentor-database
+      "tag:Purpose": fragmentor-production-database
       instance-state-name:
       - pending
       - running
@@ -54,6 +55,34 @@
     debug:
       var: db_ami.image_id
 
+  # Create security group
+
+  - name: Create database security group
+    ec2_group:
+      name: fragmentor-database
+      description: Fragmentor database security group
+      vpc_id: "{{ aws_vpc_id }}"
+      region: "{{ aws_default_region }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 5432
+        cidr_ip: 0.0.0.0/0
+        rule_desc: Database access
+      - proto: tcp
+        ports:
+        - 22
+        cidr_ip: 0.0.0.0/0
+        rule_desc: SSH access
+      tags:
+        Name: FragmentorDatabase
+        Purpose: fragmentor-database
+    register: sg_result
+
+  - name: Display SG
+    debug:
+      var: sg_result
+
   # Create server
 
   - name: Create DB server
@@ -69,8 +98,8 @@
         delete_on_termination: yes
         volume_size: "{{ db_volume_size_g }}"
       instance_tags:
-        Name: FragmentorDatabase
-        Purpose: fragmentor-database
+        Name: FragmentorProductionDatabase
+        Purpose: fragmentor-production-database
     register: server_result
 
   - name: Assert DB server instance exists

@@ -7,18 +7,21 @@
     - aws_access_key_id|string|length > 0
     - aws_secret_access_key|string|length > 0
 
-# Look for server - it'll be tagged "Purpose: fragmentor-database"
+- name: Delete security group
+  ec2_group:
+    name: fragmentor-database
+    state: absent
+
+# Look for server based on expected tag
 
 - name: Lookup DB server
   ec2_instance_info:
     filters:
-      "tag:Purpose": fragmentor-database
+      "tag:Purpose": fragmentor-production-database
       instance-state-name:
       - pending
       - running
   register: ec2_result
-
-# Delete server
 
 - name: Delete DB server
   ec2:
