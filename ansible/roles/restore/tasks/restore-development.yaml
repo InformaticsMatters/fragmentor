@@ -40,7 +40,7 @@
     state: started
     restart_policy: no
     env:
-      PGHOST: "{{ database[deployment].login_host }}"
+      PGHOST: "{{ database_login_host }}"
       PGUSER: "{{ database[deployment].login_user }}"
       PGADMINPASS: "{{ database[deployment].login_password }}"
       BACKUP_FROM: "{{ database[deployment].backup_count }}"

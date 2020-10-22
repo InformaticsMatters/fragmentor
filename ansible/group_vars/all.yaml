@@ -29,6 +29,8 @@ nextflow_container_tag: combine-06
 # Typically one of 'openstack' or 'aws'
 database_cloud_provider: openstack
 
+database_login_host: "{{ lookup('env', 'FRAGMENTOR_DB_HOST') }}"
+
 # Database credentials.
 # A map of variables based on deployment target.
 #
@@ -37,7 +39,6 @@ database_cloud_provider: openstack
 #           (see 'roles/configure/defaults/main.yaml')
 database:
   development:
-    login_host: localhost
     port: 5432
     db: mydatabase
     login_user: postgres
@@ -47,7 +48,6 @@ database:
     backup_count: 2
     db_user_account: postgres
   production:
-    login_host: "{{ lookup('env', 'FRAGMENTOR_DB_HOST')|default('130.246.214.154', true) }}"
     port: 5432
     db: fairmolecules
     login_user: fragmentor

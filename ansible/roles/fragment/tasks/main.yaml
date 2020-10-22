@@ -47,13 +47,13 @@
 
   module_defaults:
     postgresql_query:
-      login_host: "{{ database[deployment].login_host }}"
+      login_host: "{{ database_login_host }}"
       port: "{{ database[deployment].port }}"
       db: "{{ database[deployment].db }}"
       login_user: "{{ database[deployment].login_user }}"
       login_password: "{{ database[deployment].login_password }}"
     postgresql_copy:
-      login_host: "{{ database[deployment].login_host }}"
+      login_host: "{{ database_login_host }}"
       port: "{{ database[deployment].port }}"
       db: "{{ database[deployment].db }}"
       login_user: "{{ database[deployment].login_user }}"

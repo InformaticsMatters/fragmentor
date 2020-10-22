@@ -11,7 +11,7 @@
 
 - name: Copy chunk to i_edge
   command: >-
-    psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
+    psql -X -U {{ database[deployment].login_user }} -h {{ database_login_host }} --echo-all
      --set AUTOCOMMIT=on --set ON_ERROR_STOP=on
      -c "\COPY i_edge(p_smiles, c_smiles, label) FROM '{{ item }}' DELIMITER ',' CSV;"
     {{ database[deployment].db }}
@@ -25,7 +25,7 @@
 
 - name: Extract new edges into file for loading into the detabase
   command: >-
-    psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
+    psql -X -U {{ database[deployment].login_user }} -h {{ database_login_host }} --echo-all
      --set AUTOCOMMIT=off --set ON_ERROR_STOP=on
      -c "\COPY (SELECT np.id, nc.id, ied.label, {{ source_id }}
                   FROM i_edge ied

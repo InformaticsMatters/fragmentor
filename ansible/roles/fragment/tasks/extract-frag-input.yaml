@@ -4,7 +4,7 @@
 # Nonisomols with a child count of zero. These existing molecules will are filtered out later.
 - name: Extract unfragmented smiles for this source_id to fragsmifile
   command: >-
-    psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
+    psql -X -U {{ database[deployment].login_user }} -h {{ database_login_host }} --echo-all
      --set AUTOCOMMIT=off --set ON_ERROR_STOP=on
      -c "\COPY (SELECT n.smiles FROM nonisomol n
          WHERE NOT EXISTS (SELECT 1 FROM edge e WHERE e.parent_id = n.id)
