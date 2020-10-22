@@ -24,3 +24,6 @@ include_cluster_line_num=$(grep -n "${INCLUDE_CLUSTER_LINE}" "${SLURM_CONF_FILE}
 sudo sed -i "${include_cluster_line_num}i${REAL_MEM_LINE}" /opt/slurm/etc/slurm.conf
 # Restart slurm database with changes to conf file
 sudo systemctl restart slurmctld
+
+# Inform the user...
+echo "ComputeFleet memory set to ${REAL_MEM}MiB"
