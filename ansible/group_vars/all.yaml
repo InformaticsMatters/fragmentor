@@ -29,7 +29,9 @@ nextflow_container_tag: combine-06
 # Typically one of 'openstack' or 'aws'
 database_cloud_provider: openstack
 
-database_login_host: "{{ lookup('env', 'FRAGMENTOR_DB_HOST') }}"
+# The hostname of the database server.
+# One of production or development.
+database_login_host: SetMe
 
 # Database credentials.
 # A map of variables based on deployment target.
