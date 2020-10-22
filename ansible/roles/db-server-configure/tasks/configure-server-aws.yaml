@@ -27,6 +27,14 @@
     - service docker start
     - usermod -a -G docker ec2-user
 
+  - name: Install pip and Python docker module (Amazon Linux 2)
+    command: "{{ item }}"
+    args:
+      warn: no
+    loop:
+    - yum install -y python-pip
+    - pip install docker
+
   when:
   - hostvars[inventory_hostname].ansible_distribution == 'Amazon'
   - hostvars[inventory_hostname].ansible_distribution_version == '2'
