@@ -29,7 +29,7 @@
     name: db-backup
     image: "{{ backup_container_image }}:{{ backup_container_tag }}"
     state: started
-    restart_policy: no
+    restart_policy: 'no'
     env:
       PGHOST: "{{ database_login_host }}"
       PGUSER: "{{ database[deployment].login_user }}"
