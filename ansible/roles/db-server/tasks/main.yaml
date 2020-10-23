@@ -7,6 +7,14 @@
     - defaults/variables-{{ database_cloud_provider }}.yaml
     - defaults/default.yaml
 
+# Confirmation required?
+- name: Check database removal
+  pause:
+    prompt: |-
+      Are you sure you want to delete the database server?
+      Hit RETURN to continue or, to abort, press ctrl+c and then a.
+  when: db_server_state != 'present'
+
 - import_tasks: create-server-{{ database_cloud_provider }}.yaml
   when: db_server_state == 'present'
 - import_tasks: delete-server-{{ database_cloud_provider }}.yaml
