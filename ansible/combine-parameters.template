@@ -1,4 +1,5 @@
 ---
+
 # A template of the Parameter file that must be supplied for the combine playbook.
 # Please copy this to a file called parameters, edit the file and then...
 #
@@ -6,7 +7,7 @@
 
 # Vendors to be combined will come from a single or combination database that is available on S3.
 # Combinations will be added to a new combination database.
-# A map of deafults based on the vendor and library.
+# A map of defaults based on the vendor and library.
 
 # The (AWS S3) locations are stored in the combine/defaults/main.yaml file
 # Two input locations and one output location are defined in the current configuration as an example.
