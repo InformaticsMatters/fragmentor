@@ -446,7 +446,7 @@ directory on the `runpath`.
 
 The command is:
 
-    $ ansible-playbook site-combine \
+    $ ansible-playbook site-combine.yaml \
         -e @parameters \
         -e deployment=<development|production> \
         -e runpath=<path to run directory>
