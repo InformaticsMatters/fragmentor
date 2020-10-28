@@ -705,12 +705,13 @@ db_server_state: present
 aws_db_instance_type: t3a.2xlarge
 db_volume_size_g: 10
 database_cloud_provider: aws
-deployment: production
 db_shared_buffers_g: 4
 db_max_parallel_workers: 8
-runpath: /efs/frag
 aws_vpc_subnet_id: <CLUSTER_PUBLIC_SUBNET_ID>
 aws_vpc_id: <CLUSTER_VPC_ID>
+
+deployment: production
+runpath: /data/share-2/frag
 ```
 
 Now create the server: -
@@ -772,10 +773,11 @@ If your compute instances have 16GiB RAM run: -
 
     $ ../fix-pcluster-slurm-compute-memory.sh 16
 
-From here you should be able to run fragmentation plays, i.e. stuff like this: -
+From here you should be able to run fragmentation plays, i.e. stuff like this
+for a typical MolPort fragmentation run: -
 
-    $ ansible-playbook site-standardise.yaml -e vendor=xchem_dsip -e version=v1 -e @parameters
-    $ ansible-playbook site-fragment.yaml -e vendor=xchem_dsip -e version=v1 -e @parameters
+    $ ansible-playbook site-standardise.yaml -e vendor=molport -e version=2020-10 -e @parameters
+    $ ansible-playbook site-fragment.yaml -e vendor=molport -e version=2020-10 -e @parameters
     $ ansible-playbook site-inchi.yaml -e @parameters
 
 ---
