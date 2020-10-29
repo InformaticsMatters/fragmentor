@@ -34,7 +34,7 @@ Further datasets are planned.
 -   Nextflow scripts are used to control a cluster for Standardisation,
     Fragmentation, Inchi calculation and combine plays.
 -   The scripts contain parameter controlled chunking of input files at various
-    stages to control and optimase throughput to the sql
+    stages to control and optimise throughput to the sql
     database. This can be tuned to the hardware/cluster.   
 -   Processing normally starts and ends with an AWS S3 repository -
     assumed to contain the smiles data from vendors to be imported 
@@ -392,7 +392,7 @@ for example, around 900GB if temporary space is required.
 This playbook can be used to combine existing Neo4j datasets to produce one
 new Neo4j dataset. For example, if datasets were produced using more than one
 database, this playbook can combine them allowing a combination of
-public/propriatory data. Datasets can be downloaded from up to two AWS S3
+public/proprietary data. Datasets can be downloaded from up to two AWS S3
 repositories or directly from disk. The export can either be to disk or saved
 up to AWS S3. The combination is based on parameters provided in a parameter
 file containing extracts(s) and version(s) in the following example format:
@@ -663,6 +663,7 @@ insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_nod
     indexchunksize: 100
     index_build_time: 10
 ```
+
 -   Add a new vendor/library specific configuration file to the standardise
     role to identify the input file format, python script, upload table and
     copy columns that will be used for standardisation. Note that the name

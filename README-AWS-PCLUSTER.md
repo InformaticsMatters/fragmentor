@@ -46,7 +46,11 @@ aws_vpc_id: <CLUSTER_VPC_ID>
 
 deployment: production
 runpath: /data/share-2/frag
+add_backup: no
 ```
+
+>   Setting `add-backup` to `no` prevents the automatic backup
+    from taking place, which typically occurs after the inchi play.
 
 Now create the server: -
 
