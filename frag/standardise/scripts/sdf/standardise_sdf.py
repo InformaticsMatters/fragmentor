@@ -24,6 +24,7 @@ import gzip
 import logging
 import os
 import sys
+import traceback
 
 from rdkit import Chem, RDLogger
 
@@ -43,14 +44,6 @@ logger.setLevel(logging.INFO)
 # The columns in our output file.
 # In this file we don't add any of our own.
 _OUTPUT_COLUMNS = parser.STANDARD_COLUMNS
-
-# The minimum number of columns in the input files and
-# and a map of expected column names indexed by (0-based) column number.
-#
-# The 'standardised' files contain at least 2 columns...
-#
-# smiles    0
-# ID        1
 
 # The output file.
 output_filename = 'standardised-compounds.tab'
@@ -152,8 +145,10 @@ def standardise_vendor_compounds(output_file, file_name, id_field, prefix, limit
                       compound_id]
 
             output_file.write('\t'.join(output) + '\n')
+
         except:
-            print('help!')
+            num_vendor_molecule_failures += 1
+            traceback.print_exc()
 
         # Enough?
         num_processed += 1
