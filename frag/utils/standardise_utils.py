@@ -38,15 +38,27 @@ logger = logging.getLogger(__name__)
 
 def standardise(osmiles):
     """Given a vendor (original) SMILES this method standardises
-    it into a canonical form and returns a namedtuple that contains
-    the standard form, the isomeric form, the non-isomeric form
-    the heavy atom count (hac).
+   it into a canonical form and returns a namedtuple that contains
+   the standard form, the isomeric form, the non-isomeric form
+   the heavy atom count (hac).
 
-    :param osmiles: The original (non-standard) SMILES
+   :param osmiles: The original (non-standard) SMILES
 
-    :return: A namedtuple containing the standard molecule
-             representations and info. Errors are logged and, on error,
-             the standard form will be returned as None.
+   :return: A namedtuple containing the standard molecule
+            representations and info. Errors are logged and, on error,
+            the standard form will be returned as None.
+   """
+    mol = None
+    try:
+        mol = Chem.MolFromSmiles(osmiles)
+    except Exception as e:
+        logger.warning('MolFromSmiles(%s) exception: "%s"',
+                       osmiles, e.message)
+    return standardize(mol, osmiles)
+
+def standardise(mol, osmiles):
+    """Standaridise a RDKit mol object. A SMILES string that represents the molecule can also be passed in to allow
+    better logging of errors.
     """
     global logger
 
@@ -67,12 +79,6 @@ def standardise(osmiles):
     hac = 0
     rac = 0
 
-    mol = None
-    try:
-        mol = Chem.MolFromSmiles(osmiles)
-    except Exception as e:
-        logger.warning('MolFromSmiles(%s) exception: "%s"',
-                       osmiles, e.message)
     if not mol:
         logger.error('Got nothing from MolFromSmiles(%s).'
                      ' Skipping this Vendor compound', osmiles)
