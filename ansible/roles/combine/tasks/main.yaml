@@ -98,4 +98,4 @@
     block: |
       <p>Combine play ended on: {{ now(utc=True).isoformat() }}</p>
 
-- import_tasks: finalise-{{ data_source_out }}.yaml
+- include_tasks: finalise-{{ data_source_out }}.yaml
