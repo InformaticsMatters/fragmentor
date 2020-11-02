@@ -34,11 +34,14 @@ extracts:
     aws_access_key: "{{ aws_access_key_in_2 }}"
     aws_secret_key: "{{ aws_secret_key_in_2 }}"
 
-# The path_out parameter defines the subdirector in "combinations" that will be used for the output.
+# The path_out parameter defines the sub-directory in "combinations"
+# that will be used for the output.
 path_out: 'xchem_combi_20200715'
 
-# The AWS credentials for exporting the combinations.
 data_source_out: disk
 #bucket_out: {{ bucket_out }}
+
+# The AWS credentials for exporting the combinations.
+# These are credentials required if your default values are not sutable.
 #aws_access_key_out: "{{ aws_access_key_out }}"
 #aws_secret_key_out: "{{ aws_access_key_out }}"

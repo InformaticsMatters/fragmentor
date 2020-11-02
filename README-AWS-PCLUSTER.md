@@ -112,7 +112,7 @@ If your compute instances have 16GiB RAM run: -
     $ ../fix-pcluster-slurm-compute-memory.sh 16
 
 From here you should be able to run fragmentation plays, i.e. stuff like this
-for a typical MolPort fragmentation run: -
+for a typical MolPort fragmentation, extract and combination run: -
 
     $ ansible-playbook site-standardise.yaml -e @parameters \
         -e vendor=molport \
@@ -125,6 +125,8 @@ for a typical MolPort fragmentation run: -
     $ ansible-playbook site-inchi.yaml -e @parameters
 
     $ ansible-playbook site-extract.yaml -e @parameters
+
+    $ ansible-playbook site-combine.yaml -e @parameters
 
 ---
 

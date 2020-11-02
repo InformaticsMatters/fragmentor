@@ -33,6 +33,13 @@ database_cloud_provider: openstack
 # One of production or development.
 database_login_host: SetMe
 
+# The destination of play results (typically an S3 bucket).
+# One of 'disk' or 's3'
+#
+# It's defined here but (currently) is only
+# employed by the combination play.
+data_source_out: s3
+
 # Database credentials.
 # A map of variables based on deployment target.
 #
