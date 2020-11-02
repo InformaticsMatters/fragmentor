@@ -395,7 +395,9 @@ database, this playbook can combine them allowing a combination of
 public/proprietary data. Datasets can be downloaded from up to two AWS S3
 repositories or directly from disk. The export can either be to disk or saved
 up to AWS S3. The combination is based on parameters provided in a parameter
-file containing extracts(s) and version(s) in the following example format:
+file containing extracts(s) and version(s) in the following example format,
+which writes results to the local filesystem (`disk`) rather than the
+default (`s3`):
 
 ```yaml
 ---
@@ -420,11 +422,7 @@ extracts:
 # for the output in "combinations" .
 path_out: 'xchem_combi_20200715'
 
-# The AWS credentials for exporting the combinations.
 data_source_out: disk
-#bucket_out: {{ bucket_out }}
-#aws_access_key_out: "{{ aws_access_key_out }}"
-#aws_secret_key_out: "{{ aws_access_key_out }}"
 ```
 
 **Notes**

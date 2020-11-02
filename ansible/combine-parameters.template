@@ -5,17 +5,18 @@
 #
 # ansible-playbook site-combine.yaml -e @parameters -e deployment=development|production
 
-# Vendors to be combined will come from a single or combination database that is available on S3.
-# Combinations will be added to a new combination database.
+# Vendors to be combined will come from a single or combination database that
+# is available on S3. Combinations will be added to a new combination database.
 # A map of defaults based on the vendor and library.
 
 # The (AWS S3) locations are stored in the combine/defaults/main.yaml file
-# Two input locations and one output location are defined in the current configuration as an example.
-# The access keys are provided as external parameters to the script. These are currently defined as:
-# AWS_ACCESS_KEY_ID
-# AWS_SECRET_ACCESS_KEY
-# So are set to the same bucket.
-# To set these to different values add/set new parameters for aws_access_key_in_2 and aws_secret_key_in_2.
+# Two input locations and one output location are defined in the current
+# configuration as an example. The default access keys are provided as
+# external parameters to the script. These are currently defined as:
+#   AWS_ACCESS_KEY_ID
+#   AWS_SECRET_ACCESS_KEY
+# To set these to different values add/set new parameters for
+# aws_access_key_in_2 and aws_secret_key_in_2.
 
 extracts:
 - lib:
@@ -38,10 +39,4 @@ extracts:
 # that will be used for the output.
 path_out: 'xchem_combi_20200715'
 
-data_source_out: disk
-#bucket_out: {{ bucket_out }}
-
-# The AWS credentials for exporting the combinations.
-# These are credentials required if your default values are not sutable.
-#aws_access_key_out: "{{ aws_access_key_out }}"
-#aws_secret_key_out: "{{ aws_access_key_out }}"
+# data_source_out: disk
