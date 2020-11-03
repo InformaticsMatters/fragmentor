@@ -60,6 +60,9 @@ process eShatter {
 process eDedup {
 
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+{% if nextflow_process_sort_memory %}
+    memory '{{ nextflow_process_sort_memory }}'
+{% endif %}
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
     errorStrategy = 'retry'
