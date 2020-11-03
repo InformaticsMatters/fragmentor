@@ -26,7 +26,8 @@ clean_finish: no
 nextflow_container_tag: combine-06
 
 # Memory requested by a number of 'sort' processes
-# in the nextflow workflow. If set to '0' sort memory will not be requested.
+# in the nextflow workflow (namely fragmentation and combination).
+# If set to '0' sort memory will not be requested.
 #
 # Note:   We currently need to set this to '0'
 #         for AWS Slurm-based parallel clusters
