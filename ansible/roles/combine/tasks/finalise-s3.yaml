@@ -105,7 +105,7 @@
     key_prefix: extract/combination/{{ path_out }}
     file_root: "{{ combine_path }}"
     aws_access_key: "{{ aws_access_key_out }}"
-    aws_secret_key: "{{ aws_access_key_out }}"
+    aws_secret_key: "{{ aws_secret_key_out }}"
     region: "{{ aws_region }}"
 
 # Zip log files for transfer
@@ -121,7 +121,7 @@
     key_prefix: logs/combination/{{ path_out }}
     file_root: "{{ log_path }}"
     aws_access_key: "{{ aws_access_key_out }}"
-    aws_secret_key: "{{ aws_access_key_out }}"
+    aws_secret_key: "{{ aws_secret_key_out }}"
     region: "{{ aws_region }}"
 
 # Clean-up?
