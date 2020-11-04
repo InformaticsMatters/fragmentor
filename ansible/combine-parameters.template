@@ -40,3 +40,9 @@ extracts:
 path_out: 'xchem_combi_20200715'
 
 # data_source_out: disk
+
+# If you need to use a different bucket for the combination
+# and/or different AWS credentials you can yse the following variables: -
+#bucket_out: my-bucket
+#aws_access_key_out: 0000000
+#aws_secret_key_out: 0000000
