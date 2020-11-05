@@ -1,0 +1,61 @@
+---
+
+# In order to create the server we need to: -
+#
+# 1. Create the database service account
+#
+# Our expectation here is that docker is installed on the server -
+# a responsibility of the docker role we should have already applied.
+
+- name: Check deployment definition
+  assert:
+    that: deployment|string != 'SetMe'
+
+- block:
+
+  # Ansible Linux 2
+  # Install docker and Python docker modsle
+  # as geerlingguy.docker can't.
+
+  - name: Install docker (Amazon Linux 2)
+    command: "{{ item }}"
+    args:
+      warn: no
+    loop:
+    - yum update -y
+    - amazon-linux-extras install docker
+    - yum install -y docker
+    - service docker start
+    - usermod -a -G docker ec2-user
+
+  - name: Install pip and Python docker module (Amazon Linux 2)
+    command: "{{ item }}"
+    args:
+      warn: no
+    loop:
+    - yum install -y python-pip
+    - pip install docker
+
+  when:
+  - hostvars[inventory_hostname].ansible_distribution == 'Amazon'
+  - hostvars[inventory_hostname].ansible_distribution_version == '2'
+
+- name: Set DB user account
+  set_fact:
+    user_account: "{{ database[deployment].db_user_account }}"
+
+- name: Create database user account
+  user:
+    name: "{{ user_account }}"
+    groups: docker
+    append: yes
+
+- name: Create DB volume mount paths
+  file:
+    path: "{{ item.value.mount_path }}"
+    state: directory
+    mode: '0777'
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"
+    recurse: yes
+  loop: "{{ lookup('dict', db_devices) }}"

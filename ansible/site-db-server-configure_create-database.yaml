@@ -4,7 +4,9 @@
 # by just running the appropriate play in the configure role.
 
 - hosts: localhost
+  gather_facts: no
+
   tasks:
   - include_role:
-      name: configure
+      name: db-server-configure
       tasks_from: create-database.yaml

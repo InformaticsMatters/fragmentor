@@ -5,14 +5,15 @@
 # 2. Copies any reports to save location in S3 identified by vendor/version/standardisation (production only)
 
 - name: remove working files
-  command: rm standardheader
-  args:
-    chdir: "{{ standpath }}/standardise"
+  file:
+    path: "{{ standpath }}/standardise/standardheader"
+    state: absent
 
 - name: remove working files
   shell: rm done-chunk_*
   args:
     chdir: "{{ standpath }}/standardise"
+    warn: no
 
 # Finalise report
 - name: Write line to report

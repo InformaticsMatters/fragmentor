@@ -8,6 +8,8 @@ work
 /testrun/
 /ansible/SetMe/
 /ansible/parameters/
+/ansible/parameters
+/ansible/ec2.py
 /nextflow/
 /sql/*.sql
 /ansible/tmp/

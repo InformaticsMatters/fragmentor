@@ -1,0 +1,34 @@
+---
+
+- name: Assert control variables
+  assert:
+    that:
+    - aws_default_region|string|length > 0
+    - aws_access_key_id|string|length > 0
+    - aws_secret_access_key|string|length > 0
+
+# Look for server based on expected tag
+
+- name: Lookup DB server
+  ec2_instance_info:
+    filters:
+      "tag:Purpose": fragmentor-production-database
+      instance-state-name:
+      - pending
+      - running
+  register: ec2_result
+
+- name: Delete DB server
+  ec2:
+    instance_ids:
+    - "{{ ec2_result.instances[0].instance_id }}"
+    wait: yes
+    wait_timeout: 600
+    state: absent
+  when:
+  - ec2_result.instances|length == 1
+
+- name: Delete security group
+  ec2_group:
+    name: fragmentor-database
+    state: absent

@@ -1,0 +1,19 @@
+---
+
+# Expectation here is that we're using a dynamic inventory.
+# Ansible's ec2.py does this for us.
+
+- hosts: all
+  become: yes
+  vars:
+    pip_install_packages:
+    - name: docker
+
+  roles:
+
+  - role: geerlingguy.pip
+    when: hostvars[inventory_hostname].ansible_distribution != 'Amazon'
+  - role: geerlingguy.docker
+    when: hostvars[inventory_hostname].ansible_distribution != 'Amazon'
+
+  - role: db-server-configure

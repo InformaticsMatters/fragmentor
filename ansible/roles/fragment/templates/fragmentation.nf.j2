@@ -21,7 +21,7 @@ chunks = Channel.from(file(params.input))
 
 process fragment {
 
-    container 'informaticsmatters/fragmentor:molport-04'
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
     errorStrategy = 'retry'
     maxErrors = 3
 
@@ -44,7 +44,9 @@ process fragment {
 process collect_nodes {
 
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
-    memory '{{ hardware[deployment].sort_memory }}'
+{% if nextflow_process_sort_memory %}
+    memory '{{ nextflow_process_sort_memory }}'
+{% endif %}
     publishDir params.out_dir, mode: params.out_mode
     errorStrategy = 'retry'
     maxErrors = 3
@@ -62,8 +64,10 @@ process collect_nodes {
 
 process collect_edges {
 
-    container 'informaticsmatters/fragmentor:molport-04'
-    memory '{{ hardware[deployment].sort_memory }}'
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+{% if nextflow_process_sort_memory %}
+    memory '{{ nextflow_process_sort_memory }}'
+{% endif %}
     publishDir params.out_dir, mode: params.out_mode
     errorStrategy = 'retry'
     maxErrors = 3
@@ -81,8 +85,10 @@ process collect_edges {
 
 process collect_rejects {
 
-    container 'informaticsmatters/fragmentor:molport-04'
-    memory '{{ hardware[deployment].sort_memory }}'
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+{% if nextflow_process_sort_memory %}
+    memory '{{ nextflow_process_sort_memory }}'
+{% endif %}
     publishDir params.out_dir, mode: params.out_mode
     errorStrategy = 'retry'
     maxErrors = 3

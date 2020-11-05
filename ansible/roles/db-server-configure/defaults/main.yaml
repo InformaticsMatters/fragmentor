@@ -1,4 +1,5 @@
 ---
+
 # Container for the postgres database
 db_container_image: informaticsmatters/rdkit-cartridge-debian
 db_container_tag: Release_2020_03
@@ -7,6 +8,9 @@ db_container_tag: Release_2020_03
 # The deployment sets the container shm_mem to twice this value
 # so make sure your host has sufficient root-volume space.
 db_shared_buffers_g: 32
+
+# Typically 75% of the number of cores
+db_max_parallel_workers: 24
 
 # The DB work_mem (Mi)
 # Attention: a value of 256Mb corresponds to a maximum of about 28% memory usage with the nodes extraction query

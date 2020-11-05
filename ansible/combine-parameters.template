@@ -1,43 +1,48 @@
 ---
+
 # A template of the Parameter file that must be supplied for the combine playbook.
 # Please copy this to a file called parameters, edit the file and then...
 #
 # ansible-playbook site-combine.yaml -e @parameters -e deployment=development|production
 
-# Vendors to be combined will come from a single or combination database that is available on S3.
-# Combinations will be added to a new combination database.
-# A map of deafults based on the vendor and library.
+# Vendors to be combined will come from a single or combination database that
+# is available on S3. Combinations will be added to a new combination database.
+# A map of defaults based on the vendor and library.
 
 # The (AWS S3) locations are stored in the combine/defaults/main.yaml file
-# Two input locations and one output location are defined in the current configuration as an example.
-# The access keys are provided as external parameters to the script. These are currently defined as:
-# AWS_ACCESS_KEY_ID
-# AWS_SECRET_ACCESS_KEY
-# So are set to the same bucket.
-# To set these to different values add/set new parameters for aws_access_key_in_2 and aws_secret_key_in_2.
+# Two input locations and one output location are defined in the current
+# configuration as an example. The default access keys are provided as
+# external parameters to the script. These are currently defined as:
+#   AWS_ACCESS_KEY_ID
+#   AWS_SECRET_ACCESS_KEY
+# To set these to different values add/set new parameters for
+# aws_access_key_in_2 and aws_secret_key_in_2.
 
 extracts:
-    - lib:
-        path: 'xchem_dsip'
-        data_source: disk
-    - lib:
-        path: 'extract/xchem_spot/v1'
-        data_source: s3
-        bucket: "{{ bucket_in_1 }}"
-        aws_access_key: "{{ aws_access_key_in_1 }}"
-        aws_secret_key: "{{ aws_secret_key_in_1 }}"
-    - lib:
-        path: 'extract/xchem_probe/v1'
-        data_source: s3
-        bucket: "{{ bucket_in_2 }}"
-        aws_access_key: "{{ aws_access_key_in_2 }}"
-        aws_secret_key: "{{ aws_secret_key_in_2 }}"
+- lib:
+    path: 'xchem_dsip'
+    data_source: disk
+- lib:
+    path: 'extract/xchem_spot/v1'
+    data_source: s3
+    bucket: "{{ bucket_in_1 }}"
+    aws_access_key: "{{ aws_access_key_in_1 }}"
+    aws_secret_key: "{{ aws_secret_key_in_1 }}"
+- lib:
+    path: 'extract/xchem_probe/v1'
+    data_source: s3
+    bucket: "{{ bucket_in_2 }}"
+    aws_access_key: "{{ aws_access_key_in_2 }}"
+    aws_secret_key: "{{ aws_secret_key_in_2 }}"
 
-# The path_out parameter defines the subdirector in "combinations" that will be used for the output.
+# The path_out parameter defines the sub-directory in "combinations"
+# that will be used for the output.
 path_out: 'xchem_combi_20200715'
 
-# The AWS credentials for exporting the combinations.
-data_source_out: disk
-#bucket_out: {{ bucket_out }}
-#aws_access_key_out: "{{ aws_access_key_out }}"
-#aws_secret_key_out: "{{ aws_access_key_out }}"
+# data_source_out: disk
+
+# If you need to use a different bucket for the combination
+# and/or different AWS credentials you can yse the following variables: -
+#bucket_out: my-bucket
+#aws_access_key_out: 0000000
+#aws_secret_key_out: 0000000

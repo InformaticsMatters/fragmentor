@@ -1,0 +1,7 @@
+---
+
+# Present or absent?
+db_server_state: present
+
+# Root-volume size
+db_volume_size_g: 10

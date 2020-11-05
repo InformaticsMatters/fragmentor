@@ -92,7 +92,7 @@
       <tr><td>Vendor</td><td>{{ vendor }}</td></tr>
       <tr><td>Version</td><td>{{ version }}</td></tr>
       <tr><td>Source-id</td><td>{{ source_id }}</td></tr>
-      <tr><td>User</td><td>{{ ansible_hostname }}</td></tr>
+      <tr><td>User</td><td>{{ inventory_hostname }}</td></tr>
       <tr><td>Deployment</td><td>{{ deployment }}</td></tr>
       <tr><td>Heavy Atom Count</td><td>{{ vendors[vendor].fraghac }}</td></tr>
       <tr><td>Minimum Heavy Atom Count</td><td>{{ vendors[vendor].fragminhac }}</td></tr>

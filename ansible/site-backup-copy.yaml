@@ -1,7 +1,7 @@
 ---
 # This version of backup with copy the database to the backup location.
 # It requires the container to be stopped.
-- hosts: dbservers[0]
+- hosts: all
   tasks:
   - include_role:
       name: configure

@@ -2,7 +2,7 @@
 
 - name: Extract nonisomol smiles with missing inchi information to inchfile
   command: >-
-    psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
+    psql -X -U {{ database[deployment].login_user }} -h {{ database_login_host }} --echo-all
      --set AUTOCOMMIT=off --set ON_ERROR_STOP=on
      -c "\COPY (SELECT non.smiles FROM nonisomol non
                  WHERE non.inchis IS NULL)
@@ -88,7 +88,6 @@
       {{ reppath }}/nextflow/generateinchi.nf
       -w {{ nextpath }}
       -with-report {{ fragpath }}/inchi/generateinchi_report.html
-      -with-tower
       --input {{ fragpath }}/inchi/{{ inchifile }}
       --out_dir {{ fragpath }}/inchi
       --outputfile {{ inchitab }}

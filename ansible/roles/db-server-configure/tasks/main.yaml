@@ -1,0 +1,10 @@
+---
+
+- name: Check deployment definition
+  assert:
+    that:
+    - deployment|string != 'SetMe'
+    - database_cloud_provider|string != 'SetMe'
+
+- import_tasks: configure-server-{{ database_cloud_provider }}.yaml
+- import_tasks: start-database.yaml

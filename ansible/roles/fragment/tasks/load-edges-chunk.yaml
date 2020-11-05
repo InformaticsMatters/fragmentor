@@ -6,7 +6,7 @@
 
 - name: Copy chunk to edge
   command: >-
-    psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
+    psql -X -U {{ database[deployment].login_user }} -h {{ database_login_host }} --echo-all
      --set AUTOCOMMIT=on --set ON_ERROR_STOP=on
      -c "\COPY edge(parent_id, child_id, label, source_id)
          FROM '{{ item }}' DELIMITER ',' CSV;"

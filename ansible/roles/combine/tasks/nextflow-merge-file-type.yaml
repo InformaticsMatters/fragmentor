@@ -88,7 +88,6 @@
       {{ reppath }}/nextflow/merge.nf
       -w {{ next_path }}
       -with-report {{ log_path }}/merge_{{ file_type }}_report.html
-      -with-tower
   when:
   - not combined_file.stat.exists
 

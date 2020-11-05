@@ -6,9 +6,10 @@
 # 3. Files to be copied also include zipped rejected nodes.
 
 - name: remove working files
-  shell: "rm -f {{ item }}"
+  shell: rm -f {{ item }}
   args:
     chdir: "{{ fragpath }}/fragment"
+    warn: no
   loop:
   - "edgechunk_*"
   - "nodechunk_*"

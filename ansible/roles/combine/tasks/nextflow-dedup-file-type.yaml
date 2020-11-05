@@ -88,7 +88,6 @@
       {{ reppath }}/nextflow/deduplicate.nf
       -w {{ next_path }}
       -with-report {{ log_path }}/deduplicate_{{ file_type }}_report.html
-      -with-tower
   when:
   - not combined_file.stat.exists
 

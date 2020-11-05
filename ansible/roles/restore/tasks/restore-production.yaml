@@ -7,7 +7,7 @@
     get_md5: no
     get_mime: no
     get_attributes: no
-  delegate_to: "{{ groups['dbservers'][0] }}"
+  delegate_to: "{{ database_login_host }}"
   become: yes
   register: backup_result
   when: restore_file|string != 'LATEST'
@@ -25,21 +25,21 @@
     name:
     - python-dateutil==2.8.1
     - boto3==1.12.49
-  delegate_to: "{{ groups['dbservers'][0] }}"
+  delegate_to: "{{ database_login_host }}"
   become: yes
 
 # docker run -e MSHOST=172.17.0.1 \
   #    -e MSUSER=root -e MSPASS=my-secret-pw \
-  #    -v /tmp:/backup informaticsmatters/sql-recovery:latest
+  #    -v /tmp:/backup informaticsmatters/sql-recovery:stable
 
 - name: Restore backup
   docker_container:
     name: db-recover
     image: "{{ recovery_container_image }}:{{ recovery_container_tag }}"
     state: started
-    restart_policy: no
+    restart_policy: 'no'
     env:
-      PGHOST: "{{ database[deployment].login_host }}"
+      PGHOST: "{{ database_login_host }}"
       PGUSER: "{{ database[deployment].login_user }}"
       PGADMINPASS: "{{ database[deployment].login_password }}"
       BACKUP_FROM: "{{ database[deployment].backup_count }}"
@@ -47,4 +47,4 @@
     - "{{ database[deployment].backup_directory }}:/backup"
     network_mode: host
   become: yes
-  delegate_to: "{{ groups['dbservers'][0] }}"
+  delegate_to: "{{ database_login_host }}"

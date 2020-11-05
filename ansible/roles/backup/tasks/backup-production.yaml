@@ -5,7 +5,7 @@
     name:
     - python-dateutil==2.8.1
     - boto3==1.12.49
-  delegate_to: "{{ groups['dbservers'][0] }}"
+  delegate_to: "{{ database_login_host }}"
   become: yes
 
 - name: Create directories
@@ -14,18 +14,18 @@
     state: directory
   loop:
   - "{{ database[deployment].backup_directory }}"
-  delegate_to: "{{ groups['dbservers'][0] }}"
+  delegate_to: "{{ database_login_host }}"
   become: yes
 
-# sudo docker run --rm -v /pgdata-backup:/backup -e PGHOST=130.246.214.154 -e PGUSER=fragmentor -e PGADMINPASS=bullfinch informaticsmatters/sql-backup:2020.4
+# sudo docker run --rm -v /pgdata-backup:/backup -e PGHOST=130.246.214.154 -e PGUSER=fragmentor -e PGADMINPASS=bullfinch informaticsmatters/sql-backup:stable
 - name: Start backup
   docker_container:
     name: db-backup
     image: "{{ backup_container_image }}:{{ backup_container_tag }}"
     state: started
-    restart_policy: no
+    restart_policy: 'no'
     env:
-      PGHOST: "{{ database[deployment].login_host }}"
+      PGHOST: "{{ database_login_host }}"
       PGUSER: "{{ database[deployment].login_user }}"
       PGADMINPASS: "{{ database[deployment].login_password }}"
       BACKUP_COUNT: "{{ database[deployment].backup_count }}"
@@ -33,4 +33,4 @@
     - "{{ database[deployment].backup_directory }}:/backup"
     network_mode: host
   become: yes
-  delegate_to: "{{ groups['dbservers'][0] }}"
+  delegate_to: "{{ database_login_host }}"

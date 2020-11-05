@@ -7,7 +7,7 @@
 
 - name: Extract isomol smiles with missing inchi information to isoinchfile
   command: >-
-    psql -X -U {{ database[deployment].login_user }} -h {{ database[deployment].login_host }} --echo-all
+    psql -X -U {{ database[deployment].login_user }} -h {{ database_login_host }} --echo-all
      --set AUTOCOMMIT=off --set ON_ERROR_STOP=on
      -c "\COPY (SELECT iso.smiles FROM isomol iso
                  WHERE iso.inchis IS NULL)
@@ -95,7 +95,6 @@
       {{ reppath }}/nextflow/generateinchi.nf
       -w {{ nextpath }}
       -with-report {{ fragpath }}/isoinchi/generateinchi_report.html
-      -with-tower
       --input {{ fragpath }}/isoinchi/{{ isoinchifile }}
       --out_dir {{ fragpath }}/isoinchi
       --outputfile {{ isoinchitab }}

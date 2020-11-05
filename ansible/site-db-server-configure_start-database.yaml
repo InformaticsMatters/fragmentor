@@ -1,7 +1,8 @@
 ---
 
-- hosts: dbservers[0]
+- hosts: all
+
   tasks:
   - include_role:
-      name: configure
+      name: db-server-configure
       tasks_from: start-database.yaml

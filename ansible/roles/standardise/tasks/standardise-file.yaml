@@ -118,8 +118,6 @@
   when:
   - not standardised_file.stat.exists
 
-# Note that with-tower can sometime cause an error 504 if there is a problem contacting the with tower site.
-# In this case the --with-tower option can be removed.
 - name: Set nextflow command
   set_fact:
     nextflow_cmd: >-
@@ -127,7 +125,6 @@
       {{ reppath }}/nextflow/standardizer.nf
       -w {{ nextpath }}
       -with-report {{ standpath }}/standardise/standardise_nextflow_report.html
-      -with-tower
       --script {{ standardiser }}
       --inputs {{ datapath }}/data/{{ vendor }}/"{{ standinputfile }}"
       --out_dir {{ standpath }}/standardise
