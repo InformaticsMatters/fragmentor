@@ -12,6 +12,7 @@ params.inputs = 'run/data/chemspace_bb/chemspace_bb.txt'
 params.chunk_size = 15000
 params.out_dir = '.'
 params.script = 'frag.standardise.scripts.chemspace_bb.standardise_chemspace_bb_pricing_compounds'
+params.compound_id_prefix = 'SDF'
 
 chunks = Channel
      .fromPath(params.inputs)
@@ -29,7 +30,7 @@ process standardise {
 
     """
     cp $chunks input.dat
-    python -m $params.script ./ input.dat ./output
+    python -m $params.script ./ input.dat ./output --prefix $params.compound_id_prefix
     cp output/standardised-compounds.tab ./${chunks}_standardised.tab
     """
 
