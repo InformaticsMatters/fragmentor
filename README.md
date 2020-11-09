@@ -736,7 +736,8 @@ has been provided. However, additional steps are required:
 -   A specific standardisation module will need to be written to be able to
     read the additional columns. The standardisation python scripts are located
     in frag/standardise/scripts/(vendor). They are all written in similar 
-    formats. The additional columns are passed through to new table separated
+    formats with the same input parameters as these are used in the ansible playbook. 
+-   Any additional columns added are passed through to new table separated
     fields in the staging file standardised-compounds.tab.
 -   Note also, that adding a new python module requires the git repo to be
     tagged so that the nextflow processes can find the repository and download

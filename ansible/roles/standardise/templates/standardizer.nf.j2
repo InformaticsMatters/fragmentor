@@ -30,7 +30,7 @@ process standardise {
 
     """
     cp $chunks input.dat
-    python -m $params.script ./ input.dat ./output --prefix $params.compound_id_prefix
+    python -m $params.script ./ input.dat ./output --prefix ${params.compound_id_prefix}
     cp output/standardised-compounds.tab ./${chunks}_standardised.tab
     """
 

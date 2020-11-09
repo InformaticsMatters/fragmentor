@@ -23,7 +23,7 @@ clean_finish: no
 
 # The tag of the fragmentation container,
 # used for a number of nextflow workflows.
-nextflow_container_tag: sdf-02
+nextflow_container_tag: sdf-03
 
 # Memory requested by a number of 'sort' processes
 # in the nextflow workflow (namely fragmentation and combination).

@@ -20,6 +20,7 @@ Tim Dudgeon November 2020 Initial Version
 """
 
 import argparse
+import glob
 import gzip
 import logging
 import os
@@ -161,9 +162,14 @@ def standardise_vendor_compounds(output_file, file_name, id_field, prefix, limit
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser('Vendor Compound Standardiser (SDF)')
-    parser.add_argument('sdf_file',
-                        help='The SDF file to process,'
-                             ' containing tab-delimited ".gz" files to be processed.')
+    parser.add_argument('vendor_dir',
+                        help='The SDF vendor directory,'
+                             ' containing the ".gz" files to be processed.')
+    parser.add_argument('vendor_prefix',
+                        help='The SDF vendor file prefix,'
+                             ' i.e. "iis_smiles". Only files with this prefix'
+                             ' in the vendor directory will be processed')
+
     parser.add_argument('output',
                         help='The output directory')
     parser.add_argument('--id-field',
@@ -203,16 +209,28 @@ if __name__ == '__main__':
     if args.limit:
         logger.warning('Limiting processing to first {:,} molecules'.format(args.limit))
 
+    sdf_files = glob.glob('{}/{}*'.format(args.vendor_dir,
+                                                 args.vendor_prefix))
+
     # Open the file we'll write the standardised data set to.
     # A text, tab-separated file.
     logger.info('Writing %s...', output_filename)
+
+    num_processed = 0
     with open(output_filename, 'wt') as output_file:
 
         # Write the header...
         output_file.write('\t'.join(_OUTPUT_COLUMNS) + '\n')
 
-        # Process all the SDF file ...
-        num_processed =  standardise_vendor_compounds(output_file, args.sdf_file,  args.id_field, args.prefix, args.limit)
+        # Process all the Vendor files...
+        for sdf_file in sdf_files:
+            num_processed += standardise_vendor_compounds(output_file,
+                                                          sdf_file,
+                                                          args.id_field,
+                                                          args.prefix,
+                                                          args.limit)
+            if args.limit and num_processed >= args.limit:
+                break
 
     # Summary
     logger.info('{:,} vendor molecules'.format(num_vendor_mols))
