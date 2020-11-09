@@ -20,11 +20,11 @@ Summary of Contents:
 -   Playbooks are also provided to create, start, stop, and backup the database. 
 
 The libraries currently supported are as follows:
-
--   Xchem: dsip, probing library, spotfinder
--   Molport
--   Chemspace: bb
--   Enamine: ro5
+- Xchem: dsip, probing library, spotfinder
+- Molport
+- Chemspace: bb
+- Enamine: ro5
+- sdf (generic)
 
 Further datasets are planned.
 
@@ -712,14 +712,11 @@ CREATE TABLE i_mols_dsip (
   nonisomol_id INTEGER
 );
 ```
-
--   The site-fragment playbook should not require any specific changes apart
-    from the fragmentation configuration parameters in all.yaml.
--   The site-inchi playbook should not require any specific changes
--   Site-extract - Add the vendor/library specific header file in extract/files.
-    If this is an existing format than the
-    scripts for that format can be copied.
--   The site-combine playbook should not require any specific changes.
+- The site-fragment playbook should not require any specific changes apart from the fragmentation configuration 
+ parameters in all.yaml.
+- The site-inchi playbook should not require any specific changes
+- The site-extract playbook should not require any specific changes.
+- The site-combine playbook should not require any specific changes.
 
 ### Implementation Changes
 
