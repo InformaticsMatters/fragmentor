@@ -8,9 +8,9 @@ standardiser: frag.standardise.scripts.sdf.standardise_sdf_compounds
 standinputfile: test.sdf
 # Coumpound Prefix used in creating the compound-id's. For the other vendors this is hardcoded as the company name.
 standard_compound_id_prefix: SDF
-# Field in SDF file to be used for compound id. To use, the standardizer.nf must also have the prefix added to it.
-# standard_compound_id_field:
+# Field in SDF file to be used for compound id. For the other vendors this is hardcoded as the company name.
+standard_compound_id_field: mr_id
 # Upload table template to match fields in standardised compounds.
-standardise_copy_table: i_mols_dsip
+standardise_copy_table: i_mols_sdf
 # Fields to upload to table (used in copy statement).
 standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id

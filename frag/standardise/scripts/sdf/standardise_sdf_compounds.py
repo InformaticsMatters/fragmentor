@@ -131,7 +131,7 @@ def standardise_vendor_compounds(output_file, file_name, id_field, prefix, limit
             # And try and handle and report any catastrophic errors
             # from dependent modules/functions.
 
-            std_info = standardise_utils.standardise(mol, osmiles)
+            std_info = standardise_utils.standardise_mol(mol, osmiles)
             if not std_info.std:
                 num_vendor_molecule_failures += 1
                 continue

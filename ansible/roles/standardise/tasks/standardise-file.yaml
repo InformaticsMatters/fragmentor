@@ -130,6 +130,7 @@
       --out_dir {{ standpath }}/standardise
       --chunk_size {{ standchunksize|int }}
       --compound_id_prefix {{ standard_compound_id_prefix }}
+      --compound_id_field {{ standard_compound_id_field }}
   when:
   - not standardised_file.stat.exists
 

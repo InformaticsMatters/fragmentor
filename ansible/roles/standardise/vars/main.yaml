@@ -30,3 +30,8 @@ standchunksize_calc: 0
 # Chunk size to control size of transactions in
 # uploading standardised file data to database
 standchunk: 1000000
+
+# Coumpound Prefix used in creating the compound-id's. This is overridden if required in the vendor specific files.
+standard_compound_id_prefix: None
+# Field in SDF file to be used for compound id. This is overridden if required in the vendor specific files.
+standard_compound_id_field: None

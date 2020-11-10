@@ -56,7 +56,7 @@ def standardise(osmiles):
                        osmiles, e.message)
     return standardize(mol, osmiles)
 
-def standardise(mol, osmiles):
+def standardise_mol(mol, osmiles):
     """Standaridise a RDKit mol object. A SMILES string that represents the molecule can also be passed in to allow
     better logging of errors.
     """

@@ -13,6 +13,7 @@ params.chunk_size = 15000
 params.out_dir = '.'
 params.script = 'frag.standardise.scripts.chemspace_bb.standardise_chemspace_bb_pricing_compounds'
 params.compound_id_prefix = 'SDF'
+params.compound_id_field = 'mr_id'
 
 chunks = Channel
      .fromPath(params.inputs)
@@ -30,7 +31,14 @@ process standardise {
 
     """
     cp $chunks input.dat
-    python -m $params.script ./ input.dat ./output --prefix ${params.compound_id_prefix}
+    # Check if a compound_id_prefix has been set, if so - supply the prefix and id to the python script.
+    if [ ${params.compound_id_prefix} != 'None' ]
+    then
+       python -m $params.script ./ input.dat ./output --prefix ${params.compound_id_prefix} --id-field ${params.compound_id_field}
+    else
+       python -m $params.script ./ input.dat ./output
+    fi
+
     cp output/standardised-compounds.tab ./${chunks}_standardised.tab
     """
 
