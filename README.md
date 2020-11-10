@@ -239,9 +239,10 @@ The standardisation step is run as follows:
         -e vendor=<vendor_library> \ 
         -e version=<version> \
         -e deployment=<development|production> \
+        -e database_login_host=<host IP|localhost> \
         -e runpath=<work directory for this run> \
         (-e add_file=<yes|no> \)
-        (-e clean_start=<yes|no>)
+        (-e clean_start=<yes|no> \)
         (-e add_backup=<yes|no>)
 
 Example: navigate to the ansible directory
@@ -249,6 +250,7 @@ Example: navigate to the ansible directory
     $ ansible-playbook site-standardise.yaml \
         -e vendor=xchem_dsip \
         -e version=v1 -e deployment=production \
+        -e database_login_host=130.246.212.152 \
         -e runpath=/data/share-2/run01 
 
 > Parameter deployment=development|production
@@ -287,7 +289,8 @@ have not been fragmented yet and process them. It is run as follows:
         -e vendor=<vendor_library> \ 
         -e version=<version> \
         -e deployment=<development|production> \
-        -e runpath=<work directory for this run> 
+        -e database_login_host=<host IP|localhost> \
+        -e runpath=<work directory for this run> \
         (-e add_backup=<yes|no>)
 
 Example: navigate to the ansible directory
@@ -296,6 +299,7 @@ Example: navigate to the ansible directory
         -e vendor=xchem_dsip \
         -e version=v1 \
         -e deployment=production \
+        -e database_login_host=130.246.212.152 \
         -e runpath=/data/share-2/run01 
 
 A fragmentation step would normally be processed directly after a
@@ -316,13 +320,15 @@ run as follows:
 
     $ ansible-playbook site-inchi.yaml  \ 
         -e deployment=<development|production> \
-        -e runpath=<work directory for this run> 
+        -e runpath=<work directory for this run> \
+        -e database_login_host=<host IP|localhost> \
         (-e add_backup=<yes|no>)
 
 Example: navigate to the ansible directory
 
     $ ansible-playbook site-inchi.yaml \
         -e deployment=production \
+        -e database_login_host=130.246.212.152 \
         -e runpath=/data/share-2/run01
 
 As this step is driven by the database it it possible to run multiple
@@ -370,6 +376,7 @@ The command is:
     $ ansible-playbook site-extract.yaml \
         -e @parameters \
         -e deployment=<development|production> \
+        -e database_login_host=<host IP|localhost> \
         -e runpath=<path to run directory 
 
 Example: navigate to the ansible directory
@@ -378,6 +385,7 @@ Example: navigate to the ansible directory
     $ ansible-playbook site-extract.yaml
         -e @parameters \
         -e deployment=production \
+        -e database_login_host=130.246.212.152 \
         -e runpath=/data/share-2/run01  
 
 Note that for the larger extracts to complete there needs to be sufficient
