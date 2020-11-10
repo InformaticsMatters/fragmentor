@@ -54,12 +54,19 @@ def standardise(osmiles):
     except Exception as e:
         logger.warning('MolFromSmiles(%s) exception: "%s"',
                        osmiles, e.message)
-    return standardize(mol, osmiles)
+    return standardise_mol(mol, osmiles)
 
 def standardise_mol(mol, osmiles):
-    """Standaridise a RDKit mol object. A SMILES string that represents the molecule can also be passed in to allow
+    """Standardise a RDKit mol object. A SMILES string that represents the molecule can also be passed in to allow
     better logging of errors.
-    """
+
+   :param mol: flag indicating whether this is a molecule or not.
+   :param osmiles: The original (non-standard) SMILES
+
+   :return: A namedtuple containing the standard molecule
+            representations and info. Errors are logged and, on error,
+            the standard form will be returned as None.
+   """
     global logger
 
     # Standardise and update global maps...
