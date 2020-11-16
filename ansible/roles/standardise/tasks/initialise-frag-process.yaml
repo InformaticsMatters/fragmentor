@@ -20,7 +20,6 @@
     - python-dateutil==2.8.1
     - boto3==1.12.49
     - psycopg2-binary==2.8.5
-  become: yes
   when: deployment=="production"
 
 - name: Install requirements

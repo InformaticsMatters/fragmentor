@@ -13,11 +13,11 @@ echo "+> FRAGMENTOR_PLAY is ${FRAGMENTOR_PLAY}"
 : "${AWS_ACCESS_KEY_ID?Need to set AWS_ACCESS_KEY_ID}"
 : "${AWS_SECRET_ACCESS_KEY?Need to set AWS_SECRET_ACCESS_KEY}"
 
-# A playbook parameter file '$HOME/parameters' is expected to be mapped
+# A playbook parameter file '$HOME/parameters.yaml' is expected to be mapped
 # into the container. Ths file contains user-specific parameters for
 # the play that is to be run.
 
-PARAMETER_FILE=${HOME}/parameters
+PARAMETER_FILE=${HOME}/parameters.yaml
 if [ ! -f "${PARAMETER_FILE}" ]; then
     echo "+> PARAMETER_FILE (${PARAMETER_FILE}) does not exist"
     exit 1
