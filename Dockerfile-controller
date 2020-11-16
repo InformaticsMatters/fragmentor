@@ -1,0 +1,39 @@
+# Dockerfile to build the controller (playbook runner) image.
+# this is an image that just contains the Ansible playbooks
+# and all the requirements to run them.
+
+FROM python:3.8.6-slim-buster
+
+# Force the binary layer of the stdout and stderr streams
+# to be unbuffered
+ENV PYTHONUNBUFFERED 1
+
+# Base directory for the application
+# Also used for user directory
+ENV APP_USER fragmentor
+ENV APP_ROOT /home/${APP_USER}
+
+# - copy requirements in
+# - create a new user - containers should NOT run as root (as good practice)
+# - install requirements
+USER root
+COPY requirements.txt ${APP_ROOT}/
+RUN useradd -d ${APP_ROOT} -s /bin/bash ${APP_USER} && \
+    ln -sf python3 /usr/bin/python && \
+    pip install -r ${APP_ROOT}/requirements.txt
+
+# Now copy and install Ansible Galaxy requirements
+COPY requirements.yaml ${APP_ROOT}/
+RUN ansible-galaxy install -r ${APP_ROOT}/requirements.yaml
+
+COPY docker-controller-entrypoint.sh ${APP_ROOT}/
+COPY ansible/ ${APP_ROOT}/ansible/
+
+RUN chmod 755 ${APP_ROOT}/docker-controller-entrypoint.sh && \
+    chown -R ${APP_USER}:${APP_USER} ${APP_ROOT}
+
+USER ${APP_USER}
+ENV HOME ${APP_ROOT}
+WORKDIR ${APP_ROOT}
+
+ENTRYPOINT ["./docker-controller-entrypoint.sh"]
