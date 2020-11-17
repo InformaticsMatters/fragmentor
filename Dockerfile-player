@@ -52,6 +52,17 @@ RUN apt-get install -y \
 # ...when using kubectl.
 ENV KUBECONFIG /home/${APP_USER}/kubeconfig
 
+# Install PSQL (for the psql command).
+# See https://www.postgresql.org/download/linux/debian/
+# At last attempt this installed 12.5
+RUN apt-get install -y \
+        lsb-release && \
+    sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && \
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get update -y && \
+    apt-get install -y \
+        postgresql-12
+
 # - copy requirements in
 # - install requirements
 # - create a new user - containers should NOT run as root (as good practice)
