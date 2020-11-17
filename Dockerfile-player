@@ -6,6 +6,8 @@ FROM python:3.8.6-buster
 LABEL maintainer="Tim Dudgeon<tdudgeon@informaticsmatters.com>"
 ARG NF_VERSION=20.10.0
 
+USER root
+
 # Force the binary layer of the stdout and stderr streams
 # to be unbuffered
 ENV PYTHONUNBUFFERED 1
@@ -14,8 +16,6 @@ ENV PYTHONUNBUFFERED 1
 # Also used for user directory
 ENV APP_USER fragmentor
 ENV APP_ROOT /home/${APP_USER}
-
-USER root
 
 # Install Java (required by nextflow)
 RUN apt-get update -y && \
@@ -39,14 +39,20 @@ RUN apt-get install -y \
     apt-get update -y && \
     apt-get install -y \
         kubectl
+# A file for the kubernetes config.
+# This will be mapped into the container via a Kubernetes ConfigMap
+# as '~/.kube/config' and copied to '~/kubeconfig' as the container starts.
+# This is required because configmaps are mounted read-only and you
+# get...
+#   error: open /home/fragmentor/.kube/config.lock: read-only file system
+# ...when using kubectl.
+ENV KUBECONFIG /home/${APP_USER}/kubeconfig
 
 # - copy requirements in
 # - install requirements
 # - create a new user - containers should NOT run as root (as good practice)
 COPY requirements.txt ${APP_ROOT}/
-COPY requirements.yaml ${APP_ROOT}/
 RUN pip install -r ${APP_ROOT}/requirements.txt && \
-    ansible-galaxy install -r ${APP_ROOT}/requirements.yaml && \
     useradd -d ${APP_ROOT} -s /bin/bash ${APP_USER}
 
 COPY docker-player-entrypoint.sh ${APP_ROOT}/
