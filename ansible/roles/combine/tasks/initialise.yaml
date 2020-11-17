@@ -96,8 +96,8 @@
   - "{{ reppath }}/sql"
   - "{{ reppath }}/nextflow"
 
-- name: Get Fragmentor commit reference
-  command: git log --pretty=format:'%h' -n 1
+- name: Get Fragmentor commit reference (or 0)
+  shell: git log --pretty=format:'%h' -n 1 || echo 0
   args:
     chdir: "{{ reppath }}"
   register: fragmentor_commit_result

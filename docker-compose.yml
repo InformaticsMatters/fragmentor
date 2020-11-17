@@ -4,12 +4,12 @@ version: '3.8'
 
 services:
 
-  fragmentor-controller:
+  fragmentor-player:
     build:
       context: .
-      dockerfile: Dockerfile-controller
+      dockerfile: Dockerfile-player
       network: host
-    image: alanbchristie/fragmentor-controller:latest
+    image: alanbchristie/fragmentor-player:latest
     environment:
       FRAGMENTOR_PLAY: standardise
       AWS_ACCESS_KEY_ID: 1234
