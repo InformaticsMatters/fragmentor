@@ -28,6 +28,10 @@ RUN wget -qO- https://get.nextflow.io | bash && \
     chmod 755 nextflow && \
     mv nextflow /usr/local/bin && \
     nextflow -version
+# And create the 'home' directory.
+# If we don't do this now nextflow won't be able to write to the directory
+# if we rely on the directory being created once the config's mapped in.
+WORKDIR /home/${APP_USER}/.nextflow
 
 # Install kubectl
 RUN apt-get install -y \

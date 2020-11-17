@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Exit on error
-#set -e
+set -e
 
 # The controller-container entrypoint.
 # The environment variable FRAGMENTOR_PLAY defines
@@ -33,7 +33,7 @@ fi
 # A Nextflow configuration file '$HOME/nextflow.config' is expected to be mapped
 # into the container.
 
-NF_CONFIG_FILE=${HOME}/nextflow.config
+NF_CONFIG_FILE=${HOME}/.nextflow/config
 echo "+> NF_CONFIG_FILE is ${NF_CONFIG_FILE}"
 if [ ! -f "${NF_CONFIG_FILE}" ]; then
     echo "+> NF_CONFIG_FILE does not exist"
