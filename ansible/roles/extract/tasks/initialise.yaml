@@ -7,7 +7,6 @@
     name:
     - python-dateutil==2.8.1
     - boto3==1.12.49
-  delegate_to: "{{ database_login_host }}"
   when: deployment=="production"
 
 - name: Install requirements
@@ -55,8 +54,6 @@
     state: absent
     owner: "{{ database[deployment].db_user_account }}"
     group: "{{ database[deployment].db_user_account }}"
-  delegate_to: "{{ database_login_host }}"
-  become: yes
   when: deployment=="production"
 
 - name: Ensure extract path
@@ -66,8 +63,6 @@
     mode: 0777
     owner: "{{ database[deployment].db_user_account }}"
     group: "{{ database[deployment].db_user_account }}"
-  delegate_to: "{{ database_login_host }}"
-  become: yes
   when: deployment=="production"
 
 - name: Ensure sql directory is present

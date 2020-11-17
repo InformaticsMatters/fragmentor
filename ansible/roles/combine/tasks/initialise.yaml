@@ -57,7 +57,7 @@
     - '{{ aws_secret_key_out|length > 0 }}'
   when: data_source_out == "s3"
 
-# Clean-up before the run...
+# Clean-up before the run...
 # The following task does not run if 'clean_start' is false.
 
 - name: Remove existing directories
