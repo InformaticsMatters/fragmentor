@@ -13,7 +13,6 @@
   - "{{ runpath }}"
 
 # Install the required modules to be able to synchronise the data from S3 and use ansible python modules
-# Note that on prod this is done as "sudo" (become = yes)
 - name: Install requirements
   pip:
     name:

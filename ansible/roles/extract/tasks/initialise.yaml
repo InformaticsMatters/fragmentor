@@ -7,7 +7,6 @@
     name:
     - python-dateutil==2.8.1
     - boto3==1.12.49
-  become: yes
   delegate_to: "{{ database_login_host }}"
   when: deployment=="production"
 
