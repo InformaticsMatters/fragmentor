@@ -9,7 +9,7 @@ services:
       context: .
       dockerfile: Dockerfile-player
       network: host
-    image: alanbchristie/fragmentor-player:latest
+    image: alanbchristie/fragmentor-player:1.0.0
     environment:
       FRAGMENTOR_PLAY: standardise
       AWS_ACCESS_KEY_ID: 1234
