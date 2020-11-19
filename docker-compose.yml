@@ -8,8 +8,8 @@
 #
 # i.e.: -
 #
-#   IMAGE_TAG=2020.1 docker-compose build
-#   IMAGE_TAG=2020.1 docker-compose push
+#   IMAGE_TAG=1.0.0 docker-compose build
+#   IMAGE_TAG=1.0.0 docker-compose push
 
 version: '3.8'
 
