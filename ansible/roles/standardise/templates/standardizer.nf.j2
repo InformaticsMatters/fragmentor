@@ -21,7 +21,7 @@ chunks = Channel
 
 process standardise {
 
-    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+    container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
 
     input:
     file chunks

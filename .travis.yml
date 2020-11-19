@@ -5,6 +5,8 @@
 # -----------------
 #
 # PUBLISH_IMAGES        Should be 'yes' to enable publishing to Docker Hub.
+#                       If a DOCKER_PASSWORD is not set images will be built
+#                       but not pushed.
 #
 # If you set PUBLISH_IMAGES you must also set the following: -
 #
@@ -48,22 +50,38 @@ jobs:
   - stage: publish latest
     name: Latest Image
     script:
-    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    # Build ':latest' versions of the fragmentor and player
+    # Pushing if credentials appear available
     - docker build -t informaticsmatters/fragmentor:latest .
-    - docker push informaticsmatters/fragmentor:latest
+    - docker build -t informaticsmatters/fragmentor-player:latest -f Dockerfile-player .
+    - if [ -n "$DOCKER_PASSWORD" ]; then
+        docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+        docker push informaticsmatters/fragmentor:latest;
+        docker push informaticsmatters/fragmentor-player:latest;
+      fi
 
   - stage: publish tag
     name: Tagged Image
     script:
-    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    # Build tagged versions of the fragmentor and player
     - docker build -t informaticsmatters/fragmentor:${TRAVIS_TAG} .
-    - docker push informaticsmatters/fragmentor:${TRAVIS_TAG}
+    - docker build -t informaticsmatters/fragmentor-player:${TRAVIS_TAG} -f Dockerfile-player .
+    - if [ -n "$DOCKER_PASSWORD" ]; then
+        docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+        docker push informaticsmatters/fragmentor:${TRAVIS_TAG};
+        docker push informaticsmatters/fragmentor-player:${TRAVIS_TAG};
+      fi
 
   - stage: publish stable
     name: Stable Image
     script:
-    # Pull the corresponding image tag and push it as 'stable'
-    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-    - docker pull informaticsmatters/fragmentor:${TRAVIS_TAG}
-    - docker tag informaticsmatters/fragmentor:${TRAVIS_TAG} informaticsmatters/fragmentor:stable
-    - docker push informaticsmatters/fragmentor:stable
+    # Pull the corresponding image tag and push it as ':stable'
+    - if [ -n "$DOCKER_PASSWORD" ]; then
+        docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+        docker pull informaticsmatters/fragmentor:${TRAVIS_TAG};
+        docker tag informaticsmatters/fragmentor:${TRAVIS_TAG} informaticsmatters/fragmentor:stable;
+        docker push informaticsmatters/fragmentor:stable;
+        docker pull informaticsmatters/fragmentor-player:${TRAVIS_TAG};
+        docker tag informaticsmatters/fragmentor-player:${TRAVIS_TAG} informaticsmatters/fragmentor-player:stable;
+        docker push informaticsmatters/fragmentor-player:stable;
+      fi

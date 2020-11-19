@@ -30,7 +30,7 @@ edges = Channel.fromPath('{{ work_path }}/[0-9]-{{ file_type }}.gz')
 
 process eShatter {
 
-    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+    container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
     errorStrategy = 'retry'
@@ -59,7 +59,7 @@ process eShatter {
 
 process eDedup {
 
-    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+    container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
 {% if nextflow_process_sort_memory %}
     memory '{{ nextflow_process_sort_memory }}'
 {% endif %}
@@ -94,7 +94,7 @@ process eDedup {
 
 process eCat {
 
-    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+    container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
     publishDir '{{ next_path }}/results/', mode: 'move'
     scratch false
     errorStrategy = 'retry'

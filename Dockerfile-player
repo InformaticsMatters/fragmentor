@@ -1,0 +1,83 @@
+# Dockerfile to build the controller (playbook runner) image.
+# this is an image that contains the Ansible playbooks
+# and all the requirements to run them.
+
+FROM python:3.8.6-buster
+LABEL maintainer="Tim Dudgeon<tdudgeon@informaticsmatters.com>"
+ARG NF_VERSION=20.10.0
+
+USER root
+
+# Force the binary layer of the stdout and stderr streams
+# to be unbuffered
+ENV PYTHONUNBUFFERED 1
+
+# Base directory for the application
+# Also used for user directory
+ENV APP_USER fragmentor
+ENV APP_ROOT /home/${APP_USER}
+
+# Install Java (required by nextflow)
+RUN apt-get update -y && \
+    apt-get install -y \
+        default-jdk
+
+# Install nextflow
+# and run a nextflow command to force it to pull down dependent code...
+RUN wget -qO- https://get.nextflow.io | bash && \
+    chmod 755 nextflow && \
+    mv nextflow /usr/local/bin && \
+    nextflow -version
+# And create the 'home' directory.
+# If we don't do this now nextflow won't be able to write to the directory
+# if we rely on the directory being created once the config's mapped in.
+WORKDIR /home/${APP_USER}/.nextflow
+
+# Install kubectl
+RUN apt-get install -y \
+        apt-transport-https \
+        curl \
+        gnupg2 && \
+    curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list && \
+    apt-get update -y && \
+    apt-get install -y \
+        kubectl
+# A file for the kubernetes config.
+# This will be mapped into the container via a Kubernetes ConfigMap
+# as '~/.kube/config' and copied to '~/kubeconfig' as the container starts.
+# This is required because configmaps are mounted read-only and you
+# get...
+#   error: open /home/fragmentor/.kube/config.lock: read-only file system
+# ...when using kubectl.
+ENV KUBECONFIG /home/${APP_USER}/kubeconfig
+
+# Install PSQL (for the psql command).
+# See https://www.postgresql.org/download/linux/debian/
+# At last attempt this installed 12.5
+RUN apt-get install -y \
+        lsb-release && \
+    sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && \
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get update -y && \
+    apt-get install -y \
+        postgresql-12
+
+# - copy requirements in
+# - install requirements
+# - create a new user - containers should NOT run as root (as good practice)
+COPY requirements.txt ${APP_ROOT}/
+RUN pip install -r ${APP_ROOT}/requirements.txt && \
+    useradd -d ${APP_ROOT} -s /bin/bash ${APP_USER}
+
+COPY docker-player-entrypoint.sh ${APP_ROOT}/
+COPY ansible/ ${APP_ROOT}/ansible/
+
+RUN chmod 755 ${APP_ROOT}/*.sh && \
+    chown -R ${APP_USER}:${APP_USER} ${APP_ROOT}
+
+USER ${APP_USER}
+ENV HOME ${APP_ROOT}
+WORKDIR ${APP_ROOT}
+
+ENTRYPOINT ["./docker-player-entrypoint.sh"]
