@@ -1,15 +1,33 @@
 ---
 
+# You can control some of the behaviour of the build
+# with environment variables: -
+#
+# - IMAGE_TAG The client image version tag
+#             (default latest)
+#
+# i.e.: -
+#
+#   IMAGE_TAG=2020.1 docker-compose build
+#   IMAGE_TAG=2020.1 docker-compose push
+
 version: '3.8'
 
 services:
+
+  fragmentor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      network: host
+    image: informaticsmatters/fragmentor:${IMAGE_TAG:-latest}
 
   fragmentor-player:
     build:
       context: .
       dockerfile: Dockerfile-player
       network: host
-    image: alanbchristie/fragmentor-player:1.0.0
+    image: informaticsmatters/fragmentor-player:${IMAGE_TAG:-latest}
     environment:
       FRAGMENTOR_PLAY: standardise
       AWS_ACCESS_KEY_ID: 1234

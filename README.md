@@ -41,6 +41,11 @@ Further datasets are planned.
     into the process and will be the destination for Neo4j compatible
     extract files - and where they can be picked up by Fragnet Search.  
 
+## Building the images
+The images are built by the Travis CI/CD process. Review the `.travis.yml`
+file for details. A convenient docker-compose can be used to build
+the images for local experimentation.
+
 ## Prerequisites
 
 For the production configuration, it is assumed that the user has access to
