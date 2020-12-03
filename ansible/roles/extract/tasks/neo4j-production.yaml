@@ -25,8 +25,6 @@
   shell: gzip *.csv
   args:
     chdir: "{{ copy_root }}/extract"
-#  become: true
-#  become_user: "{{ database[deployment].db_user_account }}"
 
 # List all the node files into ' node-files.txt'.
 # This is a 1-file-per-line list of extracted nodes.
@@ -35,8 +33,6 @@
   shell: ls -1 *nodes*.gz > node-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
-#  become: true
-#  become_user: "{{ database[deployment].db_user_account }}"
 
 # Create the 'node_text' variable that will be used when templating
 # the loader script. This is essentially a '--nodes' directive for
@@ -61,8 +57,6 @@
   register: node_result
   args:
     chdir: "{{ copy_root }}/extract"
-#  become: true
-#  become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Set node_text
   set_fact:
@@ -75,8 +69,6 @@
   shell: ls -1 *edges*.gz > edge-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
-#  become: true
-#  become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Form relationship_result
   shell: >-
@@ -88,8 +80,6 @@
   register: relationship_result
   args:
     chdir: "{{ copy_root }}/extract"
-#  become: true
-#  become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Set relationship_text
   set_fact:
@@ -116,40 +106,56 @@
     group: "{{ database[deployment].db_user_account }}"
   with_fileglob:
   - header-*
-#  become: yes
 
 - name: Remove node and edge text files
   command: rm node-files.txt edge-files.txt
   args:
     chdir: "{{ copy_root }}/extract"
   become_user: "{{ database[deployment].db_user_account }}"
-#  become: true
-#  delegate_to: "{{ database_login_host }}"
+
+- name: List files
+  find:
+    paths: "{{ copy_root }}/extract"
+  register: find_result
+
+- name: Extract files
+  set_fact:
+    files_found: "{{ find_result|json_query('files[*].path')|flatten }}"
+
+- name: Display files
+  debug:
+    var: files_found
 
 # Synchronise the extract to S3 if desired, otherwise this data is left in the extract directory on the server.
 
 # When only one vendor, use it
-- name: Synchronise extract to S3 - Single Vendor
-  s3_sync:
+- name: Transfer files (to S3) - Single Vendor
+  aws_s3:
     bucket: "{{ bucket }}"
-    key_prefix: extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}
-    file_root: "{{ copy_root }}/extract"
+    encrypt: "{{ bucket_requires_encryption|bool }}"
+    src: "{{ item }}"
+    object: extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}/{{ item|basename }}
+    mode: put
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
+  loop: "{{ files_found }}"
   when:
   - data_source[deployment]=="s3"
   - source_id_lst|length == 1
 
 # When combination, use combination/first vendor/first version
-- name: Synchronise extract to S3 - Combination
-  s3_sync:
+- name: Transfer files (to S3) - Combination
+  aws_s3:
     bucket: "{{ bucket }}"
-    key_prefix: extract/combination/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}
-    file_root: "{{ copy_root }}/extract"
+    encrypt: "{{ bucket_requires_encryption|bool }}"
+    src: "{{ item }}"
+    object: extract/combination/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}/{{ item|basename }}
+    mode: put
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
+  loop: "{{ files_found }}"
   when:
   - data_source[deployment]=="s3"
   - source_id_lst|length > 1

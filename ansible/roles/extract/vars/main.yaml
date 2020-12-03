@@ -18,9 +18,10 @@ supmolsupedgefile: suppliermol-supplier-edges.csv
 inchiidfile: inchi-nodes.csv
 molinchiedgefile: molecule-inchi-edges.csv
 
-# The (AWS S3) location of vendor RAW data
-# a source for standardisation.
+# The (AWS S3) location of vendor data.
 bucket: im-fragnet
+# Set if data written to the bucket requires encryption.
+bucket_requires_encryption: no
 
 # The database server's pgcopy directory.
 # This *MUST* match the directory

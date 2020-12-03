@@ -98,15 +98,31 @@
   args:
     chdir: "{{ combine_path }}"
 
-# Synchronise the extract to S3
-- name: Synchronise Combination to S3
-  s3_sync:
+- name: List files
+  find:
+    paths: "{{ combine_path }}"
+  register: find_result
+
+- name: Extract files
+  set_fact:
+    files_found: "{{ find_result|json_query('files[*].path')|flatten }}"
+
+- name: Display files
+  debug:
+    var: files_found
+
+- name: Transfer files (to S3)
+  aws_s3:
     bucket: "{{ bucket_out }}"
-    key_prefix: extract/combination/{{ path_out }}
-    file_root: "{{ combine_path }}"
-    aws_access_key: "{{ aws_access_key_out }}"
-    aws_secret_key: "{{ aws_secret_key_out }}"
+    encrypt: "{{ bucket_out_requires_encryption|bool }}"
+    src: "{{ item }}"
+    object: extract/combination/{{ path_out }}/{{ item|basename }}
+    mode: put
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
+  loop: "{{ files_found }}"
+  when: deployment=="production"
 
 # Zip log files for transfer
 - name: Compress log files
@@ -114,15 +130,31 @@
   args:
     chdir: "{{ log_path }}"
 
-# Synchronise logs to S3
-- name: Synchronise Logs to S3
-  s3_sync:
+- name: List files
+  find:
+    paths: "{{ log_path }}"
+    patterns: '*.gz'
+  register: find_result
+
+- name: Extract files
+  set_fact:
+    files_found: "{{ find_result|json_query('files[*].path')|flatten }}"
+
+- name: Display files
+  debug:
+    var: files_found
+
+- name: Transfer files (to S3)
+  aws_s3:
     bucket: "{{ bucket_out }}"
-    key_prefix: logs/combination/{{ path_out }}
-    file_root: "{{ log_path }}"
-    aws_access_key: "{{ aws_access_key_out }}"
-    aws_secret_key: "{{ aws_secret_key_out }}"
+    encrypt: "{{ bucket_out_requires_encryption|bool }}"
+    src: "{{ item }}"
+    object: logs/combination/{{ path_out }}/{{ item|basename }}
+    mode: put
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
+  loop: "{{ files_found }}"
 
 # Clean-up?
 #

@@ -597,6 +597,10 @@ vendors:
     around 300 has been found to be efficient, whereas for 
     Chemspace it was possible to increase it to 2000.      
 
+If you are required to request server-side encryption for S3 bucket `put`
+operations you can set the variable `bucket_requires_ecryption: yes` (or
+`bucket_out_requires_encryption: yes` during the combination play).
+
 ## Database Sizing 
 
 Numbers are given below were achieved using the maximum fragmentation cycles
