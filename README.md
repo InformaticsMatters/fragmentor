@@ -9,6 +9,11 @@ existing database rather than having to completely re-fragment the input files -
 speeding up the loading of extracts to the Neo4j database used by
 fragment search. 
 
+>   For kubernetes execution of the fragmentation process refer to our
+    [fragmentor-ansible] repository, which contains a playbook that
+    launches the fragmentor processes as Pods within a suitably configured
+    Kubernetes cluster.
+
 Summary of Contents:
 
 -   Ansible playbooks to populate the database: standardisation, fragmentation
@@ -786,3 +791,4 @@ Removing the environment:
 ---
 
 [ssh-agent]: https://www.ssh.com/ssh/agent
+[fragmentor-ansible]: https://github.com/InformaticsMatters/fragmentor-ansible.git
