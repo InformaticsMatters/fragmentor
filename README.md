@@ -774,6 +774,63 @@ has been provided. However, additional steps are required:
     The f40_load_standardised_data.sql scripts for chemspace 
     and Molport are two examples of how this might be accomplished.  
 
+## Using an existing Vendor Library with new parameters
+If an existing Vendor Library supports your fragmentation needs you can
+provide (over-ride) the built-in parameters by supplying your own.
+You will need to: -
+
+-   **Site your data** appropriately
+-   **Provide parameters** that over-ride the built-in values
+    for your source file-type
+-   Verify that the database is sufficiently configured to deal with
+    your fragmentation needs
+
+The following example illustrates how you might utilise SDF fragment
+processing for an SDF file of your choice.
+
+### Site your data
+Place SDF files are located in your AWS bucket using the
+path `raw/vendor/sdf/<version>/<standinputfile>.gz`
+
+>   The version can be any string i.e. v1. It's just a string (with no '_')
+
+### Provide parameters
+When running playbooks to process you data, for example standardising
+your custom SDF file you may need to over-ride the built-in
+defaults for the file type being processed. You may have an especially small
+file or an especially large one. If so you may want to adjust parameters
+that determine the number of sub-processes that will run and timeouts that will
+be used.
+
+>   The built-in `group_vars/all.yaml` has documentation for the
+    parameters in its `vendors/xchem_dsip` variable.
+
+You will need to provide a `vendors` map and some additional variables.
+
+A set of parameters for SDF might be defined like this: -
+
+```yaml
+---
+vendors:
+  sdf:
+    approx_vendor_molecules: 50
+    est_total_fragmentation_time: 10
+    fragminhac: 0
+    fraghac: 36
+    fragmaxfrags: 12
+    fraglimit: 0
+    indexchunksize: 100
+    index_build_time: 10
+# Input file template (unzipped) expected by standardiser.
+# It can be a name of a file or, if there are multiple files, it can be a glob.
+standinputfile: test.sdf
+# Compound Prefix used in creating the compound-id's.
+# For the other vendors this is hardcoded as the company name.
+standard_compound_id_prefix: SDF
+# Field in SDF file to be used for compound id.
+standard_compound_id_field: mr_id
+```
+
 ## Running Python Scripts directly via a Conda Environment
 
 Create the environment:
