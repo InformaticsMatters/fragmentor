@@ -6,6 +6,8 @@ unpacker: decompress-gz-all
 standardiser: frag.standardise.scripts.sdf.standardise_sdf_compounds
 # Input file template (unzipped) expected by standardiser. If there are multiple files this can be a glob.
 standinputfile: test.sdf
+# Token used to split records.
+standsplittoken: $$$$
 # Coumpound Prefix used in creating the compound-id's. For the other vendors this is hardcoded as the company name.
 standard_compound_id_prefix: SDF
 # Field in SDF file to be used for compound id. For the other vendors this is hardcoded as the company name.

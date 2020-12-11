@@ -35,3 +35,6 @@ standchunk: 1000000
 standard_compound_id_prefix: None
 # Field in SDF file to be used for compound id. This is overridden if required in the vendor specific files.
 standard_compound_id_field: None
+# Field in file to be used to split records in the case where it is not a line. This is overridden if required in
+# the vendor specific files.
+standsplittoken: None

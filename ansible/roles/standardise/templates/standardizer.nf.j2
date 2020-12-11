@@ -5,6 +5,7 @@
  * Author | Date    | Version
  * Tim    | 03/2020 | Initial Version
  * Duncan | 03/2020 | Updated for multiple input files and no gzip.
+ * Duncan | 12/2020 | Updated to change file splitter to python script.
  *
  */
 
@@ -15,13 +16,39 @@ params.script = 'frag.standardise.scripts.chemspace_bb.standardise_chemspace_bb_
 params.compound_id_prefix = 'SDF'
 params.compound_id_field = 'mr_id'
 
-chunks = Channel
+files = Channel
      .fromPath(params.inputs)
-     .splitText(by: params.chunk_size, file: 'chunk_', keepHeader: true)
+
+process split {
+
+    container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+    errorStrategy = 'retry'
+    maxErrors = 3
+
+    input:
+    file files
+
+    output:
+    file 'chunk_*' into standardise
+
+    """
+    # Check if a token has been set, if so - supply the token to the python script.
+    # python -m frag.std_utils.standardise_file_splitter data/sdf/v1/test.sdf.gz chunk_ 10 tmp --token '$$$$'
+    if [ ${params.split_token} != 'None' ]
+    then
+       python -m frag.std_utils.standardise_file_splitter $files chunk_ params.chunk_size ./output --token ${params.split_token}
+    else
+       python -m frag.std_utils.standardise_file_splitter $files chunk_ params.chunk_size ./output --header
+    fi
+    """
+
+}
 
 process standardise {
 
     container 'informaticsmatters/fragmentor:{{ nextflow_container_tag }}'
+    errorStrategy = 'retry'
+    maxErrors = 3
 
     input:
     file chunks
