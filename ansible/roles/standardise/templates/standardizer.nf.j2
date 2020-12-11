@@ -15,6 +15,7 @@ params.out_dir = '.'
 params.script = 'frag.standardise.scripts.chemspace_bb.standardise_chemspace_bb_pricing_compounds'
 params.compound_id_prefix = 'SDF'
 params.compound_id_field = 'mr_id'
+params.split_token = 'None'
 
 files = Channel
      .fromPath(params.inputs)
@@ -29,16 +30,16 @@ process split {
     file files
 
     output:
-    file 'chunk_*' into standardise
+    file 'chunk_*' into split_files
 
     """
     # Check if a token has been set, if so - supply the token to the python script.
-    # python -m frag.std_utils.standardise_file_splitter data/sdf/v1/test.sdf.gz chunk_ 10 tmp --token '$$$$'
+    # python -m frag.std_utils.standardise_file_splitter data/sdf/v1/test.sdf.gz chunk_ 10 tmp --token {token}
     if [ ${params.split_token} != 'None' ]
     then
-       python -m frag.std_utils.standardise_file_splitter $files chunk_ params.chunk_size ./output --token ${params.split_token}
+       python -m frag.std_utils.standardise_file_splitter $files chunk_ ${params.chunk_size} ./output --token ${params.split_token}
     else
-       python -m frag.std_utils.standardise_file_splitter $files chunk_ params.chunk_size ./output --header
+       python -m frag.std_utils.standardise_file_splitter $files chunk_ ${params.chunk_size} ./output --header
     fi
     """
 
@@ -51,7 +52,7 @@ process standardise {
     maxErrors = 3
 
     input:
-    file chunks
+    file chunks from split_files
 
     output:
     file 'chunk_*.tab' into standardised

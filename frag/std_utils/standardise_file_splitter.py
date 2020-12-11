@@ -58,9 +58,9 @@ def split_file(args):
     logger.info(args)
 
     if args.input_file.endswith('.gz'):
-        file = gzip.open(args.input_file)
+        file = gzip.open(args.input_file,'rt')
     else:
-        file = open(args.input_file)
+        file = open(args.input_file,'r')
 
     start_chunk = 1
     output_filename = args.chunk_prefix + str(start_chunk).zfill(10)
@@ -77,7 +77,7 @@ def split_file(args):
     if args.header:
         header = file.readline()
         lines = file.readlines()[1:]
-        output_file.write(header.decode())
+        output_file.write(header)
     else:
         lines = file.readlines()
 
@@ -91,17 +91,17 @@ def split_file(args):
             output_filename = args.chunk_prefix + str(start_chunk).zfill(10)
             output_file = open(os.path.join(args.output_dir, output_filename), 'wt')
             if args.header:
-                output_file.write(header.decode())
+                output_file.write(header)
             num_chunks += 1
             new_file = False
 
-        output_file.write(line.decode())
+        output_file.write(line)
 
         if args.token == 'None':
             chunk_recs += 1
         else:
             # Check to see if the line is equal to a token before incrementing record counter
-            if args.token in line.decode():
+            if args.token in line:
                 chunk_recs += 1
 
         if chunk_recs > args.chunk_size-1:
