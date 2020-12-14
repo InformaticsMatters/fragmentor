@@ -30,16 +30,16 @@ process split {
     file files
 
     output:
-    file 'chunk_*' into split_files
+    file 'split_*' into split_files mode flatten
 
     """
     # Check if a token has been set, if so - supply the token to the python script.
-    # python -m frag.std_utils.standardise_file_splitter data/sdf/v1/test.sdf.gz chunk_ 10 tmp --token {token}
+    # python -m frag.std_utils.standardise_file_splitter data/sdf/v1/test.sdf.gz split_ 10 tmp --token {token}
     if [ ${params.split_token} != 'None' ]
     then
-       python -m frag.std_utils.standardise_file_splitter $files chunk_ ${params.chunk_size} ./output --token ${params.split_token}
+       python -m frag.std_utils.standardise_file_splitter $files split_ ${params.chunk_size} ./ --token ${params.split_token}
     else
-       python -m frag.std_utils.standardise_file_splitter $files chunk_ ${params.chunk_size} ./output --header
+       python -m frag.std_utils.standardise_file_splitter $files split_ ${params.chunk_size} ./ --header
     fi
     """
 
@@ -55,7 +55,7 @@ process standardise {
     file chunks from split_files
 
     output:
-    file 'chunk_*.tab' into standardised
+    file 'split_*.tab' into standardised
 
     """
     cp $chunks input.dat

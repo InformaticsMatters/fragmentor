@@ -76,7 +76,7 @@ def split_file(args):
     header = ''
     if args.header:
         header = file.readline()
-        lines = file.readlines()[1:]
+        lines = file.readlines()
         output_file.write(header)
     else:
         lines = file.readlines()
