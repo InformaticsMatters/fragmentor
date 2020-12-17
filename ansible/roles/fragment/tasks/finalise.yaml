@@ -31,15 +31,31 @@
   args:
     chdir: "{{ fragpath }}/fragment"
 
-# Copy log files to S3
-- name: Synchronise logs to S3
-  s3_sync:
+- name: List files
+  find:
+    paths: "{{ fragpath }}/fragment"
+    patterns: '*.gz'
+  register: find_result
+
+- name: Extract files
+  set_fact:
+    files_found: "{{ find_result|json_query('files[*].path')|flatten }}"
+
+- name: Display files
+  debug:
+    var: files_found
+
+- name: Transfer files (to S3)
+  aws_s3:
     bucket: "{{ bucket }}"
-    key_prefix: logs/{{ vendor }}/{{ version }}/fragment
-    file_root: "{{ fragpath }}/fragment"
+    encrypt: "{{ bucket_requires_encryption|bool }}"
+    src: "{{ item }}"
+    object: logs/{{ vendor }}/{{ version }}/fragment/{{ item|basename }}
+    mode: put
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
+  loop: "{{ files_found }}"
   when: deployment=="production"
 
 # Copy log files to Repo

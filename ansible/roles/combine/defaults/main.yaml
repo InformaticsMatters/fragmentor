@@ -7,7 +7,7 @@
 
 reppath: "{{ role_path }}/../../.."
 
-# Base path for all folders used in the combinataion.
+# Base path for all folders used in the combination.
 # This should be created by the user before the run
 # It should normally be different to the repo path and ideally should start with a "/".
 runpath: SetMe
@@ -54,6 +54,8 @@ aws_secret_key_in_2: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
 
 # The (AWS S3) location of output extract data
 bucket_out: im-fragnet
+# Set if data written to the bucket requires encryption.
+bucket_out_requires_encryption: no
 # AWS credentials for bucket access
 aws_access_key_out: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
 aws_secret_key_out: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
