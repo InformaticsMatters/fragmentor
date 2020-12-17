@@ -9,13 +9,6 @@
     - boto3==1.12.49
   when: deployment=="production"
 
-- name: Install requirements
-  pip:
-    name:
-    - python-dateutil==2.8.1
-    - boto3==1.12.49
-  when: deployment=="development"
-
 # For each source id given in the parameters file, do some sanity checks
 - name: Check and store source_id for each vendor
   include_tasks: check-source-id.yaml

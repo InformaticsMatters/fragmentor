@@ -118,8 +118,8 @@
     src: "{{ item }}"
     object: extract/combination/{{ path_out }}/{{ item|basename }}
     mode: put
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
+    aws_access_key: "{{ aws_access_key_out }}"
+    aws_secret_key: "{{ aws_secret_key_out }}"
     region: "{{ aws_region }}"
   loop: "{{ files_found }}"
   when: deployment=="production"
@@ -144,15 +144,15 @@
   debug:
     var: files_found
 
-- name: Transfer files (to S3)
+- name: Transfer log files (to S3)
   aws_s3:
     bucket: "{{ bucket_out }}"
     encrypt: "{{ bucket_out_requires_encryption|bool }}"
     src: "{{ item }}"
     object: logs/combination/{{ path_out }}/{{ item|basename }}
     mode: put
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
+    aws_access_key: "{{ aws_access_key_out }}"
+    aws_secret_key: "{{ aws_secret_key_out }}"
     region: "{{ aws_region }}"
   loop: "{{ files_found }}"
 
