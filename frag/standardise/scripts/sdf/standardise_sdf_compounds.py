@@ -13,7 +13,6 @@ A prefix for the ID that is generated must be specified using the --prefix param
 e.g. is you specify --prefix FOO then the IDs are generated as FOO:<id-field-value>.
 
 Example usage:
-
     python -m frag.standardise.scripts.sdf.standardise_sdf_compounds \
         --prefix FOO \
         --id-field mr_id data/sdf/Kinase_inhibs.sdf.gz \

@@ -26,7 +26,7 @@ clean_finish: no
 # You can provide registry, name and tag.
 nextflow_container_registry: docker.io
 nextflow_container_name: informaticsmatters/fragmentor
-nextflow_container_tag: 1.0.0
+nextflow_container_tag: pre-kubernetes-2.0
 
 # Memory requested by a number of 'sort' processes
 # in the nextflow workflow (namely fragmentation and combination).
