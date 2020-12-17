@@ -1,13 +1,17 @@
 ---
- # Provide details of the compute cluster nodes.
- # It consists of a head node and database severs.
- all:
-   children:
-     head:
-       hosts:
-         localhost:
-     dbservers:
-       hosts:
-         130.246.214.154:
-       vars:
-         ansible_user: centos
+
+# Provide details of the compute cluster nodes.
+# It consists of a head node and database severs.
+#
+# A legacy inventory used for the STFC/condor cluster
+
+all:
+  children:
+    head:
+      hosts:
+        localhost:
+    dbservers:
+      hosts:
+        130.246.214.154:
+      vars:
+        ansible_user: centos
