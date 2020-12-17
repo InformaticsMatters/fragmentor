@@ -139,5 +139,4 @@
   - "{{ work_path }}"
   - "{{ nextflow_path }}"
   - "{{ log_path }}"
-  become: yes
   when: clean_finish|bool

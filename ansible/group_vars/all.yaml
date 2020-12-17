@@ -21,9 +21,12 @@ clean_start: yes
 # Not essential files.
 clean_finish: no
 
-# The tag of the fragmentation container,
+# The details of the fragmentation container,
 # used for a number of nextflow workflows.
-nextflow_container_tag: sdf-08
+# You can provide registry, name and tag.
+nextflow_container_registry: docker.io
+nextflow_container_name: informaticsmatters/fragmentor
+nextflow_container_tag: pre-kubernetes-2.0
 
 # Memory requested by a number of 'sort' processes
 # in the nextflow workflow (namely fragmentation and combination).

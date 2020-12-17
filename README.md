@@ -41,6 +41,11 @@ Further datasets are planned.
     into the process and will be the destination for Neo4j compatible
     extract files - and where they can be picked up by Fragnet Search.  
 
+## Building the images
+The images are built by the Travis CI/CD process. Review the `.travis.yml`
+file for details. A convenient docker-compose can be used to build
+the images for local experimentation.
+
 ## Prerequisites
 
 For the production configuration, it is assumed that the user has access to
@@ -355,13 +360,13 @@ format:
 ---
 extracts:
 - lib:
-    vendor: 'enamine_ro5'
-    version: 'jun2018'
-    regenerate_index: 'no'
+    vendor: enamine_ro5
+    version: jun2018
+    regenerate_index: no
 - lib:
-    vendor: 'molport'
-    version: '2020-02'
-    regenerate_index: 'yes'
+    vendor: molport
+    version: 2020-02
+    regenerate_index: yes
 ```
 
 The first time a library version is extracted, regenerate_index should be
@@ -411,16 +416,16 @@ default (`s3`):
 ---
 extracts:
 - lib:
-    path: 'xchem_dsip'
+    path: xchem_dsip
     data_source: disk
 - lib:
-    path: 'extract/xchem_spot/v1'
+    path: extract/xchem_spot/v1
     data_source: s3
     bucket: "{{ bucket_in_1 }}"
     aws_access_key: "{{ aws_access_key_in_1 }}"
     aws_secret_key: "{{ aws_secret_key_in_1 }}"
 - lib:
-    path: 'extract/xchem_probe/v1'
+    path: extract/xchem_probe/v1
     data_source: s3
     bucket: "{{ bucket_in_2 }}"
     aws_access_key: "{{ aws_access_key_in_2 }}"
@@ -428,7 +433,7 @@ extracts:
 
 # The path_out parameter defines the subdirectory that will be used
 # for the output in "combinations" .
-path_out: 'xchem_combi_20200715'
+path_out: xchem_combi_20200715
 
 data_source_out: disk
 ```
