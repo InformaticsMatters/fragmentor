@@ -9,13 +9,6 @@
     - boto3==1.12.49
   when: deployment=="production"
 
-- name: Install requirements
-  pip:
-    name:
-    - python-dateutil==2.8.1
-    - boto3==1.12.49
-  when: deployment=="development"
-
 # For each source id given in the parameters file, do some sanity checks
 - name: Check and store source_id for each vendor
   include_tasks: check-source-id.yaml
@@ -52,8 +45,6 @@
   file:
     path: "{{ copy_root }}/extract"
     state: absent
-    owner: "{{ database[deployment].db_user_account }}"
-    group: "{{ database[deployment].db_user_account }}"
   when: deployment=="production"
 
 - name: Ensure extract path
@@ -61,8 +52,6 @@
     path: "{{ copy_root }}/extract"
     state: directory
     mode: 0777
-    owner: "{{ database[deployment].db_user_account }}"
-    group: "{{ database[deployment].db_user_account }}"
   when: deployment=="production"
 
 - name: Ensure sql directory is present

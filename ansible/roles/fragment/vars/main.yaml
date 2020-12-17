@@ -3,9 +3,10 @@
 # Variables that a user might want to change
 # through the command-line or a parameter file.
 
-# The (AWS S3) location of vendor RAW data
-# a source for standardisation.
+# The (AWS S3) location for data.
 bucket: im-fragnet
+# Set if data written to the bucket requires encryption.
+bucket_requires_encryption: no
 
 # AWS credentials for bucket access
 aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
