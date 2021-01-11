@@ -1,6 +1,8 @@
 # Fragmentation Optimisation
 
-[![Build Status](https://travis-ci.com/InformaticsMatters/fragmentor.svg?branch=master)](https://travis-ci.com/InformaticsMatters/fragmentor)
+![lint](https://github.com/InformaticsMatters/fragmentor/workflows/lint/badge.svg)
+![publish latest](https://github.com/InformaticsMatters/fragmentor/workflows/publish%20latest%20images/badge.svg)
+
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/informaticsmatters/fragmentor)
 
 Optimisation of fragmentation process through the use of a postgres database
