@@ -1,5 +1,5 @@
 ---
-name: Publish latest images
+name: publish latest images
 
 on:
   push:
