@@ -27,7 +27,6 @@ jobs:
     - name: Build and push player
       uses: docker/build-push-action@v2
       with:
-        context: .
         file: Dockerfile-player
         push: true
         tags: informaticsmatters/fragmentor-player:latest
