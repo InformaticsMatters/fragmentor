@@ -1,9 +1,12 @@
 ---
 name: publish tag
 
-# Actions for any unofficial tag.
+# Actions for any 'unofficial' tag.
 
-# Run on any tag as long as it doesn't look official...
+# It's not an official tag if it's not formed from three digits
+# (i.e. is not 'N.N.N').
+# We publish images using the tag as a tag.
+
 on:
   push:
     tags:

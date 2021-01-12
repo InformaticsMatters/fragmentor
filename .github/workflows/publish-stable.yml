@@ -2,7 +2,9 @@
 name: publish stable
 
 # Actions for an 'official' tag.
-# An official tag is a 3-digit value ... 'N.N.N'
+
+# An official tag is a 3-digit value (i.e. 'N.N.N').
+# We publish images using the tag as a tag and one using 'stable' as s tag.
 
 on:
   push:

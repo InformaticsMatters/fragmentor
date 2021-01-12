@@ -1,10 +1,11 @@
 # Fragmentation Optimisation
 
 ![lint and publish latest](https://github.com/InformaticsMatters/fragmentor/workflows/lint%20and%20publish%20latest/badge.svg)
-![publish tag](https://github.com/InformaticsMatters/fragmentor/workflows/publish%tag/badge.svg)
-![publish stable](https://github.com/InformaticsMatters/fragmentor/workflows/publish%stable/badge.svg)
+![publish tag](https://github.com/InformaticsMatters/fragmentor/workflows/publish%20tag/badge.svg)
+![publish stable](https://github.com/InformaticsMatters/fragmentor/workflows/publish%20stable/badge.svg)
+![lint and build](https://github.com/InformaticsMatters/fragmentor/workflows/lint%20and%20build/badge.svg)
 
-![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/informaticsmatters/fragmentor)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/informaticsmatters/fragmentor)
 
 Optimisation of fragmentation process through the use of a postgres database
 to previously already fragmented data. This will allow delta changes to an
