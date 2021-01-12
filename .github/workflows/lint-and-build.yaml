@@ -4,12 +4,14 @@ name: lint and build
 # Actions that take place on branches.
 
 on:
-- push:
+  push:
     branches:
     - '!master'
     tags:
     - '!**'
-- pull_request
+  pull_request:
+    branches:
+    - 'master'
 
 jobs:
   lint:
