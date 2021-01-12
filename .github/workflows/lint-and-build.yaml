@@ -1,7 +1,10 @@
 ---
 name: lint and build
 
-# Actions that take place on branches.
+# Actions that take place on branches
+# or are driven by pull-requests to the main/master branch.
+# Here we build container images but don't push them
+# and therefore do not require docker credentials.
 
 on:
   push:
@@ -39,14 +42,10 @@ jobs:
     - name: Build fragmentor
       uses: docker/build-push-action@v1
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: informaticsmatters/fragmentor
         push: false
     - name: Build player
       uses: docker/build-push-action@v1
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: informaticsmatters/fragmentor-player
         push: false
