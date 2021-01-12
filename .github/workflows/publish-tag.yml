@@ -3,10 +3,15 @@ name: publish tag
 
 # Actions for any unofficial tag.
 
+# Convoluted because it seems difficult to
+# put 'if' conditions inside jobs using reg-ex for tags.
+# So - run on any tag as long as it doesn't look official...
 on:
-  create:
+  push:
     tags:
-    - '![0-9]+.[0-9]+.[0-9]+'
+    - '**'
+    tags-ignore:
+    - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   publish-tag:

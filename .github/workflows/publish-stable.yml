@@ -2,11 +2,10 @@
 name: publish stable
 
 # Actions for an 'official' tag.
-# We publish a tagged image and a 'stable' image.
-# An official tag is has a 3-digit value 'N.N.N'.
+# An official tag is a 3-digit value ... 'N.N.N'
 
 on:
-  create:
+  push:
     tags:
     - '[0-9]+.[0-9]+.[0-9]+'
 
