@@ -1,0 +1,42 @@
+---
+name: publish stable
+
+# Actions for an 'official' tag.
+# We publish a tagged image and a 'stable' image.
+# An official tag is has a 3-digit value 'N.N.N'.
+
+on:
+  create:
+    tags:
+    - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  publish-stable:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Inject slug/short variables
+      uses: rlespinasse/github-slug-action@v3.x
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Build and push fragmentor
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        tags:
+        - informaticsmatters/fragmentor:stable
+        - informaticsmatters/fragmentor:${{ env.GITHUB_REF_SLUG }}
+    - name: Build and push player
+      uses: docker/build-push-action@v2
+      with:
+        file: Dockerfile-player
+        push: true
+        tags:
+        - informaticsmatters/fragmentor-player:stable
+        - informaticsmatters/fragmentor-player:${{ env.GITHUB_REF_SLUG }}
