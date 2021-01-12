@@ -1,7 +1,8 @@
 # Fragmentation Optimisation
 
-![lint](https://github.com/InformaticsMatters/fragmentor/workflows/lint/badge.svg)
-![Publish latest images](https://github.com/InformaticsMatters/fragmentor/workflows/publish%20latest%20images/badge.svg)
+![lint and publish latest](https://github.com/InformaticsMatters/fragmentor/workflows/lint%20and%20publish%20latest/badge.svg)
+![publish tag](https://github.com/InformaticsMatters/fragmentor/workflows/publish%tag/badge.svg)
+![publish stable](https://github.com/InformaticsMatters/fragmentor/workflows/publish%stable/badge.svg)
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/informaticsmatters/fragmentor)
 
