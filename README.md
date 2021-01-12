@@ -6,6 +6,8 @@
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/informaticsmatters/fragmentor)
 
+TEST
+
 Optimisation of fragmentation process through the use of a postgres database
 to previously already fragmented data. This will allow delta changes to an
 existing database rather than having to completely re-fragment the input files - 
