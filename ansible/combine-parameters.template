@@ -18,7 +18,7 @@
 # To set these to different values add/set new parameters for
 # aws_access_key_in_2 and aws_secret_key_in_2.
 
-extracts:
+combine:
 - lib:
     path: 'xchem_dsip'
     data_source: disk

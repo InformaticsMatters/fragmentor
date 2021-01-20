@@ -34,9 +34,9 @@
     - "{{ hardware[deployment].cluster_cores|int > 0 }}"
 
 # For each extract given in the parameters file, do some sanity checks
-- name: Check extracts to combine
+- name: Check libraries to combine
   include_tasks: check-extract.yaml
-  loop: "{{ extracts }}"
+  loop: "{{ combine }}"
 
 # Check output credentials
 - name: Output Path sanity-check

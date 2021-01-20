@@ -50,8 +50,8 @@
     that:
     - deployment|string|length > 0
     - deployment|string != 'SetMe'
-    - "{{ extracts[0].lib.path|string != 'SetMe'}}"
-    - "{{ extracts[0].lib.data_source|string != 'SetMe'}}"
+    - "{{ combine[0].lib.path|string != 'SetMe'}}"
+    - "{{ combine[0].lib.data_source|string != 'SetMe'}}"
     - "{{ data_source_out|string != 'SetMe'}}"
     - runpath|string|length > 0
     - runpath|string != 'SetMe'
@@ -60,7 +60,7 @@
 - name: List input datasets
   debug:
     msg: "{{ item.lib }}"
-  loop: "{{ extracts }}"
+  loop: "{{ combine }}"
 
 - import_tasks: initialise.yaml
 

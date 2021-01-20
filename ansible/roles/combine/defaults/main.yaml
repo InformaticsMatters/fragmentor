@@ -17,7 +17,7 @@ singularity_path: "{{ runpath }}/.."
 
 # The following is used (amongst other things)
 # to load vendor-specific variables from a specified parameters file - see extract-parameters.template...
-extracts:
+combine:
 - lib:
     path: 'SetMe'
     use_s3: 'SetMe'

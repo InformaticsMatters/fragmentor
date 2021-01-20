@@ -19,7 +19,7 @@
       <h2>Step: Concatanate Files</h2>
       <p>Start: {{ now(utc=True).isoformat() }}</p>
 
-# For each extract file type in the list - concatenate the files from the different extracts
+# For each extract file type in the list - concatenate the files from the different libraries
 - name: Concatenate each file type in the concat list
   include_tasks: concatenate-file-type.yaml
   loop: "{{ concat }}"

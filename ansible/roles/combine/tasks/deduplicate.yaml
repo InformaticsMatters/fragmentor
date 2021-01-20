@@ -15,7 +15,7 @@
       <h2>Step: Deduplicate Files</h2>
       <p>Start: {{ now(utc=True).isoformat() }}</p>
 
-# For each extract file type in the list - deduplicate the files from the different extracts
+# For each extract file type in the list - deduplicate the files from the different libraries
 - name: Deduplicate each file type in the deduplication list
   include_tasks: nextflow-dedup-file-type.yaml
   loop: "{{ deduplicate }}"

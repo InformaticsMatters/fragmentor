@@ -423,7 +423,7 @@ default (`s3`):
 
 ```yaml
 ---
-extracts:
+combine:
 - lib:
     path: xchem_dsip
     data_source: disk
