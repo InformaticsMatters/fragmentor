@@ -29,7 +29,11 @@ nodes = Channel.fromPath('{{ work_path }}/[0-9]-{{ file_type }}.gz')
 
 process nShatter {
 
+{% if nextflow_container_registry %}
     container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
+{% else %}
+    container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
+{% endif %}
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
     errorStrategy = 'retry'
@@ -58,7 +62,11 @@ process nShatter {
 
 process nMerge {
 
+{% if nextflow_container_registry %}
     container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
+{% else %}
+    container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
+{% endif %}
 {% if nextflow_process_sort_memory %}
     memory '{{ nextflow_process_sort_memory }}'
 {% endif %}
@@ -92,7 +100,11 @@ process nMerge {
 
 process nCat {
 
+{% if nextflow_container_registry %}
     container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
+{% else %}
+    container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
+{% endif %}
     publishDir '{{ next_path }}/results/', mode: 'move'
     scratch false
     errorStrategy = 'retry'
