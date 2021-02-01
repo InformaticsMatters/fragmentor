@@ -8,7 +8,6 @@
   pip:
     name: docker-py
   become: yes
-  become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Start database container
   docker_container:
