@@ -28,8 +28,9 @@ COPY (select v.supplier_node_name, '{{ GRAPHVERSION }}',s.fragmentor_commit_ref,
 -- suppliermol-nodes.csv
 -- cmpd_id:ID(SM),osmiles,:LABEL
 --
-COPY (select code, smiles, 'Available'
+COPY (select ms.code, ms.smiles, 'Available'
         from mol_source ms
+        join nonisomol non on ms.nonisomol_id = non.id and non.child_count notnull
        where ms.source_id in ({{ SOURCEIDS }}))
           to '{{ SUPMOLNODEFILE }}' DELIMITER ',' CSV;
 
@@ -39,7 +40,7 @@ COPY (select code, smiles, 'Available'
 --
 COPY (select non.smiles, ms.code, 'HasVendor'
         from mol_source ms
-        join nonisomol non on ms.nonisomol_id = non.id
+        join nonisomol non on ms.nonisomol_id = non.id and non.child_count notnull
        where ms.isomol_id is null
          and ms.source_id in ({{ SOURCEIDS }}))
           to '{{ MOLSUPMOLEDGEFILE }}' DELIMITER ',' CSV;
@@ -51,6 +52,7 @@ COPY (select non.smiles, ms.code, 'HasVendor'
 COPY (select replace(iso.smiles, chr(10), chr(92) || chr(110)), ms.code, 'HasVendor'
         from mol_source ms
         join isomol iso on ms.isomol_id = iso.id
+        join nonisomol non on non.id = iso.nonisomol_id and non.child_count notnull
          and ms.source_id in ({{ SOURCEIDS }}))
           to '{{ ISOSUPMOLEDGEFILE }}' DELIMITER ',' CSV;
 
@@ -61,7 +63,7 @@ COPY (select replace(iso.smiles, chr(10), chr(92) || chr(110)), ms.code, 'HasVen
 COPY (select replace(iso.smiles, chr(10), chr(92) || chr(110)), non.smiles, 'NonIso'
         from mol_source ms
         join isomol iso on iso.id = ms.isomol_id
-        join nonisomol non on non.id = iso.nonisomol_id
+        join nonisomol non on non.id = iso.nonisomol_id and non.child_count notnull
          and ms.source_id in ({{ SOURCEIDS }}))
           to '{{ ISOMOLEDGEFILE }}' DELIMITER ',' CSV;
 
@@ -75,6 +77,7 @@ COPY (select replace(iso.smiles, chr(10), chr(92) || chr(110)), iso.inchik, iso.
         join source s on s.id = ms.source_id
         join vendor_name v on s.name = v.vendor_name
         join isomol iso on iso.id = ms.isomol_id
+        join nonisomol non on non.id = iso.nonisomol_id and non.child_count notnull
          and ms.source_id in ({{ SOURCEIDS }})
         group by 1,2,3)
           to '{{ ISOMOLNODEFILE }}' DELIMITER ',' CSV;

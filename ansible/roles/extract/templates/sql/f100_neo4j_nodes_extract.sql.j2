@@ -9,22 +9,37 @@
 -- Note that this can be for multiple sources.
 --
 
+-- Deduplicate parent and child ids from edge index into single list view of all fragmented nodes.
+-- Includes fragmented molecules with no children.
+DROP MATERIALIZED VIEW if exists o_node_view;
+CREATE MATERIALIZED VIEW o_node_view AS
+   select os.parent_id as nonisomol_id, np.smiles, np.hac, np.rac, np.ring_smiles, np.inchik, np.inchis
+     from o_edge_parent os
+     join pg_class p on os.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
+     join nonisomol np ON np.id = os.parent_id
+    union
+   select os2.child_id as nonisomol_id, nc.smiles, nc.hac, nc.rac, nc.ring_smiles, nc.inchik, nc.inchis
+     from o_edge_parent os2
+     join pg_class p on os2.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
+     join nonisomol nc ON nc.id = os2.child_id and nc.child_count = 0;
+
+-- Take this and add orignal molecules that were not in the edge_index (these were fragmented but with no children).
 COPY (select np.smiles, np.hac, np.rac, np.ring_smiles, np.inchik, np.inchis, string_agg (distinct(ms.code), ';'),
         (case when string_agg (ms.code, ';') is null then 'F2'
               else 'F2;CanSmi;Mol;' || string_agg (distinct(v.supplier_node_label), ';')
          end) as label
-       from o_edge_parent os
-       join pg_class p on os.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
-       join nonisomol np ON np.id = os.parent_id
-       left join mol_source ms on os.parent_id = ms.nonisomol_id and ms.source_id in ({{ SOURCEIDS }})
+       from o_node_view np
+       left join mol_source ms on np.nonisomol_id = ms.nonisomol_id and ms.source_id in ({{ SOURCEIDS }})
        left join source s on s.id = ms.source_id
        left join vendor_name v on s.name = v.vendor_name
        group by 1,2,3,4,5,6
       union
-     select nc.smiles, nc.hac, nc.rac, nc.ring_smiles, nc.inchik, nc.inchis, NULL, 'F2'
-       from o_edge_parent os2
-       join pg_class p on os2.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
-       join nonisomol nc ON nc.id = os2.child_id
-        and nc.child_count = 0)
+     select n0.smiles, n0.hac, n0.rac, n0.ring_smiles, n0.inchik, n0.inchis, string_agg (distinct(ms.code), ';'),
+            'F2;CanSmi;Mol;' || string_agg (distinct(v.supplier_node_label), ';')
+       from mol_source ms
+       join nonisomol n0 on ms.nonisomol_id = n0.id and n0.child_count = 0
+       left join source s on s.id = ms.source_id
+       left join vendor_name v on s.name = v.vendor_name
+      where ms.source_id in ({{ SOURCEIDS }})
+       group by 1,2,3,4,5,6)
    TO '{{ NEONODEFILE }}' DELIMITER ',' CSV;
-
