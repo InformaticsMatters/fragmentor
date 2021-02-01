@@ -22,7 +22,11 @@ files = Channel
 
 process split {
 
+{% if nextflow_container_registry %}
     container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
+{% else %}
+    container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
+{% enif %}
     errorStrategy = 'retry'
     maxErrors = 3
 
@@ -47,7 +51,11 @@ process split {
 
 process standardise {
 
+{% if nextflow_container_registry %}
     container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
+{% else %}
+    container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
+{% enif %}
     errorStrategy = 'retry'
     maxErrors = 3
 
