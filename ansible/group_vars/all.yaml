@@ -76,6 +76,15 @@ database:
     backup_directory: /pgdata-backup
     backup_count: 2
     db_user_account: fragmentor
+  standby:
+    port: 5432
+    db: fairmolecules
+    login_user: fragmentor
+    login_password: bullfinch
+    copy_directory: /pgcopy
+    backup_directory: /pgdata-backup
+    backup_count: 2
+    db_user_account: fragmentor
 
 # A default set of devices.
 # Normally specified in a host-specific file in host_vars
