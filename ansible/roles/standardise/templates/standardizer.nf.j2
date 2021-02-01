@@ -26,7 +26,7 @@ process split {
     container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
 {% else %}
     container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
-{% enif %}
+{% endif %}
     errorStrategy = 'retry'
     maxErrors = 3
 
@@ -55,7 +55,7 @@ process standardise {
     container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
 {% else %}
     container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
-{% enif %}
+{% endif %}
     errorStrategy = 'retry'
     maxErrors = 3
 
