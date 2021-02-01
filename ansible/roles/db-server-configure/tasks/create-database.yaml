@@ -17,7 +17,6 @@
     db: "{{ database[deployment].db }}"
     login_user: "{{ database[deployment].login_user }}"
     login_password: "{{ database[deployment].login_password }}"
-  delegate_to: 127.0.0.1
 
 
 - name: Load configuration information into frag databsse
@@ -29,4 +28,3 @@
     db: "{{ database[deployment].db }}"
     login_user: "{{ database[deployment].login_user }}"
     login_password: "{{ database[deployment].login_password }}"
-  delegate_to: 127.0.0.1
