@@ -4,6 +4,12 @@
   assert:
     that: deployment|string != 'SetMe'
 
+- name: Ensure required Python modules
+  pip:
+    name: docker-py
+  become: yes
+  become_user: "{{ database[deployment].db_user_account }}"
+
 - name: Start database container
   docker_container:
     name: db
