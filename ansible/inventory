@@ -1,4 +1,4 @@
 [defaults]
 localhost ansible_connection=local
 [dbservers]
-130.246.214.46
+130.246.214.154 ansible_user=centos
