@@ -472,6 +472,12 @@ alter table ONLY public.vendor_name
 create INDEX ix_edge_parent_id ON public.edge USING btree (parent_id);
 
 --
+-- Name: ix_edge_child_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+create INDEX ix_edge_child_id ON public.edge USING btree (child_id);
+
+--
 -- Name: ix_edge_parent_child; Type: INDEX; Schema: public; Owner: postgres
 --
 create INDEX ix_edge_parent_child ON public.edge USING btree (parent_id, child_id);
