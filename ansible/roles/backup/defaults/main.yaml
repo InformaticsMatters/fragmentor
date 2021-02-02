@@ -4,6 +4,13 @@
 backup_container_image: informaticsmatters/sql-backup
 backup_container_tag: stable
 
+backup_volume_is_s3: no
+backup_volume_s3_url: ''
+backup_volume_s3_url_request_style: use_path_request_style
+backup_s3_bucket_name: ''
+backup_s3_access_key_id: ''
+backup_s3_secret_access_key: ''
+
 # The database server's backup directory.
 # This *MUST* match the directory
 # mapped into the PostgreSQL container.

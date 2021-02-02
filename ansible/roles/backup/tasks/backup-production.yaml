@@ -17,7 +17,46 @@
   delegate_to: "{{ database_login_host }}"
   become: yes
 
-# sudo docker run --rm -v /pgdata-backup:/backup -e PGHOST=130.246.214.154 -e PGUSER=fragmentor -e PGADMINPASS=bullfinch informaticsmatters/sql-backup:stable
+# docker run --privileged -d \
+#       -e PGHOST=130.246.214.154 \
+#       -e PGUSER=fragmentor \
+#       -e PGADMINPASS=bullfinch \
+#       -e AWS_BUCKET_NAME=im-fragnet-production-backup \
+#       -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+#       -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+#       -e BACKUP_VOLUME_IS_S3=yes \
+#       -e BACKUP_VOLUME_S3_URL=https://s3.echo.stfc.ac.uk/ \
+#       -e BACKUP_VOLUME_S3_REQUEST_STYLE=use_path_request_style \
+#       informaticsmatters/sql-backup:stable
+- name: Start backup (S3)
+  docker_container:
+    name: db-backup
+    image: "{{ backup_container_image }}:{{ backup_container_tag }}"
+    state: started
+    restart_policy: 'no'
+    env:
+      PGHOST: "{{ database_login_host }}"
+      PGUSER: "{{ database[deployment].login_user }}"
+      PGADMINPASS: "{{ database[deployment].login_password }}"
+      BACKUP_COUNT: "{{ database[deployment].backup_count }}"
+      AWS_BUCKET_NAME: "{{ backup_s3_bucket_name }}"
+      AWS_ACCESS_KEY_ID: "{{ backup_s3_access_key_id }}"
+      AWS_SECRET_ACCESS_KEY: "{{ backup_s3_secret_access_key }}"
+      BACKUP_VOLUME_IS_S3: "yes"
+      BACKUP_VOLUME_S3_URL: "{{ backup_volume_s3_url }}"
+      BACKUP_VOLUME_S3_REQUEST_STYLE: "{{ backup_volume_s3_url_request_style }}"
+    volumes:
+    - "{{ database[deployment].backup_directory }}:/backup"
+    network_mode: host
+  when: backup_volume_is_s3|bool
+  become: yes
+  delegate_to: "{{ database_login_host }}"
+
+# docker run -d -v /pgdata-backup:/backup \
+#       -e PGHOST=130.246.214.154 \
+#       -e PGUSER=fragmentor \
+#       -e PGADMINPASS=bullfinch \
+#       informaticsmatters/sql-backup:stable
 - name: Start backup
   docker_container:
     name: db-backup
@@ -32,5 +71,6 @@
     volumes:
     - "{{ database[deployment].backup_directory }}:/backup"
     network_mode: host
+  when: not backup_volume_is_s3|bool
   become: yes
   delegate_to: "{{ database_login_host }}"
