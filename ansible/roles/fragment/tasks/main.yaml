@@ -23,6 +23,11 @@
     - runpath|string != 'SetMe'
     fail_msg: You must provide a 'deployment', 'vendor', 'version' and default run path where files will be stored.
 
+- name: Assert sort memory
+  assert:
+    that:
+    - nextflow_process_sort_memory_m|int >= 100
+
 # The user is also expected to have defined the environment variables: -
 #
 # - AWS_ACCESS_KEY_ID

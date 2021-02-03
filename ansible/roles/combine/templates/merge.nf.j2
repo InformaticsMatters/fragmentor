@@ -67,9 +67,7 @@ process nMerge {
 {% else %}
     container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
 {% endif %}
-{% if nextflow_process_sort_memory %}
-    memory '{{ nextflow_process_sort_memory }}'
-{% endif %}
+    memory '{{ nextflow_process_sort_memory_m }}M'
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
     errorStrategy = 'retry'
@@ -83,7 +81,7 @@ process nMerge {
 
     shell:
     '''
-    sort --temporary-directory=. -u !{shard} > !temp.{shard}
+    sort -u -S {{ (nextflow_process_sort_memory_m * 0.8)|int }}M -T . !{shard} > !temp.{shard}
     python -m frag.utils.csv_merge_nodes -i !temp.{shard} -o !{shard}.d-nodes
     '''
 
