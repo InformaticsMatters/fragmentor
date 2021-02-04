@@ -61,14 +61,24 @@ kubectl version
 echo "+> kubectl config set-context..."
 kubectl config set-context --current --namespace="${FRAGMENTOR_NAMESPACE}"
 
-# All set - run the playbook...
+# All set - run the playbook (ignoring but capturing any failure)...
 
 PLAYBOOK="site-${FRAGMENTOR_PLAY}.yaml"
 echo "+> Playing ${PLAYBOOK}..."
 pushd ansible || exit 1
+EXIT_CODE=0
 ansible-playbook "${PLAYBOOK}" -e "@${PARAMETER_FILE}" \
-  -e "ansible_python_interpreter=/usr/local/bin/python"
+  -e "ansible_python_interpreter=/usr/local/bin/python" \
+  || EXIT_CODE=$?
 echo "+> Played"
+
+if [ "${EXIT_CODE}" -ne "0" ]; then
+   echo "   *********"
+   echo "   * ERROR *"
+   echo "   *********"
+   echo "+> Play ended with exit code ${EXIT_CODE}"
+   echo "+> Inspect the Play's output (above) to see what went wrong."
+fi
 
 KEEP_ALIVE_SECONDS=${KEEP_ALIVE_SECONDS:-0}
 echo "+> KEEP_ALIVE_SECONDS is ${KEEP_ALIVE_SECONDS}"

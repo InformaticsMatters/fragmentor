@@ -52,9 +52,7 @@ process collect_nodes {
 {% else %}
     container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
 {% endif %}
-{% if nextflow_process_sort_memory %}
-    memory '{{ nextflow_process_sort_memory }}'
-{% endif %}
+    memory '{{ nextflow_process_sort_memory_m }} MB'
     publishDir params.out_dir, mode: params.out_mode
     errorStrategy = 'retry'
     maxErrors = 3
@@ -66,7 +64,7 @@ process collect_nodes {
     file 'nodes.csv'
 
     """
-    sort -u -T . $chunks > nodes.csv
+    sort -u -S {{ (nextflow_process_sort_memory_m * 0.8)|int }}M -T . $chunks > nodes.csv
     """
 }
 
@@ -77,9 +75,7 @@ process collect_edges {
 {% else %}
     container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
 {% endif %}
-{% if nextflow_process_sort_memory %}
-    memory '{{ nextflow_process_sort_memory }}'
-{% endif %}
+    memory '{{ nextflow_process_sort_memory_m }} MB'
     publishDir params.out_dir, mode: params.out_mode
     errorStrategy = 'retry'
     maxErrors = 3
@@ -91,7 +87,7 @@ process collect_edges {
     file 'edges.csv'
 
     """
-    sort -u -T . $chunks > edges.csv
+    sort -u -S {{ (nextflow_process_sort_memory_m * 0.8)|int }}M -T . $chunks > edges.csv
     """
 }
 
@@ -102,9 +98,7 @@ process collect_rejects {
 {% else %}
     container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
 {% endif %}
-{% if nextflow_process_sort_memory %}
-    memory '{{ nextflow_process_sort_memory }}'
-{% endif %}
+    memory '{{ nextflow_process_sort_memory_m }} MB'
     publishDir params.out_dir, mode: params.out_mode
     errorStrategy = 'retry'
     maxErrors = 3
@@ -116,6 +110,6 @@ process collect_rejects {
     file 'rejects.smi'
 
     """
-    sort -u -T . $chunks > rejects.smi
+    sort -u -S {{ (nextflow_process_sort_memory_m * 0.8)|int }}M -T . $chunks > rejects.smi
     """
 }

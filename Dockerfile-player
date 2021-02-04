@@ -74,4 +74,4 @@ RUN chmod 755 /root/*.sh && \
 
 WORKDIR /root
 
-ENTRYPOINT ["./docker-player-entrypoint.sh"]
+CMD ["./docker-player-entrypoint.sh"]
