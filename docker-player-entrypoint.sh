@@ -73,7 +73,11 @@ ansible-playbook "${PLAYBOOK}" -e "@${PARAMETER_FILE}" \
 echo "+> Played"
 
 if [ "${EXIT_CODE}" -ne "0" ]; then
-   echo "+> ERROR - Play ended with exit code ${EXIT_CODE}"
+   echo "   *********"
+   echo "   * ERROR *"
+   echo "   *********"
+   echo "+> Play ended with exit code ${EXIT_CODE}"
+   echo "+> Inspect the Play's output (above) to see what went wrong."
 fi
 
 KEEP_ALIVE_SECONDS=${KEEP_ALIVE_SECONDS:-0}
