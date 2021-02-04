@@ -67,7 +67,7 @@ process nMerge {
 {% else %}
     container '{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
 {% endif %}
-    memory '{{ nextflow_process_sort_memory_m }}M'
+    memory '{{ nextflow_process_sort_memory_m }} MB'
     publishDir '{{ next_path }}/results/', mode: 'symlink'
     scratch false
     errorStrategy = 'retry'
