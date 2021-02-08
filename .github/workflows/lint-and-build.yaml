@@ -25,6 +25,11 @@ on:
   pull_request:
     branches:
     - 'master'
+  # Additionally, to catch an early build-dependency problems,
+  # always build the image at 08:07 on Mondays (day 1).
+  # This is handy to catch any build problems caused by modules we import.
+  schedule:
+  - cron: '7 8 * * 1'
 
 jobs:
   lint:
