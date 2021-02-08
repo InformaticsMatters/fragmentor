@@ -5,7 +5,7 @@
 ![publish stable](https://github.com/InformaticsMatters/fragmentor/workflows/publish%20stable/badge.svg)
 ![lint and build](https://github.com/InformaticsMatters/fragmentor/workflows/lint%20and%20build/badge.svg)
 
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/informaticsmatters/fragmentor)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/informaticsmatters/fragmentor)
 
 Optimisation of fragmentation process through the use of a postgres database
 to previously already fragmented data. This will allow delta changes to an
