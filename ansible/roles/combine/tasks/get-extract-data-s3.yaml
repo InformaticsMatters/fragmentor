@@ -67,7 +67,9 @@
   when:
   - not nodes_gz_data_file.stat.exists
 
-# Get the files, this time not ignoring the first entry in the list as full directory is provided...
+# Get the files, here we make sure the object does not end with a '/'
+# as there's a danger (especially if the user has created the bucket manually)
+# that the containing directory is also part of the list.
 
 - name: Get extract data
   aws_s3:
@@ -82,6 +84,7 @@
     loop_var: file_item
   when:
   - not nodes_gz_data_file.stat.exists
+  - not file_item|regex_search('.*/$')
 
 # Change the name and move it to the common work directory
 - name: Move to work directory
