@@ -28,7 +28,7 @@ clean_finish: no
 # Blank assumes no registry (i.e. 'docker.io')
 nextflow_container_registry: ''
 nextflow_container_name: informaticsmatters/fragmentor
-nextflow_container_tag: '1.0.6'
+nextflow_container_tag: '1.0.7'
 
 # Memory requested by the 'sort' processes in the nextflow workflow
 # (namely fragmentation and combination). Where it's actually used
