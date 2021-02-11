@@ -30,12 +30,19 @@
   debug:
     var: raw_result
 
-# There has to be at least two keys in the result...
-# The first key is always the directory the files are in,
+# There may be two keys in the result...
+# The first key might be the directory the files are in,
 # e.g.: "s3_keys": [
 #           "raw/vendor/xchem/v1/",
 #           "raw/vendor/xchem/v1/dsip.txt.gz"
 #        ]
+#
+# So you need to take steps to avoid any non-files
+# in the list (i.e. those that end '/'?)
+#
+# The behaviour seems to be dependent on whether the
+# bucket was created using the AWS console or programmatically.
+# See https://app.clubhouse.io/informaticsmatters/story/1760
 
 - name: Check raw data
   assert:
