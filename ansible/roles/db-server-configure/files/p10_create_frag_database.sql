@@ -18,6 +18,7 @@
  */
 drop view IF EXISTS v_edge;
 drop view IF EXISTS v_edge_node;
+drop materialized view if exists o_node_view;
 
 drop table IF EXISTS edge;
 
@@ -51,6 +52,7 @@ drop table IF EXISTS i_node;
 
 drop table IF EXISTS i_edge;
 
+drop table IF EXISTS o_edge_sdf;
 drop table IF EXISTS o_edge_xchem_dsip;
 drop table IF EXISTS o_edge_chemspace_bb;
 drop table IF EXISTS o_edge_enamine_ro5;

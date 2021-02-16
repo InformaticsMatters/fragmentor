@@ -7,17 +7,10 @@
 -- inchi.csv
 -- inchid:ID(INCHI),inchik,inchis,:LABEL
 -- Inchis used by molecules for source + label "Inchi"
----
+-- Note that this now uses the materialized view from f100_neo4j_nodes_extract
+--
 
 COPY (select inc1.inchik, inc1.inchis, 'Inchi' as label
-       from o_edge_parent os
-       join pg_class p on os.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
-       join nonisomol np ON np.id = os.parent_id
-       join inchi inc1 on inc1.id = np.inchi_id
-      union
-     select inc2.inchik, inc2.inchis, 'Inchi'
-       from o_edge_parent os2
-       join pg_class p on os2.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
-       join nonisomol nc ON nc.id = os2.child_id and nc.child_count = 0
-       join inchi inc2 on inc2.id = nc.inchi_id)
+       from o_node_view np
+       join inchi inc1 on inc1.id = np.inchi_id group by 1,2)
    TO '{{ INCHIIDFILE }}' DELIMITER ',' CSV;
