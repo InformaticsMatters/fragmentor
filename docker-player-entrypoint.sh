@@ -73,15 +73,40 @@ ansible-playbook "${PLAYBOOK}" -e "@${PARAMETER_FILE}" \
 echo "+> Played"
 
 if [ "${EXIT_CODE}" -ne "0" ]; then
-   echo "   *********"
-   echo "   * ERROR *"
-   echo "   *********"
-   echo "+> Play ended with exit code ${EXIT_CODE}"
-   echo "+> Inspect the Play's output (above) to see what went wrong."
+
+    # Display the Nextflow log? If there is one.
+    # The latest will be in [CWD]/.nextflow.log
+    ERROR_NEXTFLOW_LOG=".nextflow.log"
+    if [ -f "${ERROR_NEXTFLOW_LOG}" ]; then
+        echo "+> Found a ${ERROR_NEXTFLOW_LOG} file."
+        echo "+> ${ERROR_NEXTFLOW_LOG} BEGIN..."
+        echo "+>"
+        cat "${ERROR_NEXTFLOW_LOG}"
+        echo "+>"
+        echo "+> ...${ERROR_NEXTFLOW_LOG} END"
+    else
+        echo "+> No ${ERROR_NEXTFLOW_LOG} file to display."
+    fi
+
+    # Finish with a bold error statement...
+    echo ""
+    echo "   *********"
+    echo "   * ERROR *"
+    echo "   *********"
+    echo ""
+    echo "+> Play ended with exit code ${EXIT_CODE}"
+    echo "+> Inspect the Play's output (above) to see what went wrong."
+
+else
+    echo "+> SUCCESS"
 fi
 
+# Keep the Pod alive for a period of time?
+# Usually for debug.
 KEEP_ALIVE_SECONDS=${KEEP_ALIVE_SECONDS:-0}
-echo "+> KEEP_ALIVE_SECONDS is ${KEEP_ALIVE_SECONDS}"
-echo "+> Sleeping (${KEEP_ALIVE_SECONDS})..."
-sleep "${KEEP_ALIVE_SECONDS}"
-echo "+> Slept"
+if [ "${KEEP_ALIVE_SECONDS}" -ne "0" ]; then
+    echo "+> KEEP_ALIVE_SECONDS is ${KEEP_ALIVE_SECONDS}"
+    echo "+> Sleeping (${KEEP_ALIVE_SECONDS})..."
+    sleep "${KEEP_ALIVE_SECONDS}"
+    echo "+> Slept"
+fi
