@@ -146,7 +146,8 @@ This playbook also pre-loads the `vendor_name` table in the database with
 the vendor file types currently supported by the process. 
 
     $ ansible-playbook site-db-server-configure.yaml  \ 
-        -e deployment=<development|production>
+        -e deployment=<development|production> \
+        -e database_cloud_provider=<aws|openstack>
 
 >   You only really need to run the `site-db-server-configure` play once.
     It configures the server with Docker and runs the designated database
