@@ -62,8 +62,8 @@ a cluster and that the following instructions would be run on the head node.
 
 Install requirements: -
 
-    $ pip install -r ../requirements.txt
-    $ ansible-galaxy install -r ../requirements.yaml
+    $ pip install -r requirements.txt
+    $ ansible-galaxy install -r requirements.yaml
     
 Some ansible playbook postgres tasks require the postgres client (psql)
 to be installed on the head machine. Details can be found at
