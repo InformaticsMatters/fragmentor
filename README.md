@@ -65,31 +65,36 @@ Install requirements: -
     $ pip install -r ../requirements.txt
     $ ansible-galaxy install -r ../requirements.yaml
     
+Some ansible playbook postgres tasks require the postgres client (psql)
+to be installed on the head machine. Details can be found at
+https://www.postgresql.org/download/linux/redhat/
+
+You will also need AWS credentials for S3, so you will need to set up the
+following parameters: -
+
+    $ export AWS_ACCESS_KEY_ID=<Access Key ID>
+    $ export AWS_SECRET_ACCESS_KEY=<Secret Access Key>
+
+And then navigate to the ansible Project's ansible directory before running
+any playbooks: -
+
+    $ cd ansible
+
 You will need to ensure that the user's `~/.ssh/id_rsa` is set correctly
 (or use [ssh-agent]) so that Ansible can ssh to the servers. If the following
 works you should be able to run the project playbooks: -
 
     $ ansible -m ping all
 
-Some ansible playbook postgres tasks require the postgres client (psql)
-to be installed on the head machine. Details can be found at
-https://www.postgresql.org/download/linux/redhat/
-
-You will also need AWS credentials for S3 so you will need to set up the
-following parameters. 
-
-    $ export AWS_ACCESS_KEY_ID=<Access Key ID>
-    $ export AWS_SECRET_ACCESS_KEY=<Secret Access Key>
-
 ## Creating the database server (OpenStack)
 
 ### Openstack
 If using the **OpenStack** cloud provider you will have to provide suitable
 production and backup servers - our playbooks do not create these
-physicals. The OpenSTack deployment is experimental and assumes IP addresses
+physicals. The OpenStack deployment is experimental and assumes IP addresses
 (130.246.214.46 and 130.246.214.154).
 
->   If you want to deploy to OpenStack  consult with us on server preparation. 
+>   If you want to deploy to OpenStack consult with us on server preparation. 
 
 ### AWS EC2
 If you're using AWS a production server can be instantiated automatically.
@@ -264,16 +269,27 @@ Example: navigate to the ansible directory
     $ ansible-playbook site-standardise.yaml \
         -e vendor=xchem_dsip \
         -e version=v1 -e deployment=production \
-        -e database_login_host=130.246.212.152 \
-        -e runpath=/data/share-2/run01 
+        -e database_login_host=130.246.214.154 \
+        -e runpath=/data/fragmentor/run01 
 
 > Parameter deployment=development|production
 
-This parameter tells the playbook to use either:
+This parameter tells the playbook to use either a set of parameters suitable
+for development or production. Always review the built-in parameters to make
+sure they're suitable for your intended play. This 'high level'
+parameter sets a number of variables based on whether you're developing
+or running code in production, specifically: -
 
 1.  AWS S3 or the data directory in the repository
     (which contains small test files) as a source for input files.
 2.  The production or development postgres database.
+
+> Parameter runpath
+
+This identifies the shared-directory for execution, typically an Auto-FS
+directory known to the cluster. Check the `auto.data` for your cluster,
+or review the `roles/patch/templates/auto.data.j2` file,
+which should be up-to-date, in our [Galaxy-Patch] repository.
 
 > Optional parameter add_file: default: no
 
@@ -313,8 +329,8 @@ Example: navigate to the ansible directory
         -e vendor=xchem_dsip \
         -e version=v1 \
         -e deployment=production \
-        -e database_login_host=130.246.212.152 \
-        -e runpath=/data/share-2/run01 
+        -e database_login_host=130.246.214.154 \
+        -e runpath=/data/fragmentor/run01 
 
 A fragmentation step would normally be processed directly after a
 standardisation step, but as this step is driven by the database it is
@@ -342,8 +358,8 @@ Example: navigate to the ansible directory
 
     $ ansible-playbook site-inchi.yaml \
         -e deployment=production \
-        -e database_login_host=130.246.212.152 \
-        -e runpath=/data/share-2/run01
+        -e database_login_host=130.246.214.154 \
+        -e runpath=/data/fragmentor/run01
 
 As this step is driven by the database it it possible to run multiple
 standardisation/fragmentation steps for different 
@@ -399,8 +415,8 @@ Example: navigate to the ansible directory
     $ ansible-playbook site-extract.yaml
         -e @parameters \
         -e deployment=production \
-        -e database_login_host=130.246.212.152 \
-        -e runpath=/data/share-2/run01  
+        -e database_login_host=130.246.214.154 \
+        -e runpath=/data/fragmentor/run01  
 
 Note that for the larger extracts to complete there needs to be sufficient
 temporary space on the postgres pgdata directory for the database queries to
@@ -476,7 +492,7 @@ Example: navigate to the ansible directory
     $ ansible-playbook site-combine.yaml \
         -e @parameters \
         -e deployment=production \
-        -e runpath=/data/share-2/run01 
+        -e runpath=/data/fragmentor/run01 
 
 ## Backing up and Restoring the Database
 
@@ -853,3 +869,4 @@ Removing the environment:
 
 [ssh-agent]: https://www.ssh.com/ssh/agent
 [fragmentor-ansible]: https://github.com/InformaticsMatters/fragmentor-ansible.git
+[galaxy-patch]: https://github.com/InformaticsMatters/galaxy-patch
