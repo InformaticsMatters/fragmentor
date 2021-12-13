@@ -29,6 +29,7 @@
   pip:
     name:
     - python-dateutil==2.8.1
+    - botocore==1.19.2
     - boto3==1.12.49
 
 # docker run -e MSHOST=172.17.0.1 -e MSUSER=root -e MSPASS=my-secret-pw -v /tmp:/backup informaticsmatters/sql-recovery:stable

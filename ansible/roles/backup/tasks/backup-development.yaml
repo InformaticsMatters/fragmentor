@@ -4,6 +4,7 @@
   pip:
     name:
     - python-dateutil==2.8.1
+    - botocore==1.19.2
     - boto3==1.12.49
 
 - name: Create directories
