@@ -8,4 +8,4 @@ boto == 2.49.0
 botocore
 boto3
 jmespath == 0.10.0
-psycopg2-binary == 2.8.6
+psycopg2-binary == 2.8.5
