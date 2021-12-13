@@ -1,6 +1,6 @@
 ---
-# The DB server's database, backup, pgcopy and wal volume
-# devices, and mount-points
+# The production DB server's database,
+# WAL and backup volume devices, and mount-points
 db_devices:
   pg_data:
     device: /dev/vdb

@@ -55,10 +55,6 @@ data_source_out: s3
 
 # Database credentials.
 # A map of variables based on deployment target.
-#
-# Caution:  Ensure that the 'production.copy_directory' matches what's
-#           used in 'db_devices.pg_copy.mount_path'
-#           (see 'roles/configure/defaults/main.yaml')
 database:
   development:
     port: 5432
@@ -88,9 +84,6 @@ db_devices:
   pg_data:
     device:
     mount_path: /pgdata
-  pg_copy:
-    device:
-    mount_path: /pgcopy
   pg_wal:
     device:
     mount_path: /pgwal
