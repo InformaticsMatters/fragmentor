@@ -104,7 +104,7 @@
   - "{{ device_names }}"
   - "{{ device_uuids }}"
 
-- name: Display devide UUID dictionary
+- name: Display device UUID dictionary
   debug:
     var: device_uuids_dict
 

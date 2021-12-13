@@ -9,6 +9,13 @@
     name: docker-py
   become: yes
 
+- name: Adding "{{ database[deployment].db_user_account }}" to docker group
+  user:
+    name: "{{ database[deployment].db_user_account }}"
+    groups: docker
+    append: yes
+  become: yes
+
 - name: Start database container
   docker_container:
     name: db
