@@ -9,5 +9,5 @@ db_devices:
     device: /dev/vdd
     mount_path: /pgwal
   pg_backup:
-    device: /dev/vdc
+    device: /dev/vdf
     mount_path: /pgdata-backup
