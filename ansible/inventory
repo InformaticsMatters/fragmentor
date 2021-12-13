@@ -1,4 +1,4 @@
 [defaults]
-localhost ansible_connection=local
+localhost ansible_connection=local ansible_python_interpreter="/usr/bin/env python"
 [dbservers]
 130.246.214.154 ansible_user=centos

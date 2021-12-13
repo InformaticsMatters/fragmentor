@@ -60,9 +60,16 @@ the images for local experimentation.
 For the production configuration, it is assumed that the user has access to
 a cluster and that the following instructions would be run on the head node.  
 
+It is always worth running the playbooks from within your own Python
+environment, to avoid disturbing the system Python: -
+
+    $ python3 -m venv ~/.venv/fragmentor
+    $ source ~/.venv/fragmentor/bin/activate
+    $ pip install --upgrade pip
+
 Install requirements: -
 
-    $ [sudo] pip install -r requirements.txt
+    $ pip install -r requirements.txt
     $ ansible-galaxy install -r requirements.yaml
     
 Some ansible playbook postgres tasks require the postgres client (psql)
