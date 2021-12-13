@@ -67,6 +67,10 @@ environment, to avoid disturbing the system Python: -
     $ source ~/.venv/fragmentor/bin/activate
     $ pip install --upgrade pip
 
+And, depending on your distribution, you might need SELinux bindings...
+
+    $ sudo yum install libselinux-python3
+
 Install requirements: -
 
     $ pip install -r requirements.txt
