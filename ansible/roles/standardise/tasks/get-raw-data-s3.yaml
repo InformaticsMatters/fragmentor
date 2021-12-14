@@ -32,6 +32,9 @@
 
 - name: List raw data (AWS)
   aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    region: "{{ s3_region }}"
     bucket: "{{ s3_bucket }}"
     mode: list
     prefix: "{{ raw_path }}"
@@ -40,10 +43,12 @@
 
 - name: List raw data (non-AWS)
   aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    region: "{{ s3_region }}"
     bucket: "{{ s3_bucket }}"
     mode: list
     prefix: "{{ raw_path }}"
-    region: "{{ s3_region }}"
     s3_url: "{{ s3_url }}"
   register: raw_result
   when: s3_url|length > 0
@@ -68,7 +73,9 @@
 
 - name: Check raw data
   assert:
-    that: raw_result.s3_keys|length > 1
+    that:
+    - raw_result.s3_keys is defined
+    - raw_result.s3_keys|length > 1
 
 - name: Display raw file count
   debug:

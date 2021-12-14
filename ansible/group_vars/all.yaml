@@ -216,13 +216,6 @@ mail_recipients: "{{ lookup('env', 'GRAPH_MAIL_RECIPIENTS') }}"
 #
 # The S3 bucket and whether it requires encryption,
 # along with S3 access keys, a Region and S3 URL (blank if using AWS).
-#
-# We use environment variables that are inspected by Ansible 2.9,
-# but they are not used for variables in the aws_s3 module when
-# the module reads them anyway. i.e. we do not set the aws_s3
-# 'aws_access_key' variable because Ansible reads 'AWS_ACCESS_KEY'.
-# We load them here to allow us to assert the values are set during the
-# playbook initialisation logic.
 s3_bucket: im-fragnet
 s3_bucket_requires_encryption: no
 s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
