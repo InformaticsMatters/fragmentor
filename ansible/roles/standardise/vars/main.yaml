@@ -2,19 +2,9 @@
 # Variables that a user might want to change
 # through the command-line or a parameter file.
 
-# The (AWS S3) location of vendor RAW data
-# a source for standardisation.
-bucket: im-fragnet
-# Set if data written to the bucket requires encryption.
-bucket_requires_encryption: no
-
-# AWS credentials for bucket access
-aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
-aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
-
-# Standardisation Rate in molecules processed per minute by a single standardisation python script
-# This approximate parameter is used to tune the nextflow_timeout_minutes in conjunction with the number
+# Standardisation Rate in molecules processed per minute by a single
+# standardisation python script. This approximate parameter is used to tune
+# the nextflow_timeout_minutes in conjunction with the number
 # of CPUs and Vendor_molecules.
 standardisation_mols_minute: 4500
 nextflow_timeout_calc: 0
@@ -22,7 +12,8 @@ nextflow_timeout_calc: 0
 # Safety factor is used in case, for example, other processes are on the machine
 safety_factor: 5
 
-# Default nextflow parameters for development - these are overwritten in production deployment based on the
+# Default nextflow parameters for development.
+# These are overwritten in production deployment based on the
 # size of the vendor input files.
 nextflow_timeout_minutes: 30
 nextflow_poll_period_minutes: 1
@@ -33,10 +24,13 @@ standchunksize_calc: 0
 # uploading standardised file data to database
 standchunk: 1000000
 
-# Coumpound Prefix used in creating the compound-id's. This is overridden if required in the vendor specific files.
+# Compound Prefix used in creating the compound-id's.
+# This is overridden if required in the vendor specific files.
 standard_compound_id_prefix: None
-# Field in SDF file to be used for compound id. This is overridden if required in the vendor specific files.
+# Field in SDF file to be used for compound id.
+# This is overridden if required in the vendor specific files.
 standard_compound_id_field: None
-# Field in file to be used to split records in the case where it is not a line. This is overridden if required in
+# Field in file to be used to split records in the case where it is not a line.
+# This is overridden if required in
 # the vendor specific files.
 standsplittoken: None

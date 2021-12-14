@@ -83,8 +83,15 @@ https://www.postgresql.org/download/linux/redhat/
 You will also need AWS credentials for S3, so you will need to set up the
 following parameters: -
 
-    $ export AWS_ACCESS_KEY_ID=<Access Key ID>
-    $ export AWS_SECRET_ACCESS_KEY=<Secret Access Key>
+    $ export AWS_ACCESS_KEY=<Access Key ID>
+    $ export AWS_SECRET_KEY=<Secret Access Key>
+    $ export AWS_REGION=eu-central-1
+
+If you are using a non-AWS S3 bucket you will also need to provide the
+following (leaving them undefined if you are using AWS): -
+
+    $ export AWS_REGION=<Region>
+    $ export S3_URL=<S3 Sevrvide Endpoint/URL>
 
 And then navigate to the ansible Project's ansible directory before running
 any playbooks: -

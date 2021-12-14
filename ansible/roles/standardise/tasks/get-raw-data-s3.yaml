@@ -1,6 +1,13 @@
 ---
 # Gets 'raw' data from an AWS S3 path
 
+- name: Assert S3 credentials
+  assert:
+    that:
+    - aws_access_key|length > 0
+    - aws_secret_key|length > 0
+    fail_msg: You must provide S3 access and secret keys
+
 - name: Log line to report
   blockinfile:
     marker: "<!-- {standardise-get} ANSIBLE MANAGED BLOCK -->"
@@ -17,14 +24,23 @@
   debug:
     msg: bucket={{ bucket }} raw_path={{ raw_path }}
 
-- name: List raw data
+- name: List raw data (AWS)
   aws_s3:
     bucket: "{{ bucket }}"
     mode: list
     prefix: "{{ raw_path }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
   register: raw_result
+  when: s3_url|length == 0
+
+- name: List raw data (non-AWS)
+  aws_s3:
+    bucket: "{{ bucket }}"
+    mode: list
+    prefix: "{{ raw_path }}"
+    region: "{{ s3_region }}"
+    s3_url: "{{ s3_url }}"
+  register: raw_result
+  when: s3_url|length > 0
 
 - name: Display result
   debug:
@@ -60,15 +76,29 @@
 # as there's a danger (especially if the user has created the bucket manually)
 # that the containing directory is also part of the list.
 
-- name: Get raw data
-  aws_s3:
-    bucket: "{{ bucket }}"
-    mode: get
-    object: "{{ item }}"
-    dest: "{{ destination }}/{{ item|basename }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
-  loop: "{{ raw_result.s3_keys[1:] }}"
+- block:
+  name: Get raw data
+
+  - name: Get raw data (AWS)
+    aws_s3:
+      bucket: "{{ bucket }}"
+      mode: get
+      object: "{{ item }}"
+      dest: "{{ destination }}/{{ item|basename }}"
+    loop: "{{ raw_result.s3_keys[1:] }}"
+    when: s3_url|length == 0
+
+  - name: Get raw data (non-AWS)
+    aws_s3:
+      bucket: "{{ bucket }}"
+      mode: get
+      object: "{{ item }}"
+      dest: "{{ destination }}/{{ item|basename }}"
+      region: "{{ s3_region }}"
+      s3_url: "{{ s3_url }}"
+    loop: "{{ raw_result.s3_keys[1:] }}"
+    when: s3_url|length > 0
+
   when:
   - not item|regex_search('.*/$')
 
