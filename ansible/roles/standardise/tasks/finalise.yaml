@@ -49,9 +49,6 @@
 
   - name: Transfer to AWS
     aws_s3:
-      aws_access_key: "{{ s3_access_key }}"
-      aws_secret_key: "{{ s3_secret_key }}"
-      region: "{{ s3_region }}"
       bucket: "{{ s3_bucket }}"
       encrypt: "{{ s3_bucket_requires_encryption|bool }}"
       src: "{{ item }}"
@@ -62,14 +59,12 @@
 
   - name: Transfer to non-AWS
     aws_s3:
-      aws_access_key: "{{ s3_access_key }}"
-      aws_secret_key: "{{ s3_secret_key }}"
-      region: "{{ s3_region }}"
       bucket: "{{ s3_bucket }}"
       encrypt: "{{ s3_bucket_requires_encryption|bool }}"
       src: "{{ item }}"
       object: logs/{{ vendor }}/{{ version }}/standardise/{{ item|basename }}
       mode: put
+      region: "{{ s3_region }}"
       s3_url: "{{ s3_url }}"
     loop: "{{ files_found }}"
     when: s3_url|length > 0

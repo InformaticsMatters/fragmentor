@@ -30,32 +30,43 @@
   debug:
     msg: bucket={{ s3_bucket }} raw_path={{ raw_path }}
 
-- name: List raw data (AWS)
-  aws_s3:
-    aws_access_key: "{{ s3_access_key }}"
-    aws_secret_key: "{{ s3_secret_key }}"
-    region: "{{ s3_region }}"
-    bucket: "{{ s3_bucket }}"
-    mode: list
-    prefix: "{{ raw_path }}"
-  register: raw_result
+- name: Get raw data (AWS)
+  block:
+
+  - name: List raw data (AWS)
+    aws_s3:
+      bucket: "{{ s3_bucket }}"
+      mode: list
+      prefix: "{{ raw_path }}"
+    register: raw_result
+
+  - name: Get S3 keys (AWS)
+    set_fact:
+      s3_keys: "{{ raw_result.s3_keys }}"
+
   when: s3_url|length == 0
 
-- name: List raw data (non-AWS)
-  aws_s3:
-    aws_access_key: "{{ s3_access_key }}"
-    aws_secret_key: "{{ s3_secret_key }}"
-    region: "{{ s3_region }}"
-    bucket: "{{ s3_bucket }}"
-    mode: list
-    prefix: "{{ raw_path }}"
-    s3_url: "{{ s3_url }}"
-  register: raw_result
+- name: Get raw data (non-AWS)
+  block:
+
+  - name: List raw data (non-AWS)
+    aws_s3:
+      bucket: "{{ s3_bucket }}"
+      mode: list
+      prefix: "{{ raw_path }}"
+      region: "{{ s3_region }}"
+      s3_url: "{{ s3_url }}"
+    register: raw_result
+
+  - name: Get S3 keys (non-AWS)
+    set_fact:
+      s3_keys: "{{ raw_result.s3_keys }}"
+
   when: s3_url|length > 0
 
-- name: Display result
+- name: Display S3 keys
   debug:
-    var: raw_result
+    var: s3_keys
 
 # There may be two keys in the result...
 # The first key might be the directory the files are in,
@@ -74,12 +85,11 @@
 - name: Check raw data
   assert:
     that:
-    - raw_result.s3_keys is defined
-    - raw_result.s3_keys|length > 1
+    - s3_keys|length > 1
 
 - name: Display raw file count
   debug:
-    msg: Found {{ raw_result.s3_keys|length - 1 }} raw files
+    msg: Found {{ s3_keys|length - 1 }} raw files
 
 - name: Set destination path
   set_fact:
@@ -98,7 +108,7 @@
       mode: get
       object: "{{ item }}"
       dest: "{{ destination }}/{{ item|basename }}"
-    loop: "{{ raw_result.s3_keys[1:] }}"
+    loop: "{{ s3_keys[1:] }}"
     when: s3_url|length == 0
 
   - name: Get raw data (non-AWS)
@@ -109,7 +119,7 @@
       dest: "{{ destination }}/{{ item|basename }}"
       region: "{{ s3_region }}"
       s3_url: "{{ s3_url }}"
-    loop: "{{ raw_result.s3_keys[1:] }}"
+    loop: "{{ s3_keys[1:] }}"
     when: s3_url|length > 0
 
   when: not item|regex_search('.*/$')
