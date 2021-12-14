@@ -104,7 +104,7 @@
       mode: get
       object: "{{ item }}"
       dest: "{{ destination }}/{{ item|basename }}"
-    loop: "{{ s3_keys[1:] }}"
+    loop: "{{ s3_keys }}"
     when:
     - s3_url|length == 0
     - not item|regex_search('.*/$')
@@ -117,7 +117,7 @@
       dest: "{{ destination }}/{{ item|basename }}"
       region: "{{ s3_region }}"
       s3_url: "{{ s3_url }}"
-    loop: "{{ s3_keys[1:] }}"
+    loop: "{{ s3_keys }}"
     when:
     - s3_url|length > 0
     - not item|regex_search('.*/$')
