@@ -50,7 +50,7 @@
 
   - name: Transfer files to AWS
     aws_s3:
-      bucket: "{{ bucket }}"
+      bucket: "{{ s3_bucket }}"
       encrypt: "{{ bucket_requires_encryption|bool }}"
       src: "{{ item }}"
       object: logs/{{ vendor }}/{{ version }}/fragment/{{ item|basename }}
@@ -60,7 +60,7 @@
 
   - name: Transfer files to non-AWS
     aws_s3:
-      bucket: "{{ bucket }}"
+      bucket: "{{ s3_bucket }}"
       encrypt: "{{ bucket_requires_encryption|bool }}"
       src: "{{ item }}"
       object: logs/{{ vendor }}/{{ version }}/fragment/{{ item|basename }}

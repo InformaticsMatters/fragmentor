@@ -134,7 +134,7 @@
 
     - name: Transfer files (AWS) - Single Vendor
       aws_s3:
-        bucket: "{{ bucket }}"
+        bucket: "{{ s3_bucket }}"
         encrypt: "{{ bucket_requires_encryption|bool }}"
         src: "{{ item }}"
         object: extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}/{{ item|basename }}
@@ -144,7 +144,7 @@
 
     - name: Transfer files (non-AWS) - Single Vendor
       aws_s3:
-        bucket: "{{ bucket }}"
+        bucket: "{{ s3_bucket }}"
         encrypt: "{{ bucket_requires_encryption|bool }}"
         src: "{{ item }}"
         object: extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}/{{ item|basename }}
@@ -162,7 +162,7 @@
 
     - name: Transfer files (AWS) - Combination
       aws_s3:
-        bucket: "{{ bucket }}"
+        bucket: "{{ s3_bucket }}"
         encrypt: "{{ bucket_requires_encryption|bool }}"
         src: "{{ item }}"
         object: extract/combination/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}/{{ item|basename }}
@@ -172,7 +172,7 @@
 
     - name: Transfer files (non-AWS) - Combination
       aws_s3:
-        bucket: "{{ bucket }}"
+        bucket: "{{ s3_bucket }}"
         encrypt: "{{ bucket_requires_encryption|bool }}"
         src: "{{ item }}"
         object: extract/combination/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}/{{ item|basename }}
