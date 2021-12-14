@@ -1,4 +1,6 @@
 [defaults]
-localhost ansible_connection=local
+# We need 'ansible_python_interpreter' when running from within
+# a virtual environment, otherwise the system Python will be used.
+localhost ansible_connection=local ansible_python_interpreter="/usr/bin/env python"
 [dbservers]
 130.246.214.154 ansible_user=centos
