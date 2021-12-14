@@ -32,32 +32,59 @@
   register: nodes_gz_data_file
   changed_when: false
 
-- name: List extract data
-  aws_s3:
-    bucket: "{{ item.lib.bucket }}"
-    mode: list
-    prefix: "{{ item.lib.path }}"
-    aws_access_key: "{{ item.lib.aws_access_key }}"
-    aws_secret_key: "{{ item.lib.aws_secret_key }}"
-  register: extract_result
+- name: List extract data (AWS)
+  block:
+
+  - name: List extract data (AWS)
+    aws_s3:
+      bucket: "{{ item.lib.bucket }}"
+      mode: list
+      prefix: "{{ item.lib.path }}"
+    register: extract_result
+
+  - name: Get S3 keys (AWS)
+    set_fact:
+      s3_keys: "{{ extract_result.s3_keys }}"
+
   when:
+  - s3_url|length == 0
+  - not nodes_gz_data_file.stat.exists
+
+- name: List extract data (non-AWS)
+  block:
+
+  - name: List extract data (non-AWS)
+    aws_s3:
+      bucket: "{{ item.lib.bucket }}"
+      mode: list
+      prefix: "{{ item.lib.path }}"
+      region: "{{ s3_region }}"
+      s3_url: "{{ s3_url }}"
+    register: extract_result
+
+  - name: Get S3 keys (AWS)
+    set_fact:
+      s3_keys: "{{ extract_result.s3_keys }}"
+
+  when:
+  - s3_url|length > 0
   - not nodes_gz_data_file.stat.exists
 
 - name: Display result
   debug:
-    var: extract_result
+    var: s3_keys
   when:
   - not nodes_gz_data_file.stat.exists
 
 - name: Check extract data
   assert:
-    that: extract_result.s3_keys|length > 1
+    that: s3_keys|length > 1
   when:
   - not nodes_gz_data_file.stat.exists
 
 - name: Display extract file count
   debug:
-    msg: Found {{ extract_result.s3_keys|length - 1 }} extract files
+    msg: Found {{ s3_keys|length - 1 }} extract files
   when:
   - not nodes_gz_data_file.stat.exists
 
@@ -71,18 +98,33 @@
 # as there's a danger (especially if the user has created the bucket manually)
 # that the containing directory is also part of the list.
 
-- name: Get extract data
+- name: Get extract data (AWS)
   aws_s3:
     bucket: "{{ item.lib.bucket }}"
     mode: get
     object: "{{ file_item }}"
     dest: "{{ destination }}/{{ file_item|basename }}"
-    aws_access_key: "{{ item.lib.aws_access_key }}"
-    aws_secret_key: "{{ item.lib.aws_secret_key }}"
-  loop: "{{ extract_result.s3_keys[0:] }}"
+  loop: "{{ s3_keys[0:] }}"
   loop_control:
     loop_var: file_item
   when:
+  - s3_url|length == 0
+  - not nodes_gz_data_file.stat.exists
+  - not file_item|regex_search('.*/$')
+
+- name: Get extract data (non-AWS)
+  aws_s3:
+    bucket: "{{ item.lib.bucket }}"
+    mode: get
+    object: "{{ file_item }}"
+    dest: "{{ destination }}/{{ file_item|basename }}"
+    region: "{{ s3_region }}"
+    s3_url: "{{ s3_url }}"
+  loop: "{{ s3_keys[0:] }}"
+  loop_control:
+    loop_var: file_item
+  when:
+  - s3_url|length > 0
   - not nodes_gz_data_file.stat.exists
   - not file_item|regex_search('.*/$')
 

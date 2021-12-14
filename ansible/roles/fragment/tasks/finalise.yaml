@@ -45,18 +45,32 @@
   debug:
     var: files_found
 
-- name: Transfer files (to S3)
-  aws_s3:
-    bucket: "{{ bucket }}"
-    encrypt: "{{ bucket_requires_encryption|bool }}"
-    src: "{{ item }}"
-    object: logs/{{ vendor }}/{{ version }}/fragment/{{ item|basename }}
-    mode: put
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
-    region: "{{ aws_region }}"
-  loop: "{{ files_found }}"
-  when: deployment=="production"
+- name: Transfer files to S3
+  block:
+
+  - name: Transfer files to AWS
+    aws_s3:
+      bucket: "{{ bucket }}"
+      encrypt: "{{ bucket_requires_encryption|bool }}"
+      src: "{{ item }}"
+      object: logs/{{ vendor }}/{{ version }}/fragment/{{ item|basename }}
+      mode: put
+    loop: "{{ files_found }}"
+    when: s3_url|length == 0
+
+  - name: Transfer files to non-AWS
+    aws_s3:
+      bucket: "{{ bucket }}"
+      encrypt: "{{ bucket_requires_encryption|bool }}"
+      src: "{{ item }}"
+      object: logs/{{ vendor }}/{{ version }}/fragment/{{ item|basename }}
+      mode: put
+      region: "{{ s3_region }}"
+      s3_url: "{{ s3_url }}"
+    loop: "{{ files_found }}"
+    when: s3_url|length > 0
+
+  when: deployment == "production"
 
 # Copy log files to Repo
 - name: Copy log files to repo
