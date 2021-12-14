@@ -259,90 +259,47 @@ intensive fragmentation step.
 ![Fragmentor Sequence Diagram](images/FragmentorSequence.png)
 
 ## Process a Vendor Library
-
 The process consists of three steps, described below:
 
 ### Standardisation
+It's easier to run playbooks using a YAML-based parameter file,
+where all the control variables can be set. A typical parameter file
+(`parameters.yaml`) might look like this: -
 
-The standardisation step is run as follows:
+```yaml
+---
+database_login_host: 130.246.214.154
+deployment: production
+runpath: /data/fragmentor/run-01
+clean_start: yes
+add_backup: no
+vendor: xchem_dsip
+version: v1
+extracts:
+- lib:
+    vendor: xchem_dsip
+    version: v1
+    regenerate_index: yes
+hardware:
+  production:
+    parallel_jobs: 8
+    cluster_cores: 8
+    sort_memory: 4GB
+    postgres_jobs: 8
+```
 
-    $ ansible-playbook site-standardise.yaml  \ 
-        -e vendor=<vendor_library> \ 
-        -e version=<version> \
-        -e deployment=<development|production> \
-        -e database_login_host=<host IP|localhost> \
-        -e runpath=<work directory for this run> \
-        (-e add_file=<yes|no> \)
-        (-e clean_start=<yes|no> \)
-        (-e add_backup=<yes|no>)
-
-Example: navigate to the ansible directory
+Armed with a parameter file, like the obe shown above,
+the standardisation step is run as follows: -
 
     $ ansible-playbook site-standardise.yaml \
-        -e vendor=xchem_dsip \
-        -e version=v1 -e deployment=production \
-        -e database_login_host=130.246.214.154 \
-        -e runpath=/data/fragmentor/run01 
-
-> Parameter deployment=development|production
-
-This parameter tells the playbook to use either a set of parameters suitable
-for development or production. Always review the built-in parameters to make
-sure they're suitable for your intended play. This 'high level'
-parameter sets a number of variables based on whether you're developing
-or running code in production, specifically: -
-
-1.  AWS S3 or the data directory in the repository
-    (which contains small test files) as a source for input files.
-2.  The production or development postgres database.
-
-> Parameter runpath
-
-This identifies the shared-directory for execution, typically an Auto-FS
-directory known to the cluster. Check the `auto.data` for your cluster,
-or review the `roles/patch/templates/auto.data.j2` file,
-which should be up-to-date, in our [Galaxy-Patch] repository.
-
-> Optional parameter add_file: default: no
-
-The standardisation step will validate whether the library has been processed
-before and raise an error if this is the case. The optional add_file parameter
-allows an additional (set of) files to be added to an existing library.
-Note that the standardisation step will process all files in the input
-location, so the add_file will work more efficiently if this
-location only contains the required files for that run.  
-
-> Optional parameter clean_start: default: yes
-
-If set to 'No', it will not delete the contents of the previous run.
-This is provided only for debugging purposes and should be used with caution.
-
-> Optional parameter add_backup: default: no
-
-If set to yes, this automatically backs up the database after the
-standardisation play. 
+        -e @parameters.yaml
 
 ### Fragmentation
-
-The fragmentation step will identify molecules for the vendor/library that
-have not been fragmented yet and process them. It is run as follows:
-
-    $ ansible-playbook site-fragment.yaml  \ 
-        -e vendor=<vendor_library> \ 
-        -e version=<version> \
-        -e deployment=<development|production> \
-        -e database_login_host=<host IP|localhost> \
-        -e runpath=<work directory for this run> \
-        (-e add_backup=<yes|no>)
-
-Example: navigate to the ansible directory
+Armed with a parameter file,
+the fragmentation step is run as follows: -
 
     $ ansible-playbook site-fragment.yaml \
-        -e vendor=xchem_dsip \
-        -e version=v1 \
-        -e deployment=production \
-        -e database_login_host=130.246.214.154 \
-        -e runpath=/data/fragmentor/run01 
+        -e @parameters.yaml
 
 A fragmentation step would normally be processed directly after a
 standardisation step, but as this step is driven by the database it is
@@ -355,27 +312,16 @@ If set to yes, this automatically backs up the database after the
 fragmentation play. 
 
 ### Create Inchi Keys
-
 The Create Inchi step will identify any molecules that have not had inchi keys
 generated yet and process them. It is not vendor/library specific and can be
 run as follows:
 
-    $ ansible-playbook site-inchi.yaml  \ 
-        -e deployment=<development|production> \
-        -e runpath=<work directory for this run> \
-        -e database_login_host=<host IP|localhost> \
-        (-e add_backup=<yes|no>)
-
-Example: navigate to the ansible directory
-
     $ ansible-playbook site-inchi.yaml \
-        -e deployment=production \
-        -e database_login_host=130.246.214.154 \
-        -e runpath=/data/fragmentor/run01
+        -e @parameters.yaml
 
-As this step is driven by the database it it possible to run multiple
+As this step is driven by the database it possible to run multiple
 standardisation/fragmentation steps for different 
-vendor/libraries followed by a single create_inchi step.
+vendor/libraries followed by a single create inchi step.
 
 > Optional parameter add_backup: default: yes
 
@@ -395,6 +341,11 @@ format:
 
 ```yaml
 ---
+database_login_host: 130.246.214.154
+deployment: production
+runpath: /data/fragmentor/run-01
+clean_start: yes
+add_backup: no
 extracts:
 - lib:
     vendor: enamine_ro5
@@ -406,29 +357,16 @@ extracts:
     regenerate_index: yes
 ```
 
-The first time a library version is extracted, regenerate_index should be
+The first time a library version is extracted, `regenerate_index` should be
 set to `yes` so that the index of edges for the latest library version can be
 regenerated. For subsequent runs (e.g. to extract combinations) it should be set to
 `no` for speed - for the larger vendors this can be a significant amount of time. 
-A template (extract-parameters.template) is provided for this file.
+A template (`extract-parameters.template`) is provided for this file.
 
 The command is:
 
-
     $ ansible-playbook site-extract.yaml \
-        -e @parameters \
-        -e deployment=<development|production> \
-        -e database_login_host=<host IP|localhost> \
-        -e runpath=<path to run directory 
-
-Example: navigate to the ansible directory
-
-
-    $ ansible-playbook site-extract.yaml
-        -e @parameters \
-        -e deployment=production \
-        -e database_login_host=130.246.214.154 \
-        -e runpath=/data/fragmentor/run01  
+        -e @parameters.yaml 
 
 Note that for the larger extracts to complete there needs to be sufficient
 temporary space on the postgres pgdata directory for the database queries to
@@ -451,6 +389,9 @@ default (`s3`):
 
 ```yaml
 ---
+database_login_host: 130.246.214.154
+deployment: production
+runpath: /data/fragmentor/run-01
 combine:
 - lib:
     path: xchem_dsip
@@ -495,16 +436,7 @@ directory on the `runpath`.
 The command is:
 
     $ ansible-playbook site-combine.yaml \
-        -e @parameters \
-        -e deployment=<development|production> \
-        -e runpath=<path to run directory>
-
-Example: navigate to the ansible directory
-
-    $ ansible-playbook site-combine.yaml \
-        -e @parameters \
-        -e deployment=production \
-        -e runpath=/data/fragmentor/run01 
+        -e @parameters.yaml
 
 ## Backing up and Restoring the Database
 
