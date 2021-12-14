@@ -104,7 +104,7 @@
     mode: get
     object: "{{ file_item }}"
     dest: "{{ destination }}/{{ file_item|basename }}"
-  loop: "{{ s3_keys[0:] }}"
+  loop: "{{ s3_keys }}"
   loop_control:
     loop_var: file_item
   when:
@@ -120,7 +120,7 @@
     dest: "{{ destination }}/{{ file_item|basename }}"
     region: "{{ s3_region }}"
     s3_url: "{{ s3_url }}"
-  loop: "{{ s3_keys[0:] }}"
+  loop: "{{ s3_keys }}"
   loop_control:
     loop_var: file_item
   when:
