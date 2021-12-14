@@ -162,7 +162,6 @@ Using the AWS console wait for the database server instance to become ready
 (initialise) before trying to create the database.
 
 ## Creating the Postgres Database
-
 The database is created in a docker container. Configuring the production
 database server (a destructive action) is done via an ansible playbook.
 This playbook also pre-loads the `vendor_name` table in the database with 
@@ -205,8 +204,7 @@ Example: navigate to the ansible directory
     $ ansible-playbook site-db-server-configure_create-database.yaml \
         -e deployment=development
 
-## Configuring the AWS S3 Directory Structure
-
+## Configuring the S3 Directory Structure
 For a production deployment, the ansible playbook `site-standardise` is
 configured to import vendor data files from a tree structure defined as either:
 
@@ -246,7 +244,6 @@ For Neo4j extracts for combinations of vendor libraries: -
     `combination/xchem_dsip/2020-01-01`
 
 ## Fragmentation Process Description
-
 The sequence diagram below shows the basic steps in the fragmentation process
 including a fragmentation database called FairMolecules. The advantage of the
 database approach is that each time a new dataset of molecules is provided by 
@@ -451,7 +448,6 @@ The command is:
         -e @parameters.yaml
 
 ## Backing up and Restoring the Database
-
 The backup playbook can also be used in isolation from the other playbooks.
 It uses `pg_dumpall` to create a zipped copy of the complete database.
 The play will automatically clear up all versions of backups - the number
@@ -498,7 +494,6 @@ Example: navigate to the ansible directory
         -e deployment=production 
 
 ## Tuning Parameters
-
 The file all.yaml contains the following parameters used to control the
 different steps of the process.  
 
@@ -583,7 +578,6 @@ operations you can set the variable `bucket_requires_ecryption: yes` (or
 `bucket_out_requires_encryption: yes` during the combination play).
 
 ## Database Sizing 
-
 Numbers are given below were achieved using the maximum fragmentation cycles
 parameter set to 12. 
 
