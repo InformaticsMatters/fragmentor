@@ -79,27 +79,33 @@ Some ansible playbook postgres tasks require the postgres client (psql)
 to be installed on the head machine. Details can be found at
 https://www.postgresql.org/download/linux/redhat/
 
-You will also need AWS credentials for S3, so you will need to set up the
-following parameters: -
+You will also need credentials for S3, so you will need to set up the
+following parameters. Regardless of whether you're _actually_ using an AWS
+bucket or not, we use the standard AWS variables: -
 
     $ export AWS_ACCESS_KEY=<Access Key ID>
     $ export AWS_SECRET_KEY=<Secret Access Key>
     $ export AWS_REGION=eu-central-1
 
-If you are using a non-AWS S3 bucket you will also need to provide the
-following (leaving them undefined if you are using AWS): -
+>   If you're using an alternative provider's S3 store, just put the
+    relevant details into the appropriate AWS variable.
+    `AWS_REGION` can be blank (`''`)', and for some providers it needs to be.
 
-    $ export AWS_REGION=<Region>
-    $ export S3_URL=<S3 Sevrvide Endpoint/URL>
+If you are using a non-AWS S3 bucket you will need to provide the S3
+endpoint, but leaving this environment variable undefined if you are using
+AWS: -
 
-And then navigate to the ansible Project's ansible directory before running
-any playbooks: -
+    $ export S3_URL=<Non-AWS S3 Sevrvide Endpoint/URL>
+
+Now navigate to the ansible Project's ansible directory: -
 
     $ cd ansible
 
-You will need to ensure that the user's `~/.ssh/id_rsa` is set correctly
-(or use [ssh-agent]) so that Ansible can ssh to the servers. If the following
-works you should be able to run the project playbooks: -
+Test connection to the hosts using `ping`. You will need to ensure that the
+user's `~/.ssh/id_rsa` is set correctly (or use [ssh-agent]) so that Ansible
+can ssh to the servers.
+
+If the following works you should be able to run the project playbooks: -
 
     $ ansible -m ping all
 
