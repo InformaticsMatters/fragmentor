@@ -47,12 +47,20 @@
 - name: Transfer files to S3
   block:
 
+  - name: Set bucket object path
+    set_fact:
+      s3_object_path: "logs/{{ vendor }}/{{ version }}/standardise"
+
+  - name: Display bucket object path
+    debug:
+      var: s3_object_path
+
   - name: Transfer to AWS
     aws_s3:
       bucket: "{{ s3_bucket }}"
       encrypt: "{{ s3_bucket_requires_encryption|bool }}"
       src: "{{ item }}"
-      object: logs/{{ vendor }}/{{ version }}/standardise/{{ item|basename }}
+      object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
     loop: "{{ files_found }}"
     when: s3_url|length == 0
@@ -62,7 +70,7 @@
       bucket: "{{ s3_bucket }}"
       encrypt: "{{ s3_bucket_requires_encryption|bool }}"
       src: "{{ item }}"
-      object: logs/{{ vendor }}/{{ version }}/standardise/{{ item|basename }}
+      object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
       region: "{{ s3_region }}"
       s3_url: "{{ s3_url }}"

@@ -132,12 +132,20 @@
   - name: Single Vendor
     block:
 
+    - name: Set bucket object path
+      set_fact:
+        s3_object_path: "extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}"
+
+    - name: Display bucket object path
+      debug:
+        var: s3_object_path
+
     - name: Transfer files (AWS) - Single Vendor
       aws_s3:
         bucket: "{{ s3_bucket }}"
         encrypt: "{{ bucket_requires_encryption|bool }}"
         src: "{{ item }}"
-        object: extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}/{{ item|basename }}
+        object: "{{ s3_object_path }}/{{ item|basename }}"
         mode: put
       loop: "{{ files_found }}"
       when: s3_url|length == 0
@@ -147,7 +155,7 @@
         bucket: "{{ s3_bucket }}"
         encrypt: "{{ bucket_requires_encryption|bool }}"
         src: "{{ item }}"
-        object: extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}/{{ item|basename }}
+        object: "{{ s3_object_path }}/{{ item|basename }}"
         mode: put
         region: "{{ s3_region }}"
         s3_url: "{{ s3_url }}"
@@ -160,12 +168,20 @@
   - name: Combination
     block:
 
+    - name: Set bucket object path
+      set_fact:
+        s3_object_path: "extract/combination/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}"
+
+    - name: Display bucket object path
+      debug:
+        var: s3_object_path
+
     - name: Transfer files (AWS) - Combination
       aws_s3:
         bucket: "{{ s3_bucket }}"
         encrypt: "{{ bucket_requires_encryption|bool }}"
         src: "{{ item }}"
-        object: extract/combination/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}/{{ item|basename }}
+        object: "{{ s3_object_path }}/{{ item|basename }}"
         mode: put
       loop: "{{ files_found }}"
       when: s3_url|length == 0
@@ -175,7 +191,7 @@
         bucket: "{{ s3_bucket }}"
         encrypt: "{{ bucket_requires_encryption|bool }}"
         src: "{{ item }}"
-        object: extract/combination/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}/{{ item|basename }}
+        object: "{{ s3_object_path }}/{{ item|basename }}"
         mode: put
         region: "{{ s3_region }}"
         s3_url: "{{ s3_url }}"

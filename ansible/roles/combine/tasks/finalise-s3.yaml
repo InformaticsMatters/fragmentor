@@ -114,12 +114,20 @@
 - name: Transfer files to S3
   block:
 
+  - name: Set bucket object path
+    set_fact:
+      s3_object_path: "extract/combination/{{ path_out }}"
+
+  - name: Display bucket object path
+    debug:
+      var: s3_object_path
+
   - name: Transfer files to AWS
     aws_s3:
       bucket: "{{ bucket_out }}"
       encrypt: "{{ bucket_out_requires_encryption|bool }}"
       src: "{{ item }}"
-      object: extract/combination/{{ path_out }}/{{ item|basename }}
+      object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
     loop: "{{ files_found }}"
     when: s3_url|length == 0
@@ -129,7 +137,7 @@
       bucket: "{{ bucket_out }}"
       encrypt: "{{ bucket_out_requires_encryption|bool }}"
       src: "{{ item }}"
-      object: extract/combination/{{ path_out }}/{{ item|basename }}
+      object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
       region: "{{ s3_region }}"
       s3_url: "{{ s3_url }}"
@@ -161,12 +169,20 @@
 - name: Transfer log files to S3
   block:
 
+  - name: Set bucket object path
+    set_fact:
+      s3_object_path: "logs/combination/{{ path_out }}"
+
+  - name: Display bucket object path
+    debug:
+      var: s3_object_path
+
   - name: Transfer log files to AWS
     aws_s3:
       bucket: "{{ bucket_out }}"
       encrypt: "{{ bucket_out_requires_encryption|bool }}"
       src: "{{ item }}"
-      object: logs/combination/{{ path_out }}/{{ item|basename }}
+      object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
     loop: "{{ files_found }}"
     when: s3_url|length == 0
@@ -176,7 +192,7 @@
       bucket: "{{ bucket_out }}"
       encrypt: "{{ bucket_out_requires_encryption|bool }}"
       src: "{{ item }}"
-      object: logs/combination/{{ path_out }}/{{ item|basename }}
+      object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
       region: "{{ s3_region }}"
       s3_url: "{{ s3_url }}"
