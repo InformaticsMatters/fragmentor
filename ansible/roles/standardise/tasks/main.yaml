@@ -43,7 +43,7 @@
 
 - block:
 
-  - import_tasks: initialise-frag-process.yaml
+  - import_tasks: initialise.yaml
 
   - import_tasks: get-raw-data-{{ data_source[deployment] }}.yaml
   - import_tasks: standardise-file.yaml
