@@ -43,21 +43,21 @@ next_path: "{{ runpath }}/nextflow"
 # The (AWS S3) location of extract data
 bucket_in_1: im-fragnet
 # AWS credentials for bucket access
-aws_access_key_in_1: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-aws_secret_key_in_1: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+aws_access_key_in_1: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+aws_secret_key_in_1: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
 
 # The (AWS S3) location of extract data
 bucket_in_2: im-fragnet
 # AWS credentials for bucket access
-aws_access_key_in_2: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-aws_secret_key_in_2: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+aws_access_key_in_2: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+aws_secret_key_in_2: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
 
 # The (AWS S3) location of output extract data
 bucket_out: im-fragnet
 # Set if data written to the bucket requires encryption.
 bucket_out_requires_encryption: no
 # AWS credentials for bucket access
-aws_access_key_out: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-aws_secret_key_out: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+aws_access_key_out: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+aws_secret_key_out: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
 
-aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
+aws_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
