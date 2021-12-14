@@ -4,9 +4,15 @@
 - name: Assert S3 credentials
   assert:
     that:
-    - aws_access_key|length > 0
-    - aws_secret_key|length > 0
+    - s3_access_key|length > 0
+    - s3_secret_key|length > 0
     fail_msg: You must provide S3 access and secret keys
+
+- name: Assert S3 bucket
+  assert:
+    that:
+    - s3_bucket|length > 0
+    fail_msg: You must provide an S3 bucket
 
 - name: Log line to report
   blockinfile:
@@ -22,11 +28,11 @@
 
 - name: Display raw path
   debug:
-    msg: bucket={{ bucket }} raw_path={{ raw_path }}
+    msg: bucket={{ s3_bucket }} raw_path={{ raw_path }}
 
 - name: List raw data (AWS)
   aws_s3:
-    bucket: "{{ bucket }}"
+    bucket: "{{ s3_bucket }}"
     mode: list
     prefix: "{{ raw_path }}"
   register: raw_result
@@ -34,7 +40,7 @@
 
 - name: List raw data (non-AWS)
   aws_s3:
-    bucket: "{{ bucket }}"
+    bucket: "{{ s3_bucket }}"
     mode: list
     prefix: "{{ raw_path }}"
     region: "{{ s3_region }}"
@@ -76,12 +82,12 @@
 # as there's a danger (especially if the user has created the bucket manually)
 # that the containing directory is also part of the list.
 
-- block:
-  name: Get raw data
+- name: Get raw data
+  block:
 
   - name: Get raw data (AWS)
     aws_s3:
-      bucket: "{{ bucket }}"
+      bucket: "{{ s3_bucket }}"
       mode: get
       object: "{{ item }}"
       dest: "{{ destination }}/{{ item|basename }}"
@@ -90,7 +96,7 @@
 
   - name: Get raw data (non-AWS)
     aws_s3:
-      bucket: "{{ bucket }}"
+      bucket: "{{ s3_bucket }}"
       mode: get
       object: "{{ item }}"
       dest: "{{ destination }}/{{ item|basename }}"
@@ -99,8 +105,7 @@
     loop: "{{ raw_result.s3_keys[1:] }}"
     when: s3_url|length > 0
 
-  when:
-  - not item|regex_search('.*/$')
+  when: not item|regex_search('.*/$')
 
 # Now hand over the get logic to vendor-specific
 # un-packing code. It may need to do nothing but
