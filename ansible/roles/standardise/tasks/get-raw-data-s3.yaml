@@ -85,11 +85,7 @@
 - name: Check raw data
   assert:
     that:
-    - s3_keys|length > 1
-
-- name: Display raw file count
-  debug:
-    msg: Found {{ s3_keys|length - 1 }} raw files
+    - s3_keys|length > 0
 
 - name: Set destination path
   set_fact:
@@ -109,7 +105,9 @@
       object: "{{ item }}"
       dest: "{{ destination }}/{{ item|basename }}"
     loop: "{{ s3_keys[1:] }}"
-    when: s3_url|length == 0
+    when:
+    - s3_url|length == 0
+    - not item|regex_search('.*/$')
 
   - name: Get raw data (non-AWS)
     aws_s3:
@@ -120,9 +118,9 @@
       region: "{{ s3_region }}"
       s3_url: "{{ s3_url }}"
     loop: "{{ s3_keys[1:] }}"
-    when: s3_url|length > 0
-
-  when: not item|regex_search('.*/$')
+    when:
+    - s3_url|length > 0
+    - not item|regex_search('.*/$')
 
 # Now hand over the get logic to vendor-specific
 # un-packing code. It may need to do nothing but
