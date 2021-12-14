@@ -55,8 +55,7 @@ The images are built by the Travis CI/CD process. Review the `.travis.yml`
 file for details. A convenient docker-compose can be used to build
 the images for local experimentation.
 
-## Prerequisites
-
+## Playbook preparation
 For the production configuration, it is assumed that the user has access to
 a cluster and that the following instructions would be run on the head node.  
 
@@ -375,7 +374,7 @@ The command is:
     $ ansible-playbook site-extract.yaml \
         -e @parameters.yaml 
 
-Note that for the larger extracts to complete there needs to be sufficient
+ote that for the larger extracts to complete there needs to be sufficient
 temporary space on the postgres pgdata directory for the database queries to
 complete. In the case of the complete extract including enamine and molport,
 for example, around 900GB if temporary space is required.
