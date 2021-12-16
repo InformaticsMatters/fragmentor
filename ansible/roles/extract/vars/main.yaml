@@ -18,21 +18,11 @@ supmolsupedgefile: suppliermol-supplier-edges.csv
 inchiidfile: inchi-nodes.csv
 molinchiedgefile: molecule-inchi-edges.csv
 
-# The (AWS S3) location of vendor data.
-bucket: im-fragnet
-# Set if data written to the bucket requires encryption.
-bucket_requires_encryption: no
-
 # The database server's pgcopy directory.
 # This *MUST* match the directory
 # mapped into the PostgreSQL container.
 # copy_root: /pgcopy
 copy_root: "{{ database[deployment].copy_directory }}"
-
-# AWS credentials for bucket access
-aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
-aws_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
 
 # Source_id will be a comma-separated list of source_ids for use in the sql
 source_id_lst: []

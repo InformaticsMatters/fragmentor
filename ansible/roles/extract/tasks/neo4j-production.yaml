@@ -122,36 +122,82 @@
   debug:
     var: files_found
 
-# Synchronise the extract to S3 if desired, otherwise this data is left in the extract directory on the server.
+# Synchronise the extract to S3 if desired,
+# otherwise this data is left in the extract directory on the server.
 
-# When only one vendor, use it
-- name: Transfer files (to S3) - Single Vendor
-  aws_s3:
-    bucket: "{{ bucket }}"
-    encrypt: "{{ bucket_requires_encryption|bool }}"
-    src: "{{ item }}"
-    object: extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}/{{ item|basename }}
-    mode: put
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
-    region: "{{ aws_region }}"
-  loop: "{{ files_found }}"
-  when:
-  - data_source[deployment]=="s3"
-  - source_id_lst|length == 1
+- name: Transfer files to S3
+  block:
 
-# When combination, use combination/first vendor/first version
-- name: Transfer files (to S3) - Combination
-  aws_s3:
-    bucket: "{{ bucket }}"
-    encrypt: "{{ bucket_requires_encryption|bool }}"
-    src: "{{ item }}"
-    object: extract/combination/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}/{{ item|basename }}
-    mode: put
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
-    region: "{{ aws_region }}"
-  loop: "{{ files_found }}"
-  when:
-  - data_source[deployment]=="s3"
-  - source_id_lst|length > 1
+  # When only one vendor, use it
+  - name: Single Vendor
+    block:
+
+    - name: Set bucket object path
+      set_fact:
+        s3_object_path: "extract/{{ extracts[0].lib.vendor }}/{{ extracts[0].lib.version }}"
+
+    - name: Display bucket object path
+      debug:
+        var: s3_object_path
+
+    - name: Transfer files (AWS) - Single Vendor
+      aws_s3:
+        bucket: "{{ s3_bucket }}"
+        encrypt: "{{ bucket_requires_encryption|bool }}"
+        src: "{{ item }}"
+        object: "{{ s3_object_path }}/{{ item|basename }}"
+        mode: put
+      loop: "{{ files_found }}"
+      when: s3_url|length == 0
+
+    - name: Transfer files (non-AWS) - Single Vendor
+      aws_s3:
+        bucket: "{{ s3_bucket }}"
+        encrypt: "{{ bucket_requires_encryption|bool }}"
+        src: "{{ item }}"
+        object: "{{ s3_object_path }}/{{ item|basename }}"
+        mode: put
+        region: "{{ s3_region }}"
+        s3_url: "{{ s3_url }}"
+      loop: "{{ files_found }}"
+      when: s3_url|length > 0
+
+    when: source_id_lst|length == 1
+
+  # When combination, use combination/first vendor/first version
+  - name: Combination
+    block:
+
+    - name: Set bucket object path
+      set_fact:
+        s3_object_path: "extract/combination/{{ extracts[0].lib.vendor }}/{{ ansible_date_time.date }}"
+
+    - name: Display bucket object path
+      debug:
+        var: s3_object_path
+
+    - name: Transfer files (AWS) - Combination
+      aws_s3:
+        bucket: "{{ s3_bucket }}"
+        encrypt: "{{ bucket_requires_encryption|bool }}"
+        src: "{{ item }}"
+        object: "{{ s3_object_path }}/{{ item|basename }}"
+        mode: put
+      loop: "{{ files_found }}"
+      when: s3_url|length == 0
+
+    - name: Transfer files (non-AWS) - Combination
+      aws_s3:
+        bucket: "{{ s3_bucket }}"
+        encrypt: "{{ bucket_requires_encryption|bool }}"
+        src: "{{ item }}"
+        object: "{{ s3_object_path }}/{{ item|basename }}"
+        mode: put
+        region: "{{ s3_region }}"
+        s3_url: "{{ s3_url }}"
+      loop: "{{ files_found }}"
+      when: s3_url|length > 0
+
+    when: source_id_lst|length > 1
+
+  when: data_source[deployment]=="s3"

@@ -1,6 +1,19 @@
 ---
 # Gets 'raw' data from an AWS S3 path
 
+- name: Assert S3 credentials
+  assert:
+    that:
+    - s3_access_key|length > 0
+    - s3_secret_key|length > 0
+    fail_msg: You must provide S3 access and secret keys
+
+- name: Assert S3 bucket
+  assert:
+    that:
+    - s3_bucket|length > 0
+    fail_msg: You must provide an S3 bucket
+
 - name: Log line to report
   blockinfile:
     marker: "<!-- {standardise-get} ANSIBLE MANAGED BLOCK -->"
@@ -15,20 +28,45 @@
 
 - name: Display raw path
   debug:
-    msg: bucket={{ bucket }} raw_path={{ raw_path }}
+    msg: bucket={{ s3_bucket }} raw_path={{ raw_path }}
 
-- name: List raw data
-  aws_s3:
-    bucket: "{{ bucket }}"
-    mode: list
-    prefix: "{{ raw_path }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
-  register: raw_result
+- name: Get raw data (AWS)
+  block:
 
-- name: Display result
+  - name: List raw data (AWS)
+    aws_s3:
+      bucket: "{{ s3_bucket }}"
+      mode: list
+      prefix: "{{ raw_path }}"
+    register: raw_result
+
+  - name: Get S3 keys (AWS)
+    set_fact:
+      s3_keys: "{{ raw_result.s3_keys }}"
+
+  when: s3_url|length == 0
+
+- name: Get raw data (non-AWS)
+  block:
+
+  - name: List raw data (non-AWS)
+    aws_s3:
+      bucket: "{{ s3_bucket }}"
+      mode: list
+      prefix: "{{ raw_path }}"
+      region: "{{ s3_region }}"
+      s3_url: "{{ s3_url }}"
+    register: raw_result
+
+  - name: Get S3 keys (non-AWS)
+    set_fact:
+      s3_keys: "{{ raw_result.s3_keys }}"
+
+  when: s3_url|length > 0
+
+- name: Display S3 keys
   debug:
-    var: raw_result
+    var: s3_keys
 
 # There may be two keys in the result...
 # The first key might be the directory the files are in,
@@ -46,11 +84,8 @@
 
 - name: Check raw data
   assert:
-    that: raw_result.s3_keys|length > 1
-
-- name: Display raw file count
-  debug:
-    msg: Found {{ raw_result.s3_keys|length - 1 }} raw files
+    that:
+    - s3_keys|length > 0
 
 - name: Set destination path
   set_fact:
@@ -61,16 +96,31 @@
 # that the containing directory is also part of the list.
 
 - name: Get raw data
-  aws_s3:
-    bucket: "{{ bucket }}"
-    mode: get
-    object: "{{ item }}"
-    dest: "{{ destination }}/{{ item|basename }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
-  loop: "{{ raw_result.s3_keys[1:] }}"
-  when:
-  - not item|regex_search('.*/$')
+  block:
+
+  - name: Get raw data (AWS)
+    aws_s3:
+      bucket: "{{ s3_bucket }}"
+      mode: get
+      object: "{{ item }}"
+      dest: "{{ destination }}/{{ item|basename }}"
+    loop: "{{ s3_keys }}"
+    when:
+    - s3_url|length == 0
+    - not item|regex_search('.*/$')
+
+  - name: Get raw data (non-AWS)
+    aws_s3:
+      bucket: "{{ s3_bucket }}"
+      mode: get
+      object: "{{ item }}"
+      dest: "{{ destination }}/{{ item|basename }}"
+      region: "{{ s3_region }}"
+      s3_url: "{{ s3_url }}"
+    loop: "{{ s3_keys }}"
+    when:
+    - s3_url|length > 0
+    - not item|regex_search('.*/$')
 
 # Now hand over the get logic to vendor-specific
 # un-packing code. It may need to do nothing but

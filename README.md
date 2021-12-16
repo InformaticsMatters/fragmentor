@@ -55,8 +55,7 @@ The images are built by the Travis CI/CD process. Review the `.travis.yml`
 file for details. A convenient docker-compose can be used to build
 the images for local experimentation.
 
-## Prerequisites
-
+## Playbook preparation
 For the production configuration, it is assumed that the user has access to
 a cluster and that the following instructions would be run on the head node.  
 
@@ -80,20 +79,33 @@ Some ansible playbook postgres tasks require the postgres client (psql)
 to be installed on the head machine. Details can be found at
 https://www.postgresql.org/download/linux/redhat/
 
-You will also need AWS credentials for S3, so you will need to set up the
-following parameters: -
+You will also need credentials for S3, so you will need to set up the
+following parameters. Regardless of whether you're _actually_ using an AWS
+bucket or not, we use the standard AWS variables: -
 
-    $ export AWS_ACCESS_KEY_ID=<Access Key ID>
-    $ export AWS_SECRET_ACCESS_KEY=<Secret Access Key>
+    $ export AWS_ACCESS_KEY=<Access Key ID>
+    $ export AWS_SECRET_KEY=<Secret Access Key>
+    $ export AWS_REGION=eu-central-1
 
-And then navigate to the ansible Project's ansible directory before running
-any playbooks: -
+>   If you're using an alternative provider's S3 store, just put the
+    relevant details into the appropriate AWS variable.
+    `AWS_REGION` can be blank (`''`)', and for some providers it needs to be.
+
+If you are using a non-AWS S3 bucket you will need to provide the S3
+endpoint, but leaving this environment variable undefined if you are using
+AWS: -
+
+    $ export S3_URL=<Non-AWS S3 Sevrvide Endpoint/URL>
+
+Now navigate to the ansible Project's ansible directory: -
 
     $ cd ansible
 
-You will need to ensure that the user's `~/.ssh/id_rsa` is set correctly
-(or use [ssh-agent]) so that Ansible can ssh to the servers. If the following
-works you should be able to run the project playbooks: -
+Test connection to the hosts using `ping`. You will need to ensure that the
+user's `~/.ssh/id_rsa` is set correctly (or use [ssh-agent]) so that Ansible
+can ssh to the servers.
+
+If the following works you should be able to run the project playbooks: -
 
     $ ansible -m ping all
 
@@ -150,7 +162,6 @@ Using the AWS console wait for the database server instance to become ready
 (initialise) before trying to create the database.
 
 ## Creating the Postgres Database
-
 The database is created in a docker container. Configuring the production
 database server (a destructive action) is done via an ansible playbook.
 This playbook also pre-loads the `vendor_name` table in the database with 
@@ -193,8 +204,7 @@ Example: navigate to the ansible directory
     $ ansible-playbook site-db-server-configure_create-database.yaml \
         -e deployment=development
 
-## Configuring the AWS S3 Directory Structure
-
+## Configuring the S3 Directory Structure
 For a production deployment, the ansible playbook `site-standardise` is
 configured to import vendor data files from a tree structure defined as either:
 
@@ -234,7 +244,6 @@ For Neo4j extracts for combinations of vendor libraries: -
     `combination/xchem_dsip/2020-01-01`
 
 ## Fragmentation Process Description
-
 The sequence diagram below shows the basic steps in the fragmentation process
 including a fragmentation database called FairMolecules. The advantage of the
 database approach is that each time a new dataset of molecules is provided by 
@@ -368,7 +377,7 @@ The command is:
     $ ansible-playbook site-extract.yaml \
         -e @parameters.yaml 
 
-Note that for the larger extracts to complete there needs to be sufficient
+ote that for the larger extracts to complete there needs to be sufficient
 temporary space on the postgres pgdata directory for the database queries to
 complete. In the case of the complete extract including enamine and molport,
 for example, around 900GB if temporary space is required.
@@ -439,7 +448,6 @@ The command is:
         -e @parameters.yaml
 
 ## Backing up and Restoring the Database
-
 The backup playbook can also be used in isolation from the other playbooks.
 It uses `pg_dumpall` to create a zipped copy of the complete database.
 The play will automatically clear up all versions of backups - the number
@@ -486,7 +494,6 @@ Example: navigate to the ansible directory
         -e deployment=production 
 
 ## Tuning Parameters
-
 The file all.yaml contains the following parameters used to control the
 different steps of the process.  
 
@@ -571,7 +578,6 @@ operations you can set the variable `bucket_requires_ecryption: yes` (or
 `bucket_out_requires_encryption: yes` during the combination play).
 
 ## Database Sizing 
-
 Numbers are given below were achieved using the maximum fragmentation cycles
 parameter set to 12. 
 
