@@ -59,7 +59,7 @@
   - name: Transfer files to AWS
     aws_s3:
       bucket: "{{ s3_bucket }}"
-      encrypt: "{{ bucket_requires_encryption|bool }}"
+      encrypt: "{{ s3_bucket_requires_encryption|bool }}"
       src: "{{ item }}"
       object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
@@ -69,7 +69,7 @@
   - name: Transfer files to non-AWS
     aws_s3:
       bucket: "{{ s3_bucket }}"
-      encrypt: "{{ bucket_requires_encryption|bool }}"
+      encrypt: "{{ s3_bucket_requires_encryption|bool }}"
       src: "{{ item }}"
       object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
