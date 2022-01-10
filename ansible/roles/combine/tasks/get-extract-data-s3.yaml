@@ -3,16 +3,20 @@
 # 1. Goes to the repo listed in the 'path' variable on disk and copies files to data directory (if not already present)
 # 2. Each file in the s3 bucket should be copied to the work_path with the file prepended by the index.
 
-- name: Display extract path
+- name: Display library S3
   debug:
-    msg: bucket={{ item.lib.bucket }} extract_path={{ item.lib.path }}
+    msg: url={{ item.lib.s3_url }} region={{ item.lib.s3_region }}
+
+- name: Display library path
+  debug:
+    msg: bucket={{ item.lib.s3_bucket }} extract_path={{ item.lib.path }}
 
 - name: Log line to report
   blockinfile:
     marker: "<!-- {combine-download} ANSIBLE MANAGED BLOCK -->"
     path: "{{ log_path }}/combination_report.html"
     block: |
-      <p>Add file: {{ item.lib.bucket }}/{{ item.lib.path }}</p>
+      <p>Add file: {{ item.lib.s3_bucket }}/{{ item.lib.path }}</p>
 
 - name: Create data directory
   file:
@@ -37,9 +41,12 @@
 
   - name: List extract data (AWS)
     aws_s3:
-      bucket: "{{ item.lib.bucket }}"
+      bucket: "{{ item.lib.s3_bucket }}"
+      aws_access_key: "{{ item.lib.s3_access_key }}"
+      aws_secret_key: "{{ item.lib.s3_secret_key }}"
       mode: list
       prefix: "{{ item.lib.path }}"
+      region: "{{ item.lib.s3_region }}"
     register: extract_result
 
   - name: Get S3 keys (AWS)
@@ -47,7 +54,7 @@
       s3_keys: "{{ extract_result.s3_keys }}"
 
   when:
-  - s3_url|length == 0
+  - item.lib.s3_url|length == 0
   - not nodes_gz_data_file.stat.exists
 
 - name: List extract data (non-AWS)
@@ -55,11 +62,13 @@
 
   - name: List extract data (non-AWS)
     aws_s3:
-      bucket: "{{ item.lib.bucket }}"
+      bucket: "{{ item.lib.s3_bucket }}"
+      aws_access_key: "{{ item.lib.s3_access_key }}"
+      aws_secret_key: "{{ item.lib.s3_secret_key }}"
       mode: list
       prefix: "{{ item.lib.path }}"
-      region: "{{ s3_region }}"
-      s3_url: "{{ s3_url }}"
+      region: "{{ item.lib.s3_region }}"
+      s3_url: "{{ item.lib.s3_url }}"
     register: extract_result
 
   - name: Get S3 keys (AWS)
@@ -67,7 +76,7 @@
       s3_keys: "{{ extract_result.s3_keys }}"
 
   when:
-  - s3_url|length > 0
+  - item.lib.s3_url|length > 0
   - not nodes_gz_data_file.stat.exists
 
 - name: Display result
@@ -100,31 +109,36 @@
 
 - name: Get extract data (AWS)
   aws_s3:
-    bucket: "{{ item.lib.bucket }}"
+    bucket: "{{ item.lib.s3_bucket }}"
+    aws_access_key: "{{ item.lib.s3_access_key }}"
+    aws_secret_key: "{{ item.lib.s3_secret_key }}"
     mode: get
+    region: "{{ item.lib.s3_region }}"
     object: "{{ file_item }}"
     dest: "{{ destination }}/{{ file_item|basename }}"
   loop: "{{ s3_keys }}"
   loop_control:
     loop_var: file_item
   when:
-  - s3_url|length == 0
+  - item.lib.s3_url|length == 0
   - not nodes_gz_data_file.stat.exists
   - not file_item|regex_search('.*/$')
 
 - name: Get extract data (non-AWS)
   aws_s3:
-    bucket: "{{ item.lib.bucket }}"
+    bucket: "{{ item.lib.s3_bucket }}"
+    aws_access_key: "{{ item.lib.s3_access_key }}"
+    aws_secret_key: "{{ item.lib.s3_secret_key }}"
     mode: get
     object: "{{ file_item }}"
     dest: "{{ destination }}/{{ file_item|basename }}"
-    region: "{{ s3_region }}"
-    s3_url: "{{ s3_url }}"
+    region: "{{ item.lib.s3_region }}"
+    s3_url: "{{ item.lib.s3_url }}"
   loop: "{{ s3_keys }}"
   loop_control:
     loop_var: file_item
   when:
-  - s3_url|length > 0
+  - item.lib.s3_url|length > 0
   - not nodes_gz_data_file.stat.exists
   - not file_item|regex_search('.*/$')
 

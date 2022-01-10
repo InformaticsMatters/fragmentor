@@ -44,18 +44,18 @@
     that:
     - '{{ path_out|length > 0 }}'
 
-- name: Data source sanity-check
+- name: Destination sanity-check
   assert:
     that:
-    - '{{ data_source_out == "s3" or data_source_out == "disk" }}'
+    - '{{ output_destination == "s3" or output_destination == "disk" }}'
 
 - name: Check buckets for s3 storage
   assert:
     that:
-    - '{{ bucket_out|length > 0 }}'
-    - '{{ aws_access_key_out|length > 0 }}'
-    - '{{ aws_secret_key_out|length > 0 }}'
-  when: data_source_out == "s3"
+    - '{{ s3_out_bucket|length > 0 }}'
+    - '{{ s3_out_access_key|length > 0 }}'
+    - '{{ s3_out_secret_key|length > 0 }}'
+  when: output_destination == "s3"
 
 # Clean-up before the run...
 # The following task does not run if 'clean_start' is false.

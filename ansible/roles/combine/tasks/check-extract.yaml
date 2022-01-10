@@ -18,7 +18,7 @@
 - name: Check buckets for s3 storage
   assert:
     that:
-    - '{{ item.lib.bucket|length > 0 }}'
-    - '{{ item.lib.aws_access_key|length > 0 }}'
-    - '{{ item.lib.aws_secret_key|length > 0 }}'
+    - '{{ item.lib.s3_bucket|length > 0 }}'
+    - '{{ item.lib.s3_access_key|length > 0 }}'
+    - '{{ item.lib.s3_secret_key|length > 0 }}'
   when: item.lib.data_source == "s3"

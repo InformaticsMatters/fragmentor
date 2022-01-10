@@ -15,13 +15,19 @@ runpath: SetMe
 # containers do not have to be downloaded for each run.
 singularity_path: "{{ runpath }}/.."
 
-# The following is used (amongst other things)
-# to load vendor-specific variables from a specified parameters file - see extract-parameters.template...
+# The following defines the libraries to combine.
+# 'combine' is a list of 'lib' declarations that define the libraries to combine.
+#
+# The source of a library is one of 's3' or 'disk'.
+# If it's s3 credentials need to be provided.
+# 'lib.path' is used as a prefix when listing data when the source is 's3'
+# or as a filesystem path when the source is 'disk'.
+#
+# The file 'combine-parameters.template' provides good usage examples.
 combine:
 - lib:
     path: 'SetMe'
-    use_s3: 'SetMe'
-output_use_s3: 'SetMe'
+    data_source: 'SetMe'
 
 # Workflow directories
 # Note that files will be kept zipped all the way through.
@@ -40,24 +46,14 @@ log_path: "{{ runpath }}/logs"
 # Directory for nextflow work files
 next_path: "{{ runpath }}/nextflow"
 
-# The (AWS S3) location of extract data
-bucket_in_1: im-fragnet
-# AWS credentials for bucket access
-aws_access_key_in_1: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
-aws_secret_key_in_1: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
-
-# The (AWS S3) location of extract data
-bucket_in_2: im-fragnet
-# AWS credentials for bucket access
-aws_access_key_in_2: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
-aws_secret_key_in_2: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
-
-# The (AWS S3) location of output extract data
-bucket_out: im-fragnet
-# Set if data written to the bucket requires encryption.
-bucket_out_requires_encryption: no
-# AWS credentials for bucket access
-aws_access_key_out: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
-aws_secret_key_out: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
-
-aws_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
+# Destination?
+# One of 's3' or 'disk'.
+output_destination: s3
+# The S3 location for the destination of extracted data
+# Used if 'output_destination' is 's3'
+s3_out_bucket: im-fragnet
+s3_out_bucket_requires_encryption: no
+s3_out_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+s3_out_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+s3_out_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
+s3_out_url: "{{ lookup('env', 'S3_URL') }}"

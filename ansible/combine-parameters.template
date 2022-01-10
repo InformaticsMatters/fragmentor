@@ -8,15 +8,16 @@
 # Vendors to be combined will come from a single or combination database that
 # is available on S3. Combinations will be added to a new combination database.
 # A map of defaults based on the vendor and library.
-
-# The (AWS S3) locations are stored in the combine/defaults/main.yaml file
-# Two input locations and one output location are defined in the current
-# configuration as an example. The default access keys are provided as
-# external parameters to the script. These are currently defined as:
-#   AWS_ACCESS_KEY_ID
-#   AWS_SECRET_ACCESS_KEY
-# To set these to different values add/set new parameters for
-# aws_access_key_in_2 and aws_secret_key_in_2.
+#
+# When combining libraries the map contains a list of paths
+# that can either be sourced from 'disk' or 's3'. When the source is S3
+# you can provide individual buckets, access credentials and S3 hosts
+# (ie. the source of the combination can come from multiple locations).
+# If you only have one S3 bucket then the access keys, URL and region
+# will all be the same.
+#
+# If using AWS S3 you typically set the s3_url to an empty string ('').
+# The blank URL informs the playbook we're using AWS.
 
 combine:
 - lib:
@@ -25,24 +26,33 @@ combine:
 - lib:
     path: 'extract/xchem_spot/v1'
     data_source: s3
-    bucket: "{{ bucket_in_1 }}"
-    aws_access_key: "{{ aws_access_key_in_1 }}"
-    aws_secret_key: "{{ aws_secret_key_in_1 }}"
+    s3_bucket: im-fragnet
+    s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+    s3_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+    s3_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
+    s3_url: "{{ lookup('env', 'S3_URL') }}"
 - lib:
     path: 'extract/xchem_probe/v1'
     data_source: s3
-    bucket: "{{ bucket_in_2 }}"
-    aws_access_key: "{{ aws_access_key_in_2 }}"
-    aws_secret_key: "{{ aws_secret_key_in_2 }}"
+    s3_bucket: im-fragnet
+    s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+    s3_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+    s3_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
+    s3_url: "{{ lookup('env', 'S3_URL') }}"
 
 # The path_out parameter defines the sub-directory in "combinations"
 # that will be used for the output.
 path_out: 'xchem_combi_20200715'
 
-# data_source_out: disk
-
-# If you need to use a different bucket for the combination
-# and/or different AWS credentials you can yse the following variables: -
-#bucket_out: my-bucket
-#aws_access_key_out: 0000000
-#aws_secret_key_out: 0000000
+# The destination of the combination is one of 's3' or 'disk'.
+# The S3 destination bucket and URL can be different from the combination source.
+# So you can com,bine from multiple sources and write to a different
+# destination if you wish.
+output_destination: s3
+# Variables required if the destination is 's3': -
+s3_out_bucket: im-fragnet
+s3_out_bucket_requires_encryption: no
+s3_out_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+s3_out_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+s3_out_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
+s3_out_url: "{{ lookup('env', 'S3_URL') }}"

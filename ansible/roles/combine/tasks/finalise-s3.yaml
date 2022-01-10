@@ -1,20 +1,22 @@
 ---
 
 # All the things to do when the processing is complete.
-# This essentially means
-# 1. Creating a loader file for the nodes and edges files in a similar way to the extract play. This involves using
-#    the same header files.
+# This essentially means: -
+# 1. Creating a loader file for the nodes and edges files in a similar way
+#    to the extract play. This involves using the same header files.
 # 2. Saving the combined extract back to S3
 # 3. Saving log files from the combination
 # 4. Tidying up the remaining files.
 #
-# For the loadfile, the assumption is that a combination has been done and a number of compressed (.gz) node and edge
-# (relationship) files exist on the {{ combine }} directory. The essential property of the extracted files is that
-# their file-names contain the text 'nodes' or 'edges' (but not both) and they end '.gz'.
+# For the loadfile, the assumption is that a combination has been done
+# and a number of compressed (.gz) node and edge (relationship) files exist
+# on the {{ combine }} directory. The essential property of the extracted
+# files is that their file-names contain the text 'nodes' or 'edges'
+# (but not both) and they end '.gz'.
 #
-# Every '.gz' file we expect to find must have a corresponding 'header-' file in extract role's 'files' directory.
-# So, if there's an 'x.csv.gz' in the extract there must be a 'header-x.csv' in 'extract/files'.
-#
+# Every '.gz' file we expect to find must have a corresponding 'header-' file
+# in extract role's 'files' directory. So, if there's an 'x.csv.gz' in the
+# extract there must be a 'header-x.csv' in 'extract/files'.
 
 # List all the node files into ' node-files.txt'.
 # This is a 1-file-per-line list of extracted nodes.
@@ -107,7 +109,7 @@
   set_fact:
     files_found: "{{ find_result|json_query('files[*].path')|flatten }}"
 
-- name: Display files
+- name: Display files found
   debug:
     var: files_found
 
@@ -122,27 +124,32 @@
     debug:
       var: s3_object_path
 
-  - name: Transfer files to AWS
+  - name: Transfer files (AWS)
     aws_s3:
-      bucket: "{{ bucket_out }}"
-      encrypt: "{{ bucket_out_requires_encryption|bool }}"
+      bucket: "{{ s3_out_bucket }}"
+      aws_access_key: "{{ s3_out_access_key }}"
+      aws_secret_key: "{{ s3_out_secret_key }}"
+      encrypt: "{{ s3_out_bucket_requires_encryption|bool }}"
       src: "{{ item }}"
       object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
+      region: "{{ s3_out_region }}"
     loop: "{{ files_found }}"
-    when: s3_url|length == 0
+    when: s3_out_url|length == 0
 
-  - name: Transfer files to non-AWS
+  - name: Transfer files (non-AWS)
     aws_s3:
-      bucket: "{{ bucket_out }}"
-      encrypt: "{{ bucket_out_requires_encryption|bool }}"
+      bucket: "{{ s3_out_bucket }}"
+      aws_access_key: "{{ s3_out_access_key }}"
+      aws_secret_key: "{{ s3_out_secret_key }}"
+      encrypt: "{{ s3_out_bucket_requires_encryption|bool }}"
       src: "{{ item }}"
       object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
-      region: "{{ s3_region }}"
-      s3_url: "{{ s3_url }}"
+      region: "{{ s3_out_region }}"
+      s3_url: "{{ s3_out_url }}"
     loop: "{{ files_found }}"
-    when: s3_url|length > 0
+    when: s3_out_url|length > 0
 
   when: deployment == "production"
 
@@ -152,17 +159,17 @@
   args:
     chdir: "{{ log_path }}"
 
-- name: List files
+- name: List log files
   find:
     paths: "{{ log_path }}"
     patterns: '*.gz'
   register: find_result
 
-- name: Extract files
+- name: Extract log files
   set_fact:
     files_found: "{{ find_result|json_query('files[*].path')|flatten }}"
 
-- name: Display files
+- name: Display files found
   debug:
     var: files_found
 
@@ -177,27 +184,32 @@
     debug:
       var: s3_object_path
 
-  - name: Transfer log files to AWS
+  - name: Transfer log files (AWS)
     aws_s3:
-      bucket: "{{ bucket_out }}"
-      encrypt: "{{ bucket_out_requires_encryption|bool }}"
+      bucket: "{{ s3_out_bucket }}"
+      aws_access_key: "{{ s3_out_access_key }}"
+      aws_secret_key: "{{ s3_out_secret_key }}"
+      encrypt: "{{ s3_out_bucket_requires_encryption|bool }}"
       src: "{{ item }}"
       object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
+      region: "{{ s3_out_region }}"
     loop: "{{ files_found }}"
     when: s3_url|length == 0
 
-  - name: Transfer log files to non-AWS
+  - name: Transfer log files (non-AWS)
     aws_s3:
-      bucket: "{{ bucket_out }}"
-      encrypt: "{{ bucket_out_requires_encryption|bool }}"
+      bucket: "{{ s3_out_bucket }}"
+      aws_access_key: "{{ s3_out_access_key }}"
+      aws_secret_key: "{{ s3_out_secret_key }}"
+      encrypt: "{{ s3_out_bucket_requires_encryption|bool }}"
       src: "{{ item }}"
       object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
-      region: "{{ s3_region }}"
-      s3_url: "{{ s3_url }}"
+      region: "{{ s3_out_region }}"
+      s3_url: "{{ s3_out_url }}"
     loop: "{{ files_found }}"
-    when: s3_url|length > 0
+    when: s3_out_url|length > 0
 
   when: deployment == "production"
 

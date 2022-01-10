@@ -1,5 +1,5 @@
 ---
-# 1. Gets all the build files for all the builds to the data location
+# 1. Gets all the build files for all the builds to the data location
 # 2. Moves the files to the work location, remaining them accordingly according to the index.
 
 - name: Log line to report
@@ -10,7 +10,6 @@
       <h2>Step: Download Dataset</h2>
       <p>Start: {{ now(utc=True).isoformat() }}</p>
 
-# For each library id given in the parameters file, do some sanity checks
 - name: Validate input/Get source data for each extract
   include_tasks: get-extract-data-{{ item.lib.data_source }}.yaml
   loop: "{{ combine }}"

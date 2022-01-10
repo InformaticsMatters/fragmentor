@@ -52,7 +52,7 @@
     - deployment|string != 'SetMe'
     - "{{ combine[0].lib.path|string != 'SetMe'}}"
     - "{{ combine[0].lib.data_source|string != 'SetMe'}}"
-    - "{{ data_source_out|string != 'SetMe'}}"
+    - "{{ output_destination|string != 'SetMe'}}"
     - runpath|string|length > 0
     - runpath|string != 'SetMe'
     fail_msg: You must provide a 'deployment', a list of extracts in a parameter file to combine and an output location.
@@ -103,4 +103,4 @@
     block: |
       <p>Combine play ended on: {{ now(utc=True).isoformat() }}</p>
 
-- include_tasks: finalise-{{ data_source_out }}.yaml
+- include_tasks: finalise-{{ output_destination }}.yaml
