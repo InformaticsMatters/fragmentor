@@ -1,0 +1,11 @@
+---
+# The ansible unpack tasks - can be vendor specific
+unpacker: decompress-gz-all
+# Python script used to standardise the molecules
+standardiser: frag.standardise.scripts.dsip.standardise_xchem_compounds
+# Input file template (unzipped) expected by standardiser. If there are multiple files this can be a glob.
+standinputfile: Cys-Electrophile_DMSO.smi
+# Upload table template to match fields in standardised compounds.
+standardise_copy_table: i_mols_dsip
+# Fields to upload to table (used in copy statement).
+standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id
