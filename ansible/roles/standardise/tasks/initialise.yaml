@@ -72,6 +72,14 @@
     source_id: "{{ query_result.query_result[0].id }}"
   when: add_file|bool
 
+- name: Check vendor is known ({{ vendor }})
+  assert:
+    that:
+    - "'{{ vendor }}' in vendors"
+    fail_msg: >-
+      Vendor '{{ vendor }}' is not in the 'vendors' map.
+      Is this a new vendor?
+
 - name: Variable sanity-check
   assert:
     that:
