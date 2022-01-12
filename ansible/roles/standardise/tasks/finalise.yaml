@@ -9,7 +9,21 @@
     path: "{{ standpath }}/standardise/standardheader"
     state: absent
 
-- name: remove working files
+- name: Find working files
+  find:
+    paths: "{{ standpath }}/standardise"
+    pattrns: 'done-chunk_*'
+  register: wf_result
+
+- name: Expect working files (in {{ standpath }}/standardise)
+  assert:
+    that:
+    - wf_result.files|length > 0
+    fail_msg: >-
+      Expected to find working files (done-chunk_*).
+      Did standardise do anything?
+
+- name: Remove working files
   shell: rm done-chunk_*
   args:
     chdir: "{{ standpath }}/standardise"
