@@ -15,8 +15,8 @@ insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_nod
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_spot', NULL, 'Xchem-Spot','V_XSPOT');
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_probe', NULL, 'Xchem-Probe','V_XPROB');
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('sdf', NULL, 'SDF-File','V_SDF');
-insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem-leeds', NULL, 'Xchem-Leeds3D','V_XLEEDS');
-insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem-euopenscreen', NULL, 'Xchem-EUOpenScreen','V_XEUOPENSCR');
+insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_leeds', NULL, 'Xchem-Leeds3D','V_XLEEDS');
+insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_euopenscreen', NULL, 'Xchem-EUOpenScreen','V_XEUOPENSCR');
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_eubopendsipext', NULL, 'Xchem-EUbOpenDsipExt', 'V_XEUBOPEN');
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_cyselectrophile', NULL, 'Xchem-CysElectrophile','V_XCYSELEC');
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_covhet', NULL, 'Xchem-CovHet','V_XCOVHET');
