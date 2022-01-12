@@ -12,7 +12,7 @@
 - name: Find working files
   find:
     paths: "{{ standpath }}/standardise"
-    pattrns: 'done-chunk_*'
+    patterns: 'done-chunk_*'
   register: wf_result
 
 - name: Expect working files (in {{ standpath }}/standardise)
