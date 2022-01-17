@@ -112,9 +112,9 @@ hardware:
     # largest libraries (full enamine/molport load).
     # For role combine, ideally this might be increased
     # when combining large databases - otherwise there might be a timeout.
-    parallel_jobs: 100
-    cluster_cores: 100
-    postgres_jobs: 18
+    parallel_jobs: 500
+    cluster_cores: 500
+    postgres_jobs: 20
 
 # Vendor defaults.
 # A map of defaults based on the vendor and library.

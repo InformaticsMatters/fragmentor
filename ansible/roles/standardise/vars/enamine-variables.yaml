@@ -4,7 +4,7 @@ unpacker: decompress-gz-all
 # Python script used to standardise the molecules
 standardiser: frag.standardise.scripts.enamine.standardise_enamine_compounds
 # Input file template (unzipped) expected by standardiser. If there are multiple files this can be a glob.
-standinputfile: J*.smi
+standinputfile: x*.smi
 # Upload table template to match fields in standardised compounds.
 standardise_copy_table: i_mols_enamine
 # Fields to upload to table (used in copy statement).
