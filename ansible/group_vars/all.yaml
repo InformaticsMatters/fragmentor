@@ -113,7 +113,7 @@ hardware:
     # largest libraries (full enamine/molport load).
     # For role combine, ideally this might be increased
     # when combining large databases - otherwise there might be a timeout.
-    parallel_jobs: 6000
+    parallel_jobs: 100
     postgres_jobs: 20
 
 # Vendor defaults.
@@ -233,13 +233,13 @@ vendors:
   # For Rubens new library / per chunk
   enamine:
     approx_vendor_molecules: 50000000
-    est_total_fragmentation_time: 864000
+    est_total_fragmentation_time: 1440000
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
     indexchunksize: 300
-    index_build_time: 24000
+    index_build_time: 50000
   sdf:
     approx_vendor_molecules: 50
     est_total_fragmentation_time: 10
