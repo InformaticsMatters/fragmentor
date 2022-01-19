@@ -93,27 +93,27 @@ db_devices:
 
 # Hardware sizing - used to calculate size of chunks in standardization/fragmentation.
 # A map of variables based on deployment target.
+
+# Note that cluster_cores has been removed.
+# The size of the cluster is defined in the nextflow config which is
+# installed by the user on the machine used to run the jobs.
+# Something like /home/<user>/.nextflow./config
+
 hardware:
   development:
     # Parallel_jobs is used in calculating chunk sizes for processing -
-    # the normal assumption is that twice as many jobs are created as cores
-    # are used. If this is less than cluster_cores, then not all the cluster
-    # will be used. It is usually safe to set the parallel_jobs and
-    # cluster_cores to the same value.
+    # If this is less than cluster_cores, then not all the cluster
+    # will be used.
     parallel_jobs: 8
-    # Cluster cores is used in the nextflow_config.
-    # It defines the size of the cluster to use.
-    cluster_cores: 8
     # Number of connections to postgres -
     # note that this should be less than max_worker_processes in start-database.yaml.
     postgres_jobs: 6
   production:
-    # 100 parallel jobs/cores should be sufficient to process all but the
+    # 100 parallel jobs should be sufficient to process all but the
     # largest libraries (full enamine/molport load).
     # For role combine, ideally this might be increased
     # when combining large databases - otherwise there might be a timeout.
-    parallel_jobs: 500
-    cluster_cores: 500
+    parallel_jobs: 6000
     postgres_jobs: 20
 
 # Vendor defaults.
