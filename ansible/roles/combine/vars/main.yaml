@@ -32,7 +32,7 @@ deduplicate: [ '{{ neoedgefile }}', '{{ inchiidfile }}', '{{ molinchiedgefile }}
 # Otherwise the overhead of using the cluster is too great.
 # The code does a workcount on the input files. If linecount > threshold use whole cluster.
 shatterfiles_small: 80
-shatterfiles_large: "{{ hardware[deployment].cluster_cores }}"
+shatterfiles_large: "{{ hardware[deployment].parallel_jobs }}"
 shatterfile_large_threshold_kb: 1048576
 
 # The maximum execution time
