@@ -31,7 +31,7 @@
 - name: Check available cores
   assert:
     that:
-    - "{{ hardware[deployment].cluster_cores|int > 0 }}"
+    - "{{ hardware[deployment].parallel_jobs|int > 0 }}"
 
 # For each extract given in the parameters file, do some sanity checks
 - name: Check libraries to combine
