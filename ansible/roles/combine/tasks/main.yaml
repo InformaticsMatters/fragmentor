@@ -19,30 +19,42 @@
 # - deployment
 # - Parameter file file containing the libraries has been created.
 #
-#  e.g.
-#buckets:
-#     - s3-1:
-#        bucket: <bucket-name on s3>
-#        aws_access_key: '<access-key>'
-#        aws_secret_key: '<secret-key>'
+# e.g.
 #
-#extracts:
+# runpath: /data/fragmentor/xchem_combi_20220202
+# database_login_host: 130.246.214.154
+# clean_start: yes
+# clean_end: no
+# deployment: production
+#
+# hardware:
+#   production:
+#     postgres_jobs: 20
+#     parallel_jobs: 2500
+#
+# combine:
 #    - lib:
+#        path: 'extract/xchem_dsip/v2'
 #        path: 'xchem_dsip'
 #        data_source: disk
 #    - lib:
-#        path: 'xchem_spot'
+#        path: 'extract/xchem_spot/v2'
 #        data_source: s3
-#        bucket: s3-1
+#        s3_bucket: im-fragnet
+#        s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+#        s3_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+#        s3_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
+#        s3_url: "{{ lookup('env', 'S3_URL') }}"
+# path_out: 'xchem_combi_20220202'
+# output_destination: s3
+# s3_out_bucket: im-fragnet
+# s3_out_bucket_requires_encryption: no
+# s3_out_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+# s3_out_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+# s3_out_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
+# s3_out_url: "{{ lookup('env', 'S3_URL') }}"
 #
-## The name parameter defines the subdirector in "combinations" that will be used for the output.
-#output_name: 'xchem_combi_20200715'
-#output_data_source: disk
-#output_bucket: s3-1
-#
-#   ansible-playbook site-combine \
-#     -e @parameters \
-#     -e deployment=development|production
+# ansible-playbook site-combine -e @parameters
 #
 
 - name: Assert user-variable definitions

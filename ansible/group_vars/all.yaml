@@ -36,7 +36,7 @@ nextflow_container_tag: '1.0.8'
 # and a smaller value (typically 80% of the value you specify here)
 # used for the sort commands in the process.
 # Minimum value is 100.
-nextflow_process_sort_memory_m: 8192
+nextflow_process_sort_memory_m: 81920
 
 # Cloud provider for the database server.
 # Typically one of 'openstack' or 'aws'
@@ -233,13 +233,13 @@ vendors:
   # For Rubens new library / per chunk
   enamine:
     approx_vendor_molecules: 50000000
-    est_total_fragmentation_time: 1440000
+    est_total_fragmentation_time: 3880000
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
     indexchunksize: 300
-    index_build_time: 50000
+    index_build_time: 80000
   sdf:
     approx_vendor_molecules: 50
     est_total_fragmentation_time: 10
