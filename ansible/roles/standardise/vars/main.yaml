@@ -10,7 +10,7 @@ standardisation_mols_minute: 4500
 nextflow_timeout_calc: 0
 
 # Safety factor is used in case, for example, other processes are on the machine
-safety_factor: 5
+safety_factor: 50
 
 # Default nextflow parameters for development.
 # These are overwritten in production deployment based on the
