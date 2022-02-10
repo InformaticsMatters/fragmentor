@@ -62,7 +62,6 @@
     - "{{ database[deployment].port }}:5432"
     network_mode: host
   become: yes
-  become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Wait for database port
   wait_for:
