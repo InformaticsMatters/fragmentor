@@ -21,14 +21,13 @@
     append: yes
   become: yes
 
-#- name: Ensure required Python modules
-#  pip:
-#    name: "{{ item }}"
-#  loop:
-#  - docker
-#  - docker-py
-#  become: yes
-#  become_user: "{{ database[deployment].db_user_account }}"
+- name: Ensure required Python modules
+  pip:
+    name: "{{ item }}"
+  loop:
+  - docker
+  - docker-py
+  become: yes
 
 - name: Start database container
   docker_container:
