@@ -20,3 +20,11 @@ db_work_mem_m: 512
 # The max_wal_size size (Gi)
 # This is used to improve the speed of the write-ahead-log and relates to how the /pgwal volume is used.
 db_max_wal_size_g: 32
+
+# The play can be used to configure the hardware
+# (format volumes and mount them)
+# If you want to use this feature
+# ...and you know what you're doing,
+# ...and you know what this play will do
+# you can enable the hardware configuration: -
+configure_hardware: no
