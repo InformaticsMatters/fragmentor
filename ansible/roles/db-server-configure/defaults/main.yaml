@@ -7,16 +7,16 @@ db_container_tag: Release_2020_03
 # The DB shared_buffers size (Gi)
 # The deployment sets the container shm_mem to twice this value
 # so make sure your host has sufficient root-volume space.
-db_shared_buffers_g: 32
+db_shared_buffers_g: 64
 
 # Typically 75% of the number of cores
-db_max_parallel_workers: 24
+db_max_parallel_workers: 48
 
 # The DB work_mem (Mi)
 # Attention: a value of 256Mb corresponds to a maximum of about 28% memory usage with the nodes extraction query
 # assuming a # 32Gb shared buffer value. If this memory usage goes over 100%, queries may crash the database server.
-db_work_mem_m: 256
+db_work_mem_m: 512
 
 # The max_wal_size size (Gi)
 # This is used to improve the speed of the write-ahead-log and relates to how the /pgwal volume is used.
-db_max_wal_size_g: 16
+db_max_wal_size_g: 32
