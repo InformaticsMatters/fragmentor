@@ -4,6 +4,16 @@
   assert:
     that: deployment|string != 'SetMe'
 
+- name: Set DB user account
+  set_fact:
+    user_account: "{{ database[deployment].db_user_account }}"
+
+- name: Create database user account
+  user:
+    name: "{{ user_account }}"
+    groups: docker
+    append: yes
+
 - name: Ensure required Python modules
   pip:
     name: "{{ item }}"
@@ -11,7 +21,6 @@
   - docker
   - docker-py
   become: yes
-  become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Adding "{{ database[deployment].db_user_account }}" to docker group
   user:
@@ -19,7 +28,6 @@
     groups: docker
     append: yes
   become: yes
-  become_user: "{{ database[deployment].db_user_account }}"
 
 - name: Start database container
   docker_container:
