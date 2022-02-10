@@ -6,7 +6,10 @@
 
 - name: Ensure required Python modules
   pip:
-    name: docker-py
+    name: "{{ item }}"
+  loop:
+  - docker
+  - docker-py
   become: yes
   become_user: "{{ database[deployment].db_user_account }}"
 
