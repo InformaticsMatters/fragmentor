@@ -11,3 +11,8 @@
     append: yes
   become: yes
 
+- name: Get DB user home
+  shell: >
+    getent passwd {{ user }} | cut -d: -f6
+  changed_when: false
+  register: db_user_home

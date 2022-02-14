@@ -25,13 +25,18 @@
   pip:
     name: "{{ item }}"
   loop:
-  - docker
-  - docker-py
+  - docker-compose
   become: yes
 
-- name: Write compose file
+- name: Get DB user home
+  shell: >
+    getent passwd {{ user }} | cut -d: -f6
+  changed_when: false
+  register: db_user_home
+
+- name: Write compose file (to {{ db_user_home.stdout }})
   template:
     src: docker-compose.yaml.j2
-    dest: "{{ ansible_env.HOME }}/docker-compose.yaml"
+    dest: "{{ db_user_home.stdout }}/docker-compose.yaml"
   become: yes
   become_user: "{{ database[deployment].db_user_account }}"
