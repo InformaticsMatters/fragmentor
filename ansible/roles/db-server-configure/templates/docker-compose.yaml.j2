@@ -27,4 +27,3 @@ services:
     - "{{ database[deployment].copy_directory }}:{{ database[deployment].copy_directory }}"
     ports:
     - "{{ database[deployment].port }}:5432"
-    network_mode: host
