@@ -15,10 +15,6 @@ services:
       -c 'log_min_messages=notice'
       -c 'max_wal_size={{ db_max_wal_size_g }}GB'
     shm_size: "{{ db_shared_buffers_g|int * 2 }}G"
-    restart_policy:
-      condition: on-failure
-      delay: 5s
-      max_attempts: 5
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_USER: "{{ database[deployment].login_user }}"
