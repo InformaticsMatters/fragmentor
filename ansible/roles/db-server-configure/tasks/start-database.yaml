@@ -14,16 +14,16 @@
     groups: docker
     append: yes
 
-- name: Adding "{{ database[deployment].db_user_account }}" to docker group
+- name: Adding "{{ user_account }}" to docker group
   user:
-    name: "{{ database[deployment].db_user_account }}"
+    name: "{{ user_account }}"
     groups: docker
     append: yes
   become: yes
 
 - name: Get DB user home
   shell: >
-    getent passwd {{ user }} | cut -d: -f6
+    getent passwd {{ user_account }} | cut -d: -f6
   changed_when: false
   register: db_user_home
 
@@ -32,4 +32,4 @@
     src: docker-compose.yaml.j2
     dest: "{{ db_user_home.stdout }}/docker-compose.yaml"
   become: yes
-  become_user: "{{ database[deployment].db_user_account }}"
+  become_user: "{{ user_account }}"

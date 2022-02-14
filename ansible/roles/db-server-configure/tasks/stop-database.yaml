@@ -4,7 +4,11 @@
   assert:
     that: deployment|string != 'SetMe'
 
-- name: Adding "{{ database[deployment].db_user_account }}" to docker group
+- name: Set DB user account
+  set_fact:
+    user_account: "{{ database[deployment].db_user_account }}"
+
+- name: Adding "{{ user_account }}" to docker group
   user:
     name: "{{ database[deployment].db_user_account }}"
     groups: docker
@@ -13,6 +17,6 @@
 
 - name: Get DB user home
   shell: >
-    getent passwd {{ user }} | cut -d: -f6
+    getent passwd {{ user_account }} | cut -d: -f6
   changed_when: false
   register: db_user_home
