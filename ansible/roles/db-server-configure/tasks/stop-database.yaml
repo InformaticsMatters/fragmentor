@@ -11,9 +11,3 @@
     append: yes
   become: yes
 
-- name: Stop database container
-  docker_container:
-    name: db
-    state: stopped
-  become: yes
-  become_user: "{{ database[deployment].db_user_account }}"

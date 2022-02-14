@@ -1,0 +1,34 @@
+---
+version: '3.8'
+services:
+  db:
+    image: "{{ db_container_image }}:{{ db_container_tag }}"
+    command: >-
+      -c 'shared_buffers={{ db_shared_buffers_g }}GB'
+      -c 'work_mem={{ db_work_mem_m }}MB'
+      -c 'autovacuum_max_workers={{ db_max_parallel_workers }}'
+      -c 'max_worker_processes={{ db_max_parallel_workers }}'
+      -c 'max_parallel_workers={{ db_max_parallel_workers }}'
+      -c 'max_parallel_workers_per_gather={{ (db_max_parallel_workers|int / 2)|int }}'
+      -c 'synchronous_commit=off'
+      -c 'logging_collector=true'
+      -c 'log_min_messages=notice'
+      -c 'max_wal_size={{ db_max_wal_size_g }}GB'
+    shm_size: "{{ db_shared_buffers_g|int * 2 }}G"
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 5
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: "{{ database[deployment].login_user }}"
+      POSTGRES_PASSWORD: "{{ database[deployment].login_password }}"
+      POSTGRES_DB: "{{ database[deployment].db }}"
+      POSTGRES_INITDB_WALDIR: /var/lib/postgresql/wal/wal
+    volumes:
+    - "{{ db_devices['pg_data'].mount_path }}:/var/lib/postgresql/data"
+    - "{{ db_devices['pg_wal'].mount_path }}:/var/lib/postgresql/wal"
+    - "{{ database[deployment].copy_directory }}:{{ database[deployment].copy_directory }}"
+    ports:
+    - "{{ database[deployment].port }}:5432"
+    network_mode: host
