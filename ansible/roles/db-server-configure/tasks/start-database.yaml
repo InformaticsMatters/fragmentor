@@ -31,5 +31,13 @@
   template:
     src: docker-compose.yaml.j2
     dest: "{{ db_user_home.stdout }}/docker-compose.yaml"
+    mode: '0644'
+  become: yes
+  become_user: "{{ user_account }}"
+
+- name: Start DB
+  command: docker-compose up
+  args:
+    chdir: "{{ db_user_home.stdout }}"
   become: yes
   become_user: "{{ user_account }}"

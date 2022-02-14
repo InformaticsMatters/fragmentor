@@ -20,3 +20,10 @@
     getent passwd {{ user_account }} | cut -d: -f6
   changed_when: false
   register: db_user_home
+
+- name: Stop DB
+  command: docker-compose stop
+  args:
+    chdir: "{{ db_user_home.stdout }}"
+  become: yes
+  become_user: "{{ user_account }}"
