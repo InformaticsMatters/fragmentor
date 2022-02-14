@@ -21,13 +21,6 @@
     append: yes
   become: yes
 
-- name: Ensure required Python modules
-  pip:
-    name: "{{ item }}"
-  loop:
-  - docker-compose
-  become: yes
-
 - name: Get DB user home
   shell: >
     getent passwd {{ user }} | cut -d: -f6
