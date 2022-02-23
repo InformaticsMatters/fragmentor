@@ -18,4 +18,4 @@ fragpath: "{{ runpath }}"
 nextpath: "{{ runpath }}/nextflow"
 
 # When set to "yes" this will automatically back up the database at the end of the inchi play.
-add_backup: yes
+add_backup: no

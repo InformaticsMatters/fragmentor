@@ -1,5 +1,6 @@
 ---
-
+# The extract play can also be used to combine different libraries
+#
 # A template of the Parameter file that must be supplied for the extract playbook.
 # Please copy this to a file called parameters, edit the file and then...
 #

@@ -281,7 +281,6 @@ database_login_host: 130.246.214.154
 deployment: production
 runpath: /data/fragmentor/run-01
 clean_start: yes
-add_backup: no
 vendor: xchem_dsip
 version: v1
 extracts:
@@ -291,13 +290,14 @@ extracts:
     regenerate_index: yes
 hardware:
   production:
-    parallel_jobs: 8
-    cluster_cores: 8
-    sort_memory: 4GB
-    postgres_jobs: 8
+    parallel_jobs: 20
+    postgres_jobs: 400
 ```
 
-Armed with a parameter file, like the obe shown above,
+There is a template file with all the above settings and more explanation
+at: ansible/roles/run-parameters.template that you can copy.
+
+Armed with a parameter file, like the one shown above,
 the standardisation step is run as follows: -
 
     $ ansible-playbook site-standardise.yaml \
@@ -354,7 +354,10 @@ database_login_host: 130.246.214.154
 deployment: production
 runpath: /data/fragmentor/run-01
 clean_start: yes
-add_backup: no
+hardware:
+  production:
+    parallel_jobs: 20
+
 extracts:
 - lib:
     vendor: enamine_ro5
@@ -401,6 +404,10 @@ default (`s3`):
 database_login_host: 130.246.214.154
 deployment: production
 runpath: /data/fragmentor/run-01
+hardware:
+  production:
+    postgres_jobs: 400
+
 combine:
 - lib:
     path: xchem_dsip
@@ -424,6 +431,9 @@ path_out: xchem_combi_20200715
 
 data_source_out: disk
 ```
+
+There is a template file with all the above settings and more explanation
+at: ansible/roles/combine-parameters.template that you can copy.
 
 **Notes**
 

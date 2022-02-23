@@ -1,0 +1,73 @@
+---
+# A basic yaml template that can be used for running the standardise, fragment and
+# combine plays once a library has been configured.
+#
+# Please copy this to a file called something like 'parameters',
+# edit the file and then...
+# - Check that you are in the right environment and the correct S3 parameters
+# (https://discourse.squonk.it/t/running-the-fragmentor-stfc-dls/97)
+#
+# - ansible-playbook site-standardise.yaml -e @parameters
+# - ansible-playbook site-fragment.yaml -e @parameters
+# - ansible-playbook site-inchi.yaml -e @parameters
+# - ansible-playbook site-extract.yaml -e @parameters
+#
+
+# This just indicates to use various production deployment-related settings
+deployment: production
+
+# vendor/version:
+# The vendor needs to be set up in the vendors table. It is actually a
+# concatenation of the supplier and library names linked by a '_'.
+# The data has to be saved in a location based on the exact
+# vendor/library/version in S3 so the script can find it.
+# See the ReadMe in the repo for the file structure and more information.
+vendor: enamine
+version: jan2022-2
+
+# Runpath is for work files. It MUST have enough space for the nextflow files.
+# For our large enamine library, this has to be more than 4TB.
+runpath: /data/fragmentor/enamine_2
+
+# Location of database - relates to the file in host_vars.
+database_login_host: 130.246.214.154
+
+# clean_start will wipe most of the runpath. If you are debugging, then
+# set it to "no"
+clean_start: yes
+
+# The version is added to the source table by the standardise play
+# and is checked to see that the same library is not run twice.
+# It is also used by the other plays to make sure that the vendor step can be
+# processed.
+# This flag was created so that a second file can be added to an existing
+# version. If set to "yes" is bypasses the duplicate check in standardise.
+add_file: no
+
+hardware:
+  production:
+# This setting is for the size of the postgres datatabase machine
+# In the extract play it is used to set how many parallel jobs are used
+# to create the edge index. See the db-server-configure play for more details.
+    postgres_jobs: 40
+# This setting is for the approximate size of the cluster. It is used to
+# calculate chunk and timings in the nextflow jobs.
+# Note: If the cluster is bigger it may still use more cores as - for example -
+# the fragment play creates twice as many chunks to be processed as there
+# are parallel_jobs (ie. an average of 2 for each queue).
+    parallel_jobs: 2500
+
+# The filename of the input file to be standardised
+# This can be a glob if there are multiple files in the input directory
+standinputfile: x02.smi
+
+# The extract play can also combine libraries (although not as quickly as
+# the combine play). If so, you just add the ones you want to the list.
+extracts:
+- lib:
+    vendor: 'enamine'
+    version: 'jan2022-2'
+# Each extract is based on an index of edges that must be generated for the
+# library. If, however, you just want to rerun the existing extract for this
+# library, you can set this flag to 'no' and save a lot of time.
+    regenerate_index: yes
