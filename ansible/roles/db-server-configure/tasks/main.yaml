@@ -7,4 +7,5 @@
     - database_cloud_provider|string != 'SetMe'
 
 - import_tasks: configure-server-{{ database_cloud_provider }}.yaml
+  when: configure_hardware|bool
 - import_tasks: start-database.yaml

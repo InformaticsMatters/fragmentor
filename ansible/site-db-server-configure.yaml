@@ -5,15 +5,5 @@
 
 - hosts: dbservers[0]
   become: yes
-  vars:
-    pip_install_packages:
-    - name: docker
-
   roles:
-
-  - role: geerlingguy.pip
-    when: hostvars[inventory_hostname].ansible_distribution != 'Amazon'
-  - role: geerlingguy.docker
-    when: hostvars[inventory_hostname].ansible_distribution != 'Amazon'
-
   - role: db-server-configure

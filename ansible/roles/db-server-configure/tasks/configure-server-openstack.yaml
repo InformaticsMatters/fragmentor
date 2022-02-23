@@ -17,16 +17,6 @@
   assert:
     that: deployment|string != 'SetMe'
 
-- name: Set DB user account
-  set_fact:
-    user_account: "{{ database[deployment].db_user_account }}"
-
-- name: Create database user account
-  user:
-    name: "{{ user_account }}"
-    groups: docker
-    append: yes
-
 # Get the list of exiting mounts, present in the built-in 'ansible_mounts'
 # variable, which looks little like this...
 #
