@@ -8,9 +8,9 @@
 -- :START_ID(F2),:END_ID(F2),label,:TYPE
 --
 
-COPY (select distinct np.smiles, nc.smiles, label, 'FRAG'
-        from o_edge_parent os
-        join pg_class p on os.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
-        join nonisomol np ON np.id = os.parent_id
-        join nonisomol nc ON nc.id = os.child_id)
+COPY (select distinct np.smiles, nc.smiles, ed.label, 'FRAG'
+         From edge ed
+        Join o_node_index ono on ono.nonisomol_id = ed.parent_id
+        join nonisomol np ON np.id = ed.parent_id
+        join nonisomol nc ON nc.id = ed.child_id)
   TO '{{  NEOEDGEFILE }}' DELIMITER ',' CSV;

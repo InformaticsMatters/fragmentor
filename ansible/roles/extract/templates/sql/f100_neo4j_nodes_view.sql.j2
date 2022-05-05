@@ -1,0 +1,11 @@
+/*
+ * Deduplicate parent and child ids from edge index into single list view of all fragmented nodes.
+ * Includes fragmented molecules with no children.
+ */
+
+DROP MATERIALIZED VIEW if exists o_node_view;
+CREATE MATERIALIZED VIEW o_node_view AS
+   select os.nonisomol_id, np.smiles, np.hac, np.rac, np.ring_smiles, np.inchik, np.inchis, np.inchi_id
+     from o_node_parent os
+     join pg_class p on os.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
+     join nonisomol np ON np.id = os.nonsiomol_id;

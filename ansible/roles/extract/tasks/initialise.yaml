@@ -60,3 +60,8 @@
     state: directory
   loop:
   - "{{ reppath }}/sql"
+
+- name: (Re) create i_node_parent and refresh load procedure
+  postgresql_query:
+    path_to_script: "{{ role_path }}/files/f100-neo4j-prepare-node-index-extract.sql"
+    autocommit: yes
