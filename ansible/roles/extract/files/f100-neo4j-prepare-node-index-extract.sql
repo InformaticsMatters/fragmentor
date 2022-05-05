@@ -12,7 +12,7 @@
  *  in this table plus the extra records from mol_source where fragmentation produced no children.
  */
 
-create TABLE IF NOT EXISTS public.o_node_parent (
+create UNLOGGED TABLE IF NOT EXISTS public.o_node_parent (
     nonisomol_id integer,
     PRIMARY KEY (nonisomol_id)
 );
