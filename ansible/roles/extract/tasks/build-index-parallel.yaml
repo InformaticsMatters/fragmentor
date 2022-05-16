@@ -37,7 +37,7 @@
 - name: (Re) create o_existing_source_mols table
   postgresql_query:
     query: >-
-      drop table if exists public.drop table o_existing_source_mols;
+      drop table if exists public.o_existing_source_mols;
       create UNLOGGED table o_existing_source_mols as 
       (select distinct m.nonisomol_id from mol_source m 
          join nonisomol n on n.id = m.nonisomol_id and n.child_count notnull 
