@@ -8,4 +8,4 @@ CREATE MATERIALIZED VIEW o_node_view AS
    select os.nonisomol_id, np.smiles, np.hac, np.rac, np.ring_smiles, np.inchik, np.inchis, np.inchi_id
      from o_node_parent os
      join pg_class p on os.tableoid = p.oid and p.relname in ({{ SOURCETABLES }})
-     join nonisomol np ON np.id = os.nonsiomol_id;
+     join nonisomol np ON np.id = os.nonisomol_id;
