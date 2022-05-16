@@ -10,7 +10,7 @@
 
 COPY (select distinct np.smiles, nc.smiles, ed.label, 'FRAG'
          From edge ed
-        Join o_node_index ono on ono.nonisomol_id = ed.parent_id
+        Join o_node_view ono on ono.nonisomol_id = ed.parent_id
         join nonisomol np ON np.id = ed.parent_id
         join nonisomol nc ON nc.id = ed.child_id)
   TO '{{  NEOEDGEFILE }}' DELIMITER ',' CSV;

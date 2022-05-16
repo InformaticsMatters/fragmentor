@@ -20,4 +20,4 @@
 
 - name: Add the index table name for this source_id to a list of the source tables involved in the extract
   set_fact:
-    source_table_lst: "{{ source_table_lst + ['_'.join(('o_edge',item.lib.vendor))] }}"
+    source_table_lst: "{{ source_table_lst + ['_'.join(('o_node_index',query_result.query_result[0].id))] }}"
