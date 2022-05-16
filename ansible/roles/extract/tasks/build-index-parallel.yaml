@@ -26,7 +26,7 @@
   postgresql_query:
     query: >-
       drop table if exists public.o_node_index_{{ source_id_lst[vendor_index] }};
-      create UNLOGGED TABLE public.o_node_index_{{ source_id_lst[vendor_index] }} (PRIMARY KEY (nonisomol_id)) inherits (o_node_parent);
+      create TABLE public.o_node_index_{{ source_id_lst[vendor_index] }} (PRIMARY KEY (nonisomol_id)) inherits (o_node_parent);
     autocommit: yes
   when:
   - item.lib.regenerate_index|bool
