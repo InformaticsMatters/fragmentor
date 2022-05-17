@@ -22,19 +22,35 @@
 
 # Create a child table for this vendor that inherits from o_edge_parent table.
 # The subsequent extracts can then use o_edge_parent as a basis for selecting data from multiple child tables.
-- name: (Re) create o_edge_<vendor> table
+- name: (Re) create o_node_<src> table
   postgresql_query:
     query: >-
-      drop table if exists public.o_edge_{{ item.lib.vendor }};
-      create TABLE public.o_edge_{{ item.lib.vendor }} (PRIMARY KEY (parent_id, child_id, label)) inherits (o_edge_parent);
+      drop table if exists public.o_node_index_{{ source_id_lst[vendor_index] }};
+      create TABLE public.o_node_index_{{ source_id_lst[vendor_index] }} (PRIMARY KEY (nonisomol_id)) inherits (o_node_parent);
     autocommit: yes
   when:
   - item.lib.regenerate_index|bool
   - drop_index_table|bool
 
+# Create a child table for this vendor that inherits from o_edge_parent table.
+# The subsequent extracts can then use o_edge_parent as a basis for selecting data from multiple child tables.
+- name: (Re) create o_existing_source_mols table
+  postgresql_query:
+    query: >-
+      drop table if exists public.o_existing_source_mols;
+      create UNLOGGED table o_existing_source_mols as 
+      (select distinct m.nonisomol_id from mol_source m 
+         join nonisomol n on n.id = m.nonisomol_id and n.child_count notnull 
+        where m.source_id = {{ source_id_lst[vendor_index] }});
+      alter table o_existing_source_mols add constraint o_existing_source_mols_pk  
+          primary key (nonisomol_id);
+    autocommit: yes
+  when:
+  - item.lib.regenerate_index|bool
+
 - name: Retrieve number of molecules to extract
   postgresql_query:
-    query: select count(*) from mol_source where source_id = {{ source_id_lst[vendor_index] }};
+    query: select count(*) from o_existing_source_mols;
     autocommit: no
   register: query_result
   when: item.lib.regenerate_index|bool
@@ -111,11 +127,11 @@
 # Because we use 'async' and 'poll: 0' no task will block here,
 # it's run-and-move-on...
 
-- name: Run parallel extract_o_edge_vendor jobs asynchronously
+- name: Run parallel extract_o_node_index_src jobs asynchronously
   postgresql_query:
     query: >-
-      call extract_o_edge_vendor({{ source_id_lst[vendor_index] }}, {{ vendors[item.lib.vendor].indexchunksize }},
-      {{ job_queue.offset }}, {{ job_queue.limit }}, 'o_edge_{{ item.lib.vendor }}' );
+      call extract_o_node_index_src({{ source_id_lst[vendor_index] }}, {{ vendors[item.lib.vendor].indexchunksize }},
+      {{ job_queue.offset }}, {{ job_queue.limit }}, 'o_node_index_{{ source_id_lst[vendor_index] }}' );
     autocommit: yes
   async: "{{ index_timeout_minutes|int * 60 }}"
   poll: 0

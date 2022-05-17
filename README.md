@@ -33,9 +33,37 @@ The libraries currently supported are as follows:
 - Molport
 - Chemspace: bb
 - Enamine: ro5
+- Enamine: Ruben's extract (see Important Issues below)
 - sdf (generic)
 
 Further datasets are planned.
+
+## Important Issues
+
+During the database reconstruction the Fragmentor was used in a slightly 
+different way highlighting two manual actions that must be performed in the 
+process. These are discussed in detail in sc-2829: https://app.shortcut.com/informaticsmatters/story/2829/fragmentor-process-bug-fixes-and-necessary-changes
+
+In short:
+1. Xchem standardisation python script - If you process the new enamine (or other XCHEM libraries), it uses
+the xchem standardisation python script is used and the ID prefix defaults to "XCHEM" 
+- so you have to update the mol_source records to have the correct ID for the graph to
+work as the ID in graph must be unique. 
+For example: 
+```commandline
+Begin work; 
+UPDATE mol_source SET code = replace(code, 'XCHEM:', 'XCHEM-DISP') where code like 'XCHEM:%' and  source_id = 3;  
+select * from mol_source where source_id = 3 limit 5; 
+select count(*) from mol_source where code like 'XCHEM:%' and  source_id = 3; 
+commit work; 
+```
+
+2. Combination of libraries with different source_id's for the same vendor
+As enamine was so large, it was split into 5 with files run through the process
+individually. When these files are combined at the end (using site-combine),
+the supplier-nodes file has duplicate records that will cause problems in the graph.
+The simplest fix is to modifiy the the supplier-nodes.csv file after it has
+been generated to just take the first of the enamine supplier nodes records ('REAL')
 
 **Notes**
 

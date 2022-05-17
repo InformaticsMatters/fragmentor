@@ -4,6 +4,8 @@
 # This runs a single index build process - kept in case there is a problem with the parallel process or the database
 # cannot support parallel connections.
 
+# NB NOT UPDATED FOR NODE INDEX
+
 - name: Display vendor
   debug:
     msg: "{{ item.lib.vendor }}"
