@@ -39,13 +39,11 @@ longer be used. It needs two fixes:
 So anyway, here I'm just creating the table for the index for source 15:
 
 ```
-create UNLOGGED TABLE public.o_node_index_15 (
+create TABLE public.o_node_index_15 (
     nonisomol_id integer NOT NULL,
     CONSTRAINT "o_node_index_15_pkey" PRIMARY KEY (nonisomol_id)
 );
 ```
-
-Making this table UNLOGGED is supposed to double the insert speed, see sc-2830
 
 ## Step 3: Extract node index
 

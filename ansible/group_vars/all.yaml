@@ -210,7 +210,7 @@ vendors:
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
-    indexchunksize: 2000
+    indexchunksize: 5000
     index_build_time: 480
   molport:
     approx_vendor_molecules: 8000000
@@ -219,7 +219,7 @@ vendors:
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
-    indexchunksize: 300
+    indexchunksize: 3000
     index_build_time: 4320
   enamine_ro5:
     approx_vendor_molecules: 40000000
@@ -228,7 +228,7 @@ vendors:
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
-    indexchunksize: 300
+    indexchunksize: 3000
     index_build_time: 17280
   # For Rubens new library / per chunk
   enamine:
@@ -238,7 +238,7 @@ vendors:
     fraghac: 36
     fragmaxfrags: 12
     fraglimit: 0
-    indexchunksize: 300
+    indexchunksize: 3000
     index_build_time: 80000
   sdf:
     approx_vendor_molecules: 50
