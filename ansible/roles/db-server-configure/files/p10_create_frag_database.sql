@@ -52,15 +52,8 @@ drop table IF EXISTS i_node;
 
 drop table IF EXISTS i_edge;
 
-drop table IF EXISTS o_edge_sdf;
-drop table IF EXISTS o_edge_xchem_dsip;
-drop table IF EXISTS o_edge_chemspace_bb;
-drop table IF EXISTS o_edge_enamine_ro5;
-drop table IF EXISTS o_edge_molport;
-drop table IF EXISTS o_edge_xchem_probe;
-drop table IF EXISTS o_edge_xchem_spot;
-drop table IF EXISTS o_edge_parent;
-
+drop table IF EXISTS o_edge_parent CASCADE;
+drop table IF EXISTS o_node_parent CASCADE;
 
 /*
  * Regenerate database 
