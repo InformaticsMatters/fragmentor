@@ -1,5 +1,4 @@
 ---
-
 # Check that required command line parameters have been set:
 # - deployment
 # - Parameter file file containing vendor(s) and version(s) has been created.
@@ -75,5 +74,5 @@
       login_password: "{{ database[deployment].login_password }}"
 
 # Final destination depends on whether database is prod/dev.
-# - import_tasks: neo4j-production.yaml
-#  when: deployment=="production"
+  - import_tasks: neo4j-production.yaml
+    when: deployment=="production"

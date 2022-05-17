@@ -59,4 +59,3 @@ BEGIN
         end if;
     END LOOP;
 end $nodes$ ;
-
