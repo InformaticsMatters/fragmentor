@@ -38,12 +38,11 @@
   postgresql_query:
     query: >-
       drop table if exists public.o_existing_source_mols;
-      create UNLOGGED table o_existing_source_mols as 
+      create UNLOGGED table o_existing_source_mols as
       (select distinct m.nonisomol_id from mol_source m 
-         join nonisomol n on n.id = m.nonisomol_id and n.child_count notnull 
-        where m.source_id = {{ source_id_lst[vendor_index] }});
-      alter table o_existing_source_mols add constraint o_existing_source_mols_pk  
-          primary key (nonisomol_id);
+      join nonisomol n on n.id = m.nonisomol_id and n.child_count notnull
+      where m.source_id = {{ source_id_lst[vendor_index] }});
+      alter table o_existing_source_mols add constraint o_existing_source_mols_pk primary key (nonisomol_id);
     autocommit: yes
   when:
   - item.lib.regenerate_index|bool

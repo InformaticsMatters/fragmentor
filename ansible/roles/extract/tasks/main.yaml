@@ -1,4 +1,5 @@
 ---
+
 # Check that required command line parameters have been set:
 # - deployment
 # - Parameter file file containing vendor(s) and version(s) has been created.
