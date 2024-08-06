@@ -66,7 +66,7 @@
     dev: "{{ item.value.device }}"
   loop: "{{ lookup('dict', db_devices) }}"
   when:
-  - item.value.device | string | length > 0
+  - item.value.device
   - item.value.device not in mounted_devices
 
 # Now create a dictionary of device names (/dev/vda)
@@ -112,5 +112,5 @@
     state: mounted
   loop: "{{ lookup('dict', db_devices) }}"
   when:
-  - item.value.device | string | length > 0
+  - item.value.device
   - item.value.device not in mounted_devices
