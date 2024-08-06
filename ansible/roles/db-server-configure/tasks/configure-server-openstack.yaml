@@ -99,6 +99,8 @@
   with_together:
   - "{{ device_names }}"
   - "{{ device_uuids }}"
+  when:
+  - item.1
 
 - name: Display device UUID dictionary
   debug:
