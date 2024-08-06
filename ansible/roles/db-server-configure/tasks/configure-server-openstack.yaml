@@ -61,7 +61,9 @@
     fstype: ext4
     dev: "{{ item.value.device }}"
   loop: "{{ lookup('dict', db_devices) }}"
-  when: item.value.device not in mounted_devices
+  when:
+  - item.value.device | string | length > 0
+  - item.value.device not in mounted_devices
 
 # Now create a dictionary of device names (/dev/vda)
 # against device UUID (c55fbb69-46b5-432e-a222-59ef5531923f)
@@ -105,4 +107,6 @@
     fstype: ext4
     state: mounted
   loop: "{{ lookup('dict', db_devices) }}"
-  when: item.value.device not in mounted_devices
+  when:
+  - item.value.device | string | length > 0
+  - item.value.device not in mounted_devices

@@ -1,0 +1,15 @@
+---
+# The new production DB server's database,
+# WAL and backup volume devices, and mount-points
+# If the device is empty then a filesystem is not created, i.e. just the mount_path is created,
+# used when the the device is the system's root volume.
+db_devices:
+  pg_data:
+    device:
+    mount_path: /pgdata
+  pg_wal:
+    device:
+    mount_path: /pgwal
+#  pg_backup:
+#    device: /dev/vdf
+#    mount_path: /pgdata-backup

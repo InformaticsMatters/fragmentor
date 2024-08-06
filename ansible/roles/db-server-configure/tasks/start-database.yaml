@@ -36,7 +36,7 @@
   become_user: "{{ user_account }}"
 
 - name: Start DB
-  command: /usr/local/bin/docker-compose up -d
+  command: docker compose up -d
   args:
     chdir: "{{ db_user_home.stdout }}"
   become: yes
