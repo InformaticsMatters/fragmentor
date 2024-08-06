@@ -46,6 +46,10 @@
   debug:
     var: mounted_devices
 
+- name: Set DB user account
+  set_fact:
+    user_account: "{{ database[deployment].db_user_account }}"
+
 - name: Create DB volume mount paths
   file:
     path: "{{ item.value.mount_path }}"
