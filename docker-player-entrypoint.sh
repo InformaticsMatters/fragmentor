@@ -63,6 +63,12 @@ kubectl config set-context --current --namespace="${FRAGMENTOR_NAMESPACE}"
 
 # All set - run the playbook (ignoring but capturing any failure)...
 
+echo "+> psql version..."
+psql --version
+
+echo "+> Ansible version..."
+ansible --version
+
 PLAYBOOK="site-${FRAGMENTOR_PLAY}.yaml"
 echo "+> Playing ${PLAYBOOK}..."
 pushd ansible || exit 1
