@@ -7,12 +7,13 @@
 FROM python:3.8.6-buster
 LABEL maintainer="Tim Dudgeon<tdudgeon@informaticsmatters.com>"
 ARG NF_VERSION=20.10.0
+ARG KUBECTL_VERSION=1.23.16
 
 USER root
 
 # Force the binary layer of the stdout and stderr streams
 # to be unbuffered
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
 # Install Java (required by nextflow)
 RUN apt-get update -y && \
@@ -35,11 +36,9 @@ RUN apt-get install -y \
         apt-transport-https \
         curl \
         gnupg2 && \
-    curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list && \
-    apt-get update -y && \
-    apt-get install -y \
-        kubectl
+    curl -LO https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl && \
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
 # A file for the kubernetes config.
 # This will be mapped into the container via a Kubernetes ConfigMap
 # as '~/.kube/config' and copied to '~/kubeconfig' as the container starts.
@@ -47,7 +46,7 @@ RUN apt-get install -y \
 # get...
 #   error: open /root/.kube/config.lock: read-only file system
 # ...when using kubectl.
-ENV KUBECONFIG ${HOME}/kubeconfig
+ENV KUBECONFIG=${HOME}/kubeconfig
 
 # Install PSQL (for the psql command).
 # See https://www.postgresql.org/download/linux/debian/
