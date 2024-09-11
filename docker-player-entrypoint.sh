@@ -66,6 +66,9 @@ kubectl config set-context --current --namespace="${FRAGMENTOR_NAMESPACE}"
 echo "+> psql version..."
 psql --version
 
+echo "+> pip list..."
+pip list
+
 echo "+> Ansible version..."
 ansible --version
 
