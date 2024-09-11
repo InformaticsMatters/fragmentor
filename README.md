@@ -871,6 +871,25 @@ Removing the environment:
 
     $ conda env remove --name fragmentor
 
+# Building the "player" image
+The player image, produced by `Dockerfile-player` is used by the [fragmentor-ansible]
+respository for execution of the playbooks in this reposity using an image
+of this repository's content in Kubernetes.
+
+To build the player image you will need to
+build and push the image from this dockerfile: -
+
+    $ docker build . -f Dockerfile-player \
+        -t informaticsmatters/fragmentor-player:latest \
+        --push
+
+Or, an Intel image on Apple/ARM silicon using `buildx`: -
+
+    $ docker buildx build . -f Dockerfile-player \
+        --platform linux/amd64 \
+        -t informaticsmatters/fragmentor-player:latest \
+        --push
+
 ---
 
 [ssh-agent]: https://www.ssh.com/ssh/agent
