@@ -46,6 +46,10 @@
   debug:
     var: mounted_devices
 
+- name: Set DB user account
+  set_fact:
+    user_account: "{{ database[deployment].db_user_account }}"
+
 - name: Create DB volume mount paths
   file:
     path: "{{ item.value.mount_path }}"
@@ -61,7 +65,9 @@
     fstype: ext4
     dev: "{{ item.value.device }}"
   loop: "{{ lookup('dict', db_devices) }}"
-  when: item.value.device not in mounted_devices
+  when:
+  - item.value.device
+  - item.value.device not in mounted_devices
 
 # Now create a dictionary of device names (/dev/vda)
 # against device UUID (c55fbb69-46b5-432e-a222-59ef5531923f)
@@ -93,6 +99,9 @@
   with_together:
   - "{{ device_names }}"
   - "{{ device_uuids }}"
+  when:
+  - item.0
+  - item.1
 
 - name: Display device UUID dictionary
   debug:
@@ -105,4 +114,6 @@
     fstype: ext4
     state: mounted
   loop: "{{ lookup('dict', db_devices) }}"
-  when: item.value.device not in mounted_devices
+  when:
+  - item.value.device
+  - item.value.device not in mounted_devices

@@ -9,9 +9,9 @@
 
 Optimisation of fragmentation process through the use of a postgres database
 to previously already fragmented data. This will allow delta changes to an
-existing database rather than having to completely re-fragment the input files - 
+existing database rather than having to completely re-fragment the input files -
 speeding up the loading of extracts to the Neo4j database used by
-fragment search. 
+fragment search.
 
 >   For kubernetes execution of the fragmentation process refer to our
     [fragmentor-ansible] repository, which contains a playbook that
@@ -21,12 +21,12 @@ fragment search.
 Summary of Contents:
 
 -   Ansible playbooks to populate the database: standardisation, fragmentation
-    and inchi creation. 
+    and inchi creation.
 -   A playbook to extract datasets of single and combinations of vendors from
     the database for import into the Fragnet Search Neo4j database.
 -   A playbook to combine different extracted datasets
     (from, say, different databases) to create new Fragnet search Neo4j databases.
--   Playbooks are also provided to create, start, stop, and backup the database. 
+-   Playbooks are also provided to create, start, stop, and backup the database.
 
 The libraries currently supported are as follows:
 - Xchem: dsip, probing library, spotfinder
@@ -40,22 +40,22 @@ Further datasets are planned.
 
 ## Important Issues
 
-During the database reconstruction the Fragmentor was used in a slightly 
-different way highlighting two manual actions that must be performed in the 
+During the database reconstruction the Fragmentor was used in a slightly
+different way highlighting two manual actions that must be performed in the
 process. These are discussed in detail in sc-2829: https://app.shortcut.com/informaticsmatters/story/2829/fragmentor-process-bug-fixes-and-necessary-changes
 
 In short:
 1. Xchem standardisation python script - If you process the new enamine (or other XCHEM libraries), it uses
-the xchem standardisation python script is used and the ID prefix defaults to "XCHEM" 
+the xchem standardisation python script is used and the ID prefix defaults to "XCHEM"
 - so you have to update the mol_source records to have the correct ID for the graph to
-work as the ID in graph must be unique. 
-For example: 
+work as the ID in graph must be unique.
+For example:
 ```commandline
-Begin work; 
-UPDATE mol_source SET code = replace(code, 'XCHEM:', 'XCHEM-DISP') where code like 'XCHEM:%' and  source_id = 3;  
-select * from mol_source where source_id = 3 limit 5; 
-select count(*) from mol_source where code like 'XCHEM:%' and  source_id = 3; 
-commit work; 
+Begin work;
+UPDATE mol_source SET code = replace(code, 'XCHEM:', 'XCHEM-DISP') where code like 'XCHEM:%' and  source_id = 3;
+select * from mol_source where source_id = 3 limit 5;
+select count(*) from mol_source where code like 'XCHEM:%' and  source_id = 3;
+commit work;
 ```
 
 2. Combination of libraries with different source_id's for the same vendor
@@ -67,16 +67,16 @@ been generated to just take the first of the enamine supplier nodes records ('RE
 
 **Notes**
 
--   Standardise and fragmentation code based on the Fragalysis Repository 
+-   Standardise and fragmentation code based on the Fragalysis Repository
 -   Nextflow scripts are used to control a cluster for Standardisation,
     Fragmentation, Inchi calculation and combine plays.
 -   The scripts contain parameter controlled chunking of input files at various
     stages to control and optimise throughput to the sql
-    database. This can be tuned to the hardware/cluster.   
+    database. This can be tuned to the hardware/cluster.
 -   Processing normally starts and ends with an AWS S3 repository -
-    assumed to contain the smiles data from vendors to be imported 
+    assumed to contain the smiles data from vendors to be imported
     into the process and will be the destination for Neo4j compatible
-    extract files - and where they can be picked up by Fragnet Search.  
+    extract files - and where they can be picked up by Fragnet Search.
 
 ## Building the images
 The images are built by the Travis CI/CD process. Review the `.travis.yml`
@@ -85,7 +85,7 @@ the images for local experimentation.
 
 ## Playbook preparation
 For the production configuration, it is assumed that the user has access to
-a cluster and that the following instructions would be run on the head node.  
+a cluster and that the following instructions would be run on the head node.
 
 It is always worth running the playbooks from within your own Python
 environment, to avoid disturbing the system Python: -
@@ -102,7 +102,7 @@ Install requirements: -
 
     $ pip install -r requirements.txt
     $ ansible-galaxy install -r requirements.yaml
-    
+
 Some ansible playbook postgres tasks require the postgres client (psql)
 to be installed on the head machine. Details can be found at
 https://www.postgresql.org/download/linux/redhat/
@@ -125,6 +125,13 @@ AWS: -
 
     $ export S3_URL=<Non-AWS S3 Sevrvide Endpoint/URL>
 
+The playbooks will use `psql` commands to interact with the database, so you
+must ensure that the control host has access to `psql`. For ubuntu this can
+be satisfied by installing an appropriate client: -
+
+    $ sudo apt install postgresql-client-common
+    $ sudo apt-get install postgresql-client -y
+
 Now navigate to the ansible Project's ansible directory: -
 
     $ cd ansible
@@ -142,10 +149,11 @@ If the following works you should be able to run the project playbooks: -
 ### Openstack
 If using the **OpenStack** cloud provider you will have to provide suitable
 production and backup servers - our playbooks do not create these
-physicals. The OpenStack deployment is experimental and assumes IP addresses
-(130.246.214.46 and 130.246.214.154).
+physicals.
 
->   If you want to deploy to OpenStack consult with us on server preparation. 
+>   If you want to deploy to OpenStack consult with us on server preparation.
+    Some basic installation notes can be found in this repository's
+    README-UBUNTU-DB-SERVER.md file.
 
 ### AWS EC2
 If you're using AWS a production server can be instantiated automatically.
@@ -153,7 +161,7 @@ You will need AWS credentials to allow general EC2 configuration and a set of
 parameters to define the server flavour: -
 
 You will need an AWS VPC and subnet.
- 
+
 ```yaml
 ---
 db_server_state: present
@@ -168,14 +176,14 @@ aws_vpc_id: <CLUSTER_VPC_ID>
 
 Now create the server: -
 
-    $ ansible-playbook site-db-server.yaml -e @parameters 
+    $ ansible-playbook site-db-server.yaml -e @parameters
 
 Adjust your parameters so that they include the address of the database server.
 You'll need this with other plays. The server's IP address is printed by the
 above play: -
 
     TASK [db-server : Display DB server address (Private IP)] *****************
-    Thursday 22 October 2020  18:54:00 +0000 (0:00:00.048)       0:00:24.557 ** 
+    Thursday 22 October 2020  18:54:00 +0000 (0:00:00.048)       0:00:24.557 **
     ok: [localhost] => {
         "server_result.instances[0].private_ip": "10.0.0.192"
     }
@@ -189,43 +197,61 @@ database_login_host: 10.0.0.192
 Using the AWS console wait for the database server instance to become ready
 (initialise) before trying to create the database.
 
+## Adjust the Ansible inventory
+
+You may need to adjust your `ansible/inventory`
+to provide the address of your database server, as the default we have provided is unlikely
+to be of any use to you. You may also need to alter `ansible_user` and
+`ansible_ssh_private_key_file` to match your installation.
+You will also need to make matching changes to the 'inventory.yaml'
+
+From this point on you can create playbook paramters to match your installation in
+`ansible/parameters` (a YAML file). For example: -
+
+```yaml
+deployment: production
+database_cloud_provider: openstack
+database_login_host: 130.246.81.18
+configure_hardware: yes
+```
+
+The `deployment` parameter must be one of `development` or `production` to
+setup/use a production database instance or a separate local database
+instance.
+
+> The `parameters` file will be excluded by the project's `.gitignore` file.
+
 ## Creating the Postgres Database
 The database is created in a docker container. Configuring the production
 database server (a destructive action) is done via an ansible playbook.
-This playbook also pre-loads the `vendor_name` table in the database with 
-the vendor file types currently supported by the process. 
+This playbook also pre-loads the `vendor_name` table in the database with
+the vendor file types currently supported by the process.
 
-    $ ansible-playbook site-db-server-configure.yaml  \ 
-        -e deployment=<development|production> \
-        -e database_cloud_provider=<aws|openstack>
+    $ ansible-playbook site-db-server-configure.yaml -e @parameters
 
 >   You only really need to run the `site-db-server-configure` play once.
     It configures the server with Docker and runs the designated database
     image and then formats the initial DB.
 
-The `deployment` parameter, one of `development` or `production`
-the playbook to either set up a production instance or a separate development
-instance.
-
 >   Note that if there are automatic update jobs running that periodically
     stop servers (to install new software  for example), it may be prudent to
-    disable them and use alternative arrangements to prevent the database being 
+    disable them and use alternative arrangements to prevent the database being
     brought down when in use.
 
 Note that `site-db-server-configure` is primarily aimed at a production
 database instance. For development (local) a postgres container could be
-launched with a command something like:         
+launched with a command something like:
 
     $ docker run --shm-size=1g --name psql \
-        -v /home/user/project/postgresql/data:/var/lib/postgresql/data 
+        -v /home/user/project/postgresql/data:/var/lib/postgresql/data
         -e POSTGRES_PASSWORD=1234 \
         -p 5432:5432 \
         -d postgres:alpine \
-        -c 'logging_collector=true' 
+        -c 'logging_collector=true'
 
 In this case, an `extract` subdirectory directory must also be created within
 the `data` directory for the extract play to successfully run. This must
-have correct permissions so that ansible can write to it. 
+have correct permissions so that ansible can write to it.
 
 Example: navigate to the ansible directory
 
@@ -245,10 +271,10 @@ or
 **Examples**
 
 -   Data files for version `v1` of the `dsip` library for vendor `xchem`
-    should be placed in directory `xchem/dsip/v1` 
+    should be placed in directory `xchem/dsip/v1`
 
 -   Data files for version `2020-10` for vendor `Molport` (only one library)
-    should be placed in directory `molport/2020-10` 
+    should be placed in directory `molport/2020-10`
 
 The ansible playbook `site-extract` is configured to export datasets to a
 tree structure defined as:
@@ -257,16 +283,16 @@ For Neo4j extracts for individual vendor libraries: -
 
     <extract><vendor_library><version>
 
-For Neo4j extracts for combinations of vendor libraries: -  
+For Neo4j extracts for combinations of vendor libraries: -
 
     <combination><first vendor_library><date>
 
 **Examples**
 
 -   The Neo4j extract for version `v1` of the `dsip` library for vendor
-    `xchem` is exported to directory: `xchem_dsip/v1` 
+    `xchem` is exported to directory: `xchem_dsip/v1`
 -   The Neo4j extract for version `2020-10` for vendor `Molport`
-    (only one library) is exported to directory `molport/2020-10` 
+    (only one library) is exported to directory `molport/2020-10`
 -   The Neo4j extract for a combination of the above libraries run on 1/1/2020
     (assuming xchem is listed first in the request) is exported to directory
     `combination/xchem_dsip/2020-01-01`
@@ -274,13 +300,13 @@ For Neo4j extracts for combinations of vendor libraries: -
 ## Fragmentation Process Description
 The sequence diagram below shows the basic steps in the fragmentation process
 including a fragmentation database called FairMolecules. The advantage of the
-database approach is that each time a new dataset of molecules is provided by 
+database approach is that each time a new dataset of molecules is provided by
 the vendor, the relatively lightweight standardisation step must still be
 performed - but only new molecules will have to go through the hardware
-intensive fragmentation step.  
+intensive fragmentation step.
 
 -   The process is run by an operator. The operator configures the process and
-    place the input files in the correct location on AWS S3. 
+    place the input files in the correct location on AWS S3.
 -   The Controller is the head node where the fragmentor repository is installed.
     All Ansible playbooks are run from the head node.
 -   The Cluster is a Cluster-group used by nextflow for the standardisation,
@@ -288,10 +314,10 @@ intensive fragmentation step.
 -   FairMolecules is the postgres database containing standardisation and
     fragmentation data as well as indexes used by the extraction playbook.
     Extracted Neo4j datasets are uploaded from here back to S3 to complete the
-    process. 
+    process.
 -   Once a new library has been added to the database, processing to extract
     and combine datasets are done via the extract and combine plays.
-    See below for more details.      
+    See below for more details.
 
 ![Fragmentor Sequence Diagram](images/FragmentorSequence.png)
 
@@ -301,7 +327,7 @@ The process consists of three steps, described below:
 ### Standardisation
 It's easier to run playbooks using a YAML-based parameter file,
 where all the control variables can be set. A typical parameter file
-(`parameters.yaml`) might look like this: -
+(`parameters`) might look like this: -
 
 ```yaml
 ---
@@ -328,15 +354,13 @@ at: ansible/roles/run-parameters.template that you can copy.
 Armed with a parameter file, like the one shown above,
 the standardisation step is run as follows: -
 
-    $ ansible-playbook site-standardise.yaml \
-        -e @parameters.yaml
+    $ ansible-playbook site-standardise.yaml -e @parameters
 
 ### Fragmentation
 Armed with a parameter file,
 the fragmentation step is run as follows: -
 
-    $ ansible-playbook site-fragment.yaml \
-        -e @parameters.yaml
+    $ ansible-playbook site-fragment.yaml -e @parameters
 
 A fragmentation step would normally be processed directly after a
 standardisation step, but as this step is driven by the database it is
@@ -346,24 +370,23 @@ by a single fragmentation step.
 > Optional parameter add_backup: default: no
 
 If set to yes, this automatically backs up the database after the
-fragmentation play. 
+fragmentation play.
 
 ### Create Inchi Keys
 The Create Inchi step will identify any molecules that have not had inchi keys
 generated yet and process them. It is not vendor/library specific and can be
 run as follows:
 
-    $ ansible-playbook site-inchi.yaml \
-        -e @parameters.yaml
+    $ ansible-playbook site-inchi.yaml -e @parameters
 
 As this step is driven by the database it possible to run multiple
-standardisation/fragmentation steps for different 
+standardisation/fragmentation steps for different
 vendor/libraries followed by a single create inchi step.
 
 > Optional parameter add_backup: default: yes
 
 If set to yes, this automatically backs up the database after the Inchi play.
-Note that this defaults to "yes" as at 
+Note that this defaults to "yes" as at
 this stage the data import for a new library would be complete.
 
 ## Extract a Neo4j Dataset to S3.
@@ -372,7 +395,7 @@ this stage the data import for a new library would be complete.
 
 The Extract Neo4j Dataset playbook will create a dataset exportable to Neo4j
 containing either a single vendor or combination of vendors from information
-contained in the database. The export is based on parameters provided in a 
+contained in the database. The export is based on parameters provided in a
 parameter file containing vendor(s) and version(s) in the following example
 format:
 
@@ -400,13 +423,12 @@ extracts:
 The first time a library version is extracted, `regenerate_index` should be
 set to `yes` so that the index of edges for the latest library version can be
 regenerated. For subsequent runs (e.g. to extract combinations) it should be set to
-`no` for speed - for the larger vendors this can be a significant amount of time. 
+`no` for speed - for the larger vendors this can be a significant amount of time.
 A template (`extract-parameters.template`) is provided for this file.
 
 The command is:
 
-    $ ansible-playbook site-extract.yaml \
-        -e @parameters.yaml 
+    $ ansible-playbook site-extract.yaml -e @parameters
 
 ote that for the larger extracts to complete there needs to be sufficient
 temporary space on the postgres pgdata directory for the database queries to
@@ -478,48 +500,45 @@ input sources.
 For data source disk - files are expected (by default) to be in a directory
 called `extract` (configurable) in the `runpath`. If `data_source_out` is set
 to `disk`, then the combined extract will be available in the `combine`
-directory on the `runpath`. 
+directory on the `runpath`.
 
 The command is:
 
-    $ ansible-playbook site-combine.yaml \
-        -e @parameters.yaml
+    $ ansible-playbook site-combine.yaml -e @parameters
 
 ## Backing up and Restoring the Database
 The backup playbook can also be used in isolation from the other playbooks.
 It uses `pg_dumpall` to create a zipped copy of the complete database.
 The play will automatically clear up all versions of backups - the number
 of backups retained defaults to 2, but can be adjusted per database
-(the backup_count parameter in group_vars/all.yaml). 
+(the backup_count parameter in group_vars/all.yaml).
 
-Example: 
+Example:
 
-    $ ansible-playbook site-backup.yaml \
-        -e deployment=production 
+    $ ansible-playbook site-backup.yaml -e @parameters
 
 A backed up database can be restored with the restore playbook.
 It defaults to the latest saved backup. Other backups can be chosen by setting
 the optional restore_file parameter to the name of the file in the `hourly`
 folder.
 
-Examples: 
+Examples:
+
+    $ ansible-playbook site-restore.yaml -e @parameters
 
     $ ansible-playbook site-restore.yaml \
-        -e deployment=production
-    
-    $ ansible-playbook site-restore.yaml \
-        -e deployment=production \
+        -e @parameters \
         -e restore_file=backup-2020-07-23T16:12:56Z-dumpall.sql.gz
 
 Similarly there are playbooks to stop and start the database server.
-The postgres startup configuration items are set 
+The postgres startup configuration items are set
 up in the start-database playbook.
 
     $ ansible-playbook site-db-server-configure_stop-database.yaml \
-        -e deployment=production
-     
+        -e @parameters
+
     $ ansible-playbook site-db-server-configure_start-database.yaml \
-        -e deployment=production   
+        -e @parameters
 
 As an alternative to the pg_dump based backup and restore plays a simple
 backup play has also been created to copy the database volume to the backup
@@ -528,16 +547,15 @@ restarts the database: -
 
 Example: navigate to the ansible directory
 
-    $ ansible-playbook site-backup-copy.yaml \
-        -e deployment=production 
+    $ ansible-playbook site-backup-copy.yaml -e @parameters
 
 ## Tuning Parameters
 The file all.yaml contains the following parameters used to control the
-different steps of the process.  
+different steps of the process.
 
 >   Hardware sizing - used to calculate size of chunks in standardization/fragmentation.
     A map of variables based on deployment and should reflect the approximate
-    CPUs available on the machine/cluster and how many postgres parallel 
+    CPUs available on the machine/cluster and how many postgres parallel
     jobs that can be safely run. The second parameter is currently only used
     in building the index in the site-extract play.
 
@@ -608,19 +626,19 @@ vendors:
     deduplication vs record insertion and indicates how many source molecules are
     processed in memory before a database commit. The most efficient value appears
     to depend on how "clean" molecules are. For Molport and Enamine a value
-    around 300 has been found to be efficient, whereas for 
-    Chemspace it was possible to increase it to 2000.      
+    around 300 has been found to be efficient, whereas for
+    Chemspace it was possible to increase it to 2000.
 
 If you are required to request server-side encryption for S3 bucket `put`
 operations you can set the variable `bucket_requires_ecryption: yes` (or
 `bucket_out_requires_encryption: yes` during the combination play).
 
-## Database Sizing 
+## Database Sizing
 Numbers are given below were achieved using the maximum fragmentation cycles
-parameter set to 12. 
+parameter set to 12.
 
 | Vendor/Lib       | Version     | Molecules   | Nodes       |Edges        |
-| ---------------- | ----------- | ----------- | ----------- | ----------- | 
+| ---------------- | ----------- | ----------- | ----------- | ----------- |
 | Xchem_dsip       | v1          | 768         | 5099        | 14421       |
 | Molport          | 2020-02     | 7118865     | 104407052   | 582264651   |
 | Chemspace_bb     | December2019| 17257752    | 27265866    | 111716670   |
@@ -639,12 +657,12 @@ backup directories.
 
 ## FairMolecules Database Schema
 
-The diagram below shows the FairMolecules database schema: 
+The diagram below shows the FairMolecules database schema:
 
 ![FairMolecules Database](images/FairMoleculesDatabase.png)
 
 Tables beginning with “i_” (not shown) are used in the loading process and
-tables beginning with "o_" are used in the extract process. 
+tables beginning with "o_" are used in the extract process.
 
 ## Fragnet Model Neo4j Database Schema
 
@@ -653,20 +671,20 @@ tables beginning with "o_" are used in the extract process.
 ## Adding a new Vendor Library to the Repository
 
 The following steps summarize the changes required to add a new vendor
-library to the fragmentor ansible process:  
+library to the fragmentor ansible process:
 
 ### Repository Changes
 
 -   The new vendor/library details must be added to the vendor name table
     in the database. The load script in the site-configure role
     (configure/files/p10_load_config_data.sql) should be updated to reflect this.
-    
+
     For example:
 
 ```sql
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_spot', NULL, 'Xchem','V_XSPOT');
 ```
- 
+
 -   Folder changes must be made to add the new library in the data directory
     of the repository (subsequently matched on S3 directory) matching the
     structure given above. Note that the input file should be compressed with
@@ -676,7 +694,7 @@ insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_nod
 ```
   xchem/spot/v1/spotfinder.smi.gz
 ```
- 
+
 -   Group-vars. The overall configuration in ansible/group-vars/all.yaml
     requires a configuration for each vendor/library. For example:
 
@@ -704,22 +722,22 @@ unpacker: decompress-gz-all
 # Python script used to standardise the molecules
 standardiser: frag.standardise.scripts.dsip.standardise_xchem_compounds
 # Input file template (unzipped) expected by standardiser.
-# If there are multiple files this can be a glob. 
+# If there are multiple files this can be a glob.
 standinputfile: spotfinder.smi
-# Upload table template to match fields in standardised compounds. 
+# Upload table template to match fields in standardised compounds.
 standardise_copy_table: i_mols_dsip
-# Fields to upload to table (used in copy statement). 
+# Fields to upload to table (used in copy statement).
 standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id
 ```
- 
+
 -   Add a new vendor/library specific yaml task file to unpack the raw data
     if special processing is required (see chemspace for an example). If this
     is an existing format then the standard unpacker is referred to (as above).
 -   If the new vendor input file is the same as a current format, then an
     existing standardisation python script can be used. If the layout varies
     then more customisation is required. Please see below for more details on this.
--   Add a new create script for creating the i_mols_table 
-    (ansible/standardise/files/vendor/f40_create_stand_database.sql) and a newload script 
+-   Add a new create script for creating the i_mols_table
+    (ansible/standardise/files/vendor/f40_create_stand_database.sql) and a newload script
     (ansible/standardise/files/vendor/f40_load_standardised_data.sql) to upload
     this data into the database. If a new python script has been written,
     then please see the customisation section below. Otherwise, if this is an
@@ -731,7 +749,7 @@ standardise_copy_columns: osmiles,isosmiles,nonisosmiles,hac,cmpd_id
 -- Purpose: Creates fragmentation company specific tables. This is the same as the xchem_dsip library.
 DROP TABLE IF EXISTS i_mols_dsip;
 
--- Create i_mols        
+-- Create i_mols
 CREATE TABLE i_mols_dsip (
   osmiles TEXT,
   isosmiles TEXT,
@@ -742,7 +760,7 @@ CREATE TABLE i_mols_dsip (
   nonisomol_id INTEGER
 );
 ```
-- The site-fragment playbook should not require any specific changes apart from the fragmentation configuration 
+- The site-fragment playbook should not require any specific changes apart from the fragmentation configuration
  parameters in all.yaml.
 - The site-inchi playbook should not require any specific changes
 - The site-extract playbook should not require any specific changes.
@@ -756,31 +774,31 @@ CREATE TABLE i_mols_dsip (
     found by the fragmentor playbooks (see above).
 -   Pull the updated repository from the head node.
 
-### Further Customisation 
+### Further Customisation
 
 Some vendors (for example Molport and Chemspace) contain additional information
 in the input file, usually in the form of pricing information. Pricing
-information can be provided in different formats, so a flexible database layout 
+information can be provided in different formats, so a flexible database layout
 has been provided. However, additional steps are required:
 
 -   A specific standardisation module will need to be written to be able to
     read the additional columns. The standardisation python scripts are located
-    in frag/standardise/scripts/(vendor). They are all written in similar 
-    formats with the same input parameters as these are used in the ansible playbook. 
+    in frag/standardise/scripts/(vendor). They are all written in similar
+    formats with the same input parameters as these are used in the ansible playbook.
 -   Any additional columns added are passed through to new table separated
     fields in the staging file standardised-compounds.tab.
 -   Note also, that adding a new python module requires the git repo to be
     tagged so that the nextflow processes can find the repository and download
-    it to the cluster. The nextflow_container_tag parameter in ansible/group_vars/all.yaml 
+    it to the cluster. The nextflow_container_tag parameter in ansible/group_vars/all.yaml
     has to be updated with this tag.
 -   A dedicated i_mols_(vendor) table will have to be created in
     f40_create_stand_database.sql to allow for the new columns in
     standardised-compounds.tab. Similarly, the columns will have to be added
     to the parameters and the f40_load_standardised_data.sql adapted.
-    If the new fields do contain pricing information, then an sql insert statement 
+    If the new fields do contain pricing information, then an sql insert statement
     will have to be coded to add this data to the price table.
-    The f40_load_standardised_data.sql scripts for chemspace 
-    and Molport are two examples of how this might be accomplished.  
+    The f40_load_standardised_data.sql scripts for chemspace
+    and Molport are two examples of how this might be accomplished.
 
 ## Using an existing Vendor Library with new parameters
 If an existing Vendor Library supports your fragmentation needs you can

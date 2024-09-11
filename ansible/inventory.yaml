@@ -12,6 +12,8 @@ all:
         localhost:
     dbservers:
       hosts:
-        130.246.214.154:
+        130.246.81.18:
       vars:
-        ansible_user: centos
+        ansible_user: ubuntu
+        ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+        ansible_remote_tmp: /tmp
