@@ -54,8 +54,10 @@
       bucket: "{{ s3_bucket }}"
       mode: list
       prefix: "{{ raw_path }}"
-      region: "{{ s3_region }}"
       s3_url: "{{ s3_url }}"
+      aws_access_key: "{{ s3_access_key }}"
+      aws_secret_key: "{{ s3_secret_key }}"
+      region: "{{ s3_region }}"
     register: raw_result
 
   - name: Get S3 keys (non-AWS)
@@ -115,8 +117,10 @@
       mode: get
       object: "{{ item }}"
       dest: "{{ destination }}/{{ item|basename }}"
-      region: "{{ s3_region }}"
       s3_url: "{{ s3_url }}"
+      aws_access_key: "{{ s3_access_key }}"
+      aws_secret_key: "{{ s3_secret_key }}"
+      region: "{{ s3_region }}"
     loop: "{{ s3_keys }}"
     when:
     - s3_url|length > 0
