@@ -1,0 +1,20 @@
+---
+
+# Invoked from some vendor-specific unpack logic to decompress
+# all .bz2 files in the directory. The expectation is that 'destination'
+# is where the (unpacked) data is stored.
+
+- name: Assert destination
+  assert:
+    that:
+    - destination is defined
+    - destination|string|length > 0
+
+# Unpack all '.gz' files...
+
+- name: Unpack all .bz2 files
+  command: bunzip2 {{ item }}
+  args:
+    creates: "{{ item|regex_replace('.bz2') }}"
+  with_fileglob:
+  - "{{ destination }}/*.bz2"
