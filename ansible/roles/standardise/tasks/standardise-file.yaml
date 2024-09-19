@@ -18,81 +18,81 @@
   register: standardised_file
   changed_when: false
 
-# Count molecules in all input files. Note that command does not work with a glob as a standinputfile template.
-- name: Count molecules
-  shell: wc -l {{ datapath }}/data/{{ vendor }}/{{ standinputfile }} # noqa 305
-  register: molcount_result
-  when:
-  - not standardised_file.stat.exists
-
-- name: Set mol_count
-  set_fact:
-    mol_count: "{{ molcount_result.stdout }}"
-  when:
-  - not standardised_file.stat.exists
-
-# Set chunksize based on the expected input file(s) and number of CPUS. If this is development or too small
-# then this defaults.
-- name: Set chunksize_calc
-  set_fact:
-    standchunksize_calc: "{{ (0.5 *
-        vendors[vendor].approx_vendor_molecules|int/hardware[deployment].parallel_jobs)|int }}"
-  when:
-  - not standardised_file.stat.exists
-  - deployment=="production"
-
-- name: Set standardisation chunksize
-  set_fact:
-    standchunksize: "{{ standchunksize_calc|int }}"
-  when:
-  - not standardised_file.stat.exists
-  - standchunksize_calc|int>standchunksize
-
-- name: Variable sanity-check
-  assert:
-    that:
-    - standchunksize|int > 0
-  when:
-  - not standardised_file.stat.exists
-
-# Set nextflow_timeout_minutes based on the expected input file(s), speed of python script and number of CPUS.
-# If this is development or the value is lower than the default then the default is used.
-- name: Set nextflow_timeout_calc
-  set_fact:
-    nextflow_timeout_calc: "{{ (safety_factor * vendors[vendor].approx_vendor_molecules/(standardisation_mols_minute * hardware[deployment].parallel_jobs))|int }}"
-  when:
-  - not standardised_file.stat.exists
-  - deployment=="production"
-
-- name: Set nextflow_timeout_minutes
-  set_fact:
-    nextflow_timeout_minutes: "{{ nextflow_timeout_calc|int }}"
-  when:
-  - not standardised_file.stat.exists
-  - nextflow_timeout_calc|int>nextflow_timeout_minutes
-
-- debug:
-    var: nextflow_timeout_minutes
-  when:
-  - not standardised_file.stat.exists
-
-# Set nextflow_poll_period_minutes based on nextflow_timeout_minutes/30.
-# If this is development then this defaults.
-- name: Set nextflow_poll_period_minutes
-  set_fact:
-    nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/30)|int }}"
-  when:
-  - not standardised_file.stat.exists
-  - deployment=="production"
-
-- debug:
-    var: nextflow_poll_period_minutes
-  when:
-  - not standardised_file.stat.exists
-
 - name: Run standardise processing
   when: not standardised_file.stat.exists
   block:
+
+  # Count molecules in all input files.
+  # Note that command does not work with a glob as a standinputfile template.
+  - name: Count molecules
+    shell: wc -l {{ datapath }}/data/{{ vendor }}/{{ standinputfile }} # noqa 305
+    register: molcount_result
+
+  - name: Set mol_count
+    set_fact:
+      mol_count: "{{ molcount_result.stdout }}"
+
+  # Set chunksize based on the expected input file(s) and number of CPUS. If this is development or too small
+  # then this defaults.
+  - name: Set chunksize_calc
+    set_fact:
+      standchunksize_calc: "{{ (0.5 *
+          vendors[vendor].approx_vendor_molecules|int/hardware[deployment].parallel_jobs)|int }}"
+    when:
+    - not force_standchunksize | bool
+    - deployment == "production"
+
+  - name: Set standardisation chunksize
+    set_fact:
+      standchunksize: "{{ standchunksize_calc|int }}"
+    when:
+    - not force_standchunksize | bool
+    - standchunksize_calc | int > standchunksize
+
+  - name: Variable sanity-check
+    assert:
+      that:
+      - standchunksize | int > 0
+
+  - name: Display chunksize
+    debug:
+      var: standchunksize
+
+  # Set nextflow_timeout_minutes based on the expected input file(s), speed of python script and number of CPUS.
+  # If this is development or the value is lower than the default then the default is used.
+  - name: Set nextflow_timeout_calc
+    set_fact:
+      nextflow_timeout_calc: "{{ (safety_factor * vendors[vendor].approx_vendor_molecules/(standardisation_mols_minute * hardware[deployment].parallel_jobs))|int }}"
+    when:
+    - not force_nextflow_timeout_minutes | bool
+    - deployment == "production"
+
+  - name: Set nextflow_timeout_minutes
+    set_fact:
+      nextflow_timeout_minutes: "{{ nextflow_timeout_calc|int }}"
+    when:
+    - not force_nextflow_timeout_minutes | bool
+    - nextflow_timeout_calc | int > nextflow_timeout_minutes
+
+  - name: Variable sanity-check
+    assert:
+      that:
+      - nextflow_timeout_minutes | int > 0
+
+  - name: Display nextflow timeout (minutes)
+    debug:
+      var: nextflow_timeout_minutes
+
+  # Set nextflow_poll_period_minutes based on nextflow_timeout_minutes/30.
+  # If this is development then this defaults.
+  - name: Set nextflow_poll_period_minutes
+    set_fact:
+      nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/30)|int }}"
+    when: deployment == "production"
+
+  - name: Display nextflow poll period (minutes)
+    debug:
+      var: nextflow_poll_period_minutes
 
   - name: Log line to report
     blockinfile:
@@ -142,13 +142,6 @@
     async: "{{ nextflow_timeout_minutes|int * 60 }}"
     poll: 0
     register: nextflow_async
-
-  # A short pause, prior to the async processing
-  # to allow the initial "wait for nextflow" task is able to stop
-  # early on nextflow startup failures.
-#  - name: Command failure pause (async)
-#    pause:
-#      seconds: 8
 
   - name: Wait for nextflow (async)
     async_status:

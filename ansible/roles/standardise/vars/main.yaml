@@ -15,10 +15,15 @@ safety_factor: 50
 # Default nextflow parameters for development.
 # These are overwritten in production deployment based on the
 # size of the vendor input files.
-nextflow_timeout_minutes: 30
-nextflow_poll_period_minutes: 1
+nextflow_timeout_minutes: 60
+# If set use the timeout provided
+force_nextflow_timeout_minutes: no
 standchunksize: 250
+# If set use the chunksize provided
+force_standchunksize: no
+
 standchunksize_calc: 0
+nextflow_poll_period_minutes: 1
 
 # Chunk size to control size of transactions in
 # uploading standardised file data to database
