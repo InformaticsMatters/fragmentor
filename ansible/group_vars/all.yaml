@@ -231,8 +231,8 @@ vendors:
     indexchunksize: 3000
     index_build_time: 17280
   enamine_mferla:
-    approx_vendor_molecules: 40000000
-    est_total_fragmentation_time: 720000
+    approx_vendor_molecules: 20000000
+    est_total_fragmentation_time: 360000
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12

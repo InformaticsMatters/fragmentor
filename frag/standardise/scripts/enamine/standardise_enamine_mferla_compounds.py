@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
-"""standardise_enamine_compounds.py
+"""standardise_enamine_mferla_compounds.py
 
-Processes Enamine (Real) vendor compound files, and generates a 'standard'
+Processes Compounds produced by mferla, and generates a 'standard'
 tab-separated output.
 
 We create a 'real-standardised-compounds.tab' file that contains a 1st-line
 'header' formed from the _OUTPUT_COLUMNS list.
 
 Alan Christie
-February 2019
+September 2024
 """
 
 import argparse
@@ -123,14 +123,14 @@ def standardise_vendor_compounds(output_file, file_name, limit):
         for line in input_file:
 
             line_num += 1
-            fields = line.split()
+            fields = line.split('\t')
             if len(fields) <= 1:
                 continue
 
             if line_num % report_rate == 0:
                 logger.info(' ...at compound {:,}'.format(line_num))
 
-            osmiles = fields[smiles_col]
+            osmiles = fields[smiles_col].split()[0]
             compound_id = real_prefix + fields[compound_col]
 
             # Add the compound (expected to be unique)

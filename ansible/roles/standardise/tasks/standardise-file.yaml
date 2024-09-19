@@ -90,74 +90,73 @@
   when:
   - not standardised_file.stat.exists
 
-- name: Log line to report
-  blockinfile:
-    marker: "<!-- {standardise-nextflow} ANSIBLE MANAGED BLOCK -->"
-    path: "{{ standpath }}/standardise/standardise_report.html"
-    block: |
-      <p><table>
-      <tr><th>Parameter</th><th>Value</th></tr>
-      <tr><td>Molecules to Standardise</td><td>{{ mol_count }}</td></tr>
-      <tr><td>Standardisation Chunk Size</td><td>{{ standchunksize }}</td></tr>
-      <tr><td>nextflow_timeout_minutes</td><td>{{ nextflow_timeout_minutes }}</td></tr>
-      <tr><td>nextflow_poll_period_minutes</td><td>{{ nextflow_poll_period_minutes }}</td></tr>
-      </table></p>
-  when:
-  - not standardised_file.stat.exists
+- name: Run standardise processing
+  when: not standardised_file.stat.exists
+  block:
 
-# Move the nextflow workflow and config into place (from templates)
-# so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
+  - name: Log line to report
+    blockinfile:
+      marker: "<!-- {standardise-nextflow} ANSIBLE MANAGED BLOCK -->"
+      path: "{{ standpath }}/standardise/standardise_report.html"
+      block: |
+        <p><table>
+        <tr><th>Parameter</th><th>Value</th></tr>
+        <tr><td>Molecules to Standardise</td><td>{{ mol_count }}</td></tr>
+        <tr><td>Standardisation Chunk Size</td><td>{{ standchunksize }}</td></tr>
+        <tr><td>nextflow_timeout_minutes</td><td>{{ nextflow_timeout_minutes }}</td></tr>
+        <tr><td>nextflow_poll_period_minutes</td><td>{{ nextflow_poll_period_minutes }}</td></tr>
+        </table></p>
 
-- name: Translate nextflow files
-  template:
-    src: "{{ item }}"
-    dest: "{{ reppath }}/nextflow/{{ item|regex_replace(deployment + '/')|regex_replace('.j2') }}"
-  loop:
-  - "standardizer.nf.j2"
-  - "{{ deployment }}/nextflow.config.j2"
-  when:
-  - not standardised_file.stat.exists
+  # Move the nextflow workflow and config into place (from templates)
+  # so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
 
-- name: Set nextflow command
-  set_fact:
-    nextflow_cmd: >-
-      nextflow run -c {{ reppath }}/nextflow/nextflow.config
-      {{ reppath }}/nextflow/standardizer.nf
-      -w {{ nextpath }}
-      -with-report {{ standpath }}/standardise/standardise_nextflow_report.html
-      --script {{ standardiser }}
-      --inputs {{ datapath }}/data/{{ vendor }}/"{{ standinputfile }}"
-      --out_dir {{ standpath }}/standardise
-      --chunk_size {{ standchunksize|int }}
-      --compound_id_prefix {{ standard_compound_id_prefix }}
-      --compound_id_field {{ standard_compound_id_field }}
-      --split_token {{ standsplittoken }}
-  when:
-  - not standardised_file.stat.exists
+  - name: Translate nextflow files
+    template:
+      src: "{{ item }}"
+      dest: "{{ reppath }}/nextflow/{{ item|regex_replace(deployment + '/')|regex_replace('.j2') }}"
+    loop:
+    - "standardizer.nf.j2"
+    - "{{ deployment }}/nextflow.config.j2"
 
-- name: Display nextflow command
-  debug:
-    var: nextflow_cmd
-  when:
-  - not standardised_file.stat.exists
+  - name: Set nextflow command
+    set_fact:
+      nextflow_cmd: >-
+        nextflow run -c {{ reppath }}/nextflow/nextflow.config
+        {{ reppath }}/nextflow/standardizer.nf
+        -w {{ nextpath }}
+        -with-report {{ standpath }}/standardise/standardise_nextflow_report.html
+        --script {{ standardiser }}
+        --inputs {{ datapath }}/data/{{ vendor }}/"{{ standinputfile }}"
+        --out_dir {{ standpath }}/standardise
+        --chunk_size {{ standchunksize|int }}
+        --compound_id_prefix {{ standard_compound_id_prefix }}
+        --compound_id_field {{ standard_compound_id_field }}
+        --split_token {{ standsplittoken }}
 
-- name: Run nextflow (async)
-  command: "{{ nextflow_cmd }}"
-  async: "{{ nextflow_timeout_minutes|int * 60 }}"
-  poll: 0
-  register: nextflow_async
-  when:
-  - not standardised_file.stat.exists
+  - name: Display nextflow command
+    debug:
+      var: nextflow_cmd
 
-- name: Wait for nextflow (async)
-  async_status:
-    jid: "{{ nextflow_async.ansible_job_id }}"
-  register: nextflow_result
-  until: nextflow_result.finished
-  delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
-  retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
-  when:
-  - not standardised_file.stat.exists
+  - name: Run nextflow (async)
+    command: "{{ nextflow_cmd }}"
+    async: "{{ nextflow_timeout_minutes|int * 60 }}"
+    poll: 0
+    register: nextflow_async
+
+  # A short pause, prior to the async processing
+  # to allow the initial "wait for nextflow" task is able to stop
+  # early on nextflow startup failures.
+#  - name: Command failure pause (async)
+#    pause:
+#      seconds: 8
+
+  - name: Wait for nextflow (async)
+    async_status:
+      jid: "{{ nextflow_async.ansible_job_id }}"
+    register: nextflow_result
+    until: nextflow_result.finished
+    delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
+    retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
 
 - name: Log line to report
   blockinfile:
