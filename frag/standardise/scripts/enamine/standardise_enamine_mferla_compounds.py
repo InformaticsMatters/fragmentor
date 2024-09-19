@@ -146,7 +146,7 @@ def standardise_vendor_compounds(output_file, file_name, limit):
                         continue
                     logger.warning('Found ID used for different compounds %s', cid)
                 else:
-                    logger.warning('Found compound with different IDs %s', osmiles)
+                    logger.warning('Found duplicate compound with different IDs %s', osmiles)
 
                 # If we get here the compound's been seen but it has the same ID
                 # so we can skip it!
