@@ -57,8 +57,11 @@ output_filename = 'standardised-compounds.tab'
 # The prefix we use in our fragment file
 real_prefix = 'REAL:'
 
-# All the vendor compound IDs
-vendor_compounds = set()
+# The set of all original SMILES we've seen.
+vendor_osmiles = set()
+# A map of all the original SMILES indexed by their compound ID.
+# Used to detect duplicate compounds.
+vendor_compound_ids = {}
 
 # Various diagnostic counts
 num_vendor_mols = 0
@@ -97,7 +100,7 @@ def standardise_vendor_compounds(output_file, file_name, limit):
 
     line_num = 0
     num_processed = 0
-    with open(file_name, 'rt') as input_file:
+    with open(file_name, 'rt', encoding='utf8') as input_file:
 
         # Check first line (a space-delimited header).
         # This is a basic sanity-check to make sure the important column
@@ -128,16 +131,28 @@ def standardise_vendor_compounds(output_file, file_name, limit):
                 continue
 
             if line_num % report_rate == 0:
-                logger.info(' ...at compound {:,}'.format(line_num))
+                logger.info('...at compound {:,}'.format(line_num))
 
             osmiles = fields[smiles_col].split()[0]
-            compound_id = real_prefix + fields[compound_col]
+            cid = fields[compound_col]
+            compound_id = real_prefix + cid
 
-            # Add the compound (expected to be unique)
-            # to our set of 'all compounds'.
-            if compound_id in vendor_compounds:
-                error('Duplicate compound ID ({})'.format(compound_id))
-            vendor_compounds.add(compound_id)
+            if osmiles in vendor_osmiles:
+                # Potential duplicate?
+                # A problem if the ID is already used and it's not the same SMILES
+                if cid in vendor_compound_ids:
+                    if vendor_compound_ids[cid] == osmiles:
+                        logger.warning('Skipping duplicate compound (%s %s)', osmiles, cid)
+                        continue
+                    error(f'Found ID used for different compounds ({cid})')
+                else:
+                    error(f'Found compound with different IDs ({osmiles})')
+
+                # If we get here the compound's been seen but it has the same ID
+                # so we can skip it!
+
+            vendor_osmiles.add(osmiles)
+            vendor_compound_ids[cid] = osmiles
 
             # Standardise and update global maps...
             # And try and handle and report any catastrophic errors
@@ -194,7 +209,7 @@ if __name__ == '__main__':
     # Output is either s fixed name in an output directory
     # or a prefixed filename (without an output directory)
     if args.output_is_prefix:
-        output_filename = '{}.{}'.format(args.output, output_filename)
+        output_filename = f'{args.output}.{output_filename}'
     else:
         # Create the output directory
         if os.path.exists(args.output):
@@ -202,8 +217,7 @@ if __name__ == '__main__':
             sys.exit(1)
         os.mkdir(args.output)
         os.chmod(args.output, 0o777)
-        output_filename = os.path.join(args.output,
-                                       '{}'.format(output_filename))
+        output_filename = os.path.join(args.output, f'{output_filename}')
 
     # Suppress basic RDKit logging...
     RDLogger.logger().setLevel(RDLogger.ERROR)
@@ -222,7 +236,7 @@ if __name__ == '__main__':
     # A text, tab-separated file.
     logger.info('Writing %s...', output_filename)
     num_processed = 0
-    with open(output_filename, 'wt') as output_file:
+    with open(output_filename, 'wt', encoding='utf8') as output_file:
 
         # Write the header...
         output_file.write('\t'.join(_OUTPUT_COLUMNS) + '\n')
