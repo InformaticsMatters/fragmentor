@@ -142,11 +142,11 @@ def standardise_vendor_compounds(output_file, file_name, limit):
                 # A problem if the ID is already used and it's not the same SMILES
                 if cid in vendor_compound_ids:
                     if vendor_compound_ids[cid] == osmiles:
-                        logger.warning('Skipping duplicate compound (%s %s)', osmiles, cid)
+                        logger.warning('Skipping duplicate compound %s %s', osmiles, cid)
                         continue
-                    logger.warning('Found ID used for different compounds (%s)', cid)
+                    logger.warning('Found ID used for different compounds %s', cid)
                 else:
-                    logger.warning('Found compound with different IDs (%s)', osmiles)
+                    logger.warning('Found compound with different IDs %s', osmiles)
 
                 # If we get here the compound's been seen but it has the same ID
                 # so we can skip it!
