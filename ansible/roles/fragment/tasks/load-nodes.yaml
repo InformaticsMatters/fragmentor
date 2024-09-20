@@ -36,7 +36,7 @@
   set_fact:
     node_count: "{{ nodecount_result.stdout }}"
 
-- name: Display number of edges
+- name: Display number of nodes
   debug:
     var: node_count
 
