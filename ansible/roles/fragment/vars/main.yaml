@@ -10,6 +10,9 @@
 # may take 16 hours on the cluster.
 
 nextflow_timeout_minutes: 120
+# If set use the timeout provided
+force_nextflow_timeout_minutes: no
+
 nextflow_poll_period_minutes: 1
 
 # Filename of standardised SMILES extracted from i_mols for fragmentation
