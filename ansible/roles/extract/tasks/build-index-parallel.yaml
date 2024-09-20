@@ -82,14 +82,19 @@
   set_fact:
     index_timeout_calc: "{{ (safety_factor|int
                  * vendors[item.lib.vendor].index_build_time|int)/hardware[deployment].postgres_jobs|int }}"
-  when: deployment=="production"
+  when:
+  - deployment == "production"
+  - not force_index_timeout_minutes | bool
 
 - name: Set index_timeout_minutes
   set_fact:
     index_timeout_minutes: "{{ index_timeout_calc|int }}"
-  when: index_timeout_calc|int>index_timeout_minutes|int
+  when:
+  - index_timeout_calc |int > index_timeout_minutes | int
+  - not force_index_timeout_minutes | bool
 
-- debug:
+- name: Display index timeout (minutes)
+  debug:
     var: index_timeout_minutes
 
 # Set index_poll_period_minutes based on index_timeout_minutes/120.
@@ -101,7 +106,8 @@
   - deployment=="production"
   - index_timeout_minutes|int > 120
 
-- debug:
+- name: Display index poll period
+  debug:
     var: index_poll_period_minutes
 
 # The command list divides the number of molecules into postgres_jobs
