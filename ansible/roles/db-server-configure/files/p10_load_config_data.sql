@@ -21,3 +21,4 @@ insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_nod
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_cyselectrophile', NULL, 'Xchem-CysElectrophile','V_XCYSELEC');
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('xchem_covhet', NULL, 'Xchem-CovHet','V_XCOVHET');
 insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('enamine', NULL, 'REAL','V_REAL');
+insert into vendor_name (vendor_name, currency, supplier_node_name, supplier_node_label) values ('enamine_mferla', NULL, 'REAL-MFERLA','V_REAL');

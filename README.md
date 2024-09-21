@@ -349,7 +349,7 @@ hardware:
 ```
 
 There is a template file with all the above settings and more explanation
-at: ansible/roles/run-parameters.template that you can copy.
+at: `ansible/run-parameters.template` that you can copy.
 
 Armed with a parameter file, like the one shown above,
 the standardisation step is run as follows: -

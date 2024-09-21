@@ -55,7 +55,7 @@ echo "+> Copying ${KUBECONFIG_FILE} to ${KUBECONFIG}..."
 cp "${KUBECONFIG_FILE}" "${KUBECONFIG}"
 
 echo "+> kubectl version..."
-kubectl version
+kubectl version --short
 
 # Now set default kubernetes namespace (i.e. the fragmentor)
 echo "+> kubectl config set-context..."

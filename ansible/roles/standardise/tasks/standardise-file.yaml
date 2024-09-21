@@ -18,146 +18,138 @@
   register: standardised_file
   changed_when: false
 
-# Count molecules in all input files. Note that command does not work with a glob as a standinputfile template.
-- name: Count molecules
-  shell: wc -l {{ datapath }}/data/{{ vendor }}/{{ standinputfile }} # noqa 305
-  register: molcount_result
-  when:
-  - not standardised_file.stat.exists
+- name: Run standardise processing
+  when: not standardised_file.stat.exists
+  block:
 
-- name: Set mol_count
-  set_fact:
-    mol_count: "{{ molcount_result.stdout }}"
-  when:
-  - not standardised_file.stat.exists
+  # Count molecules in all input files.
+  # Note that command does not work with a glob as a standinputfile template.
+  - name: Count molecules
+    shell: wc -l {{ datapath }}/data/{{ vendor }}/{{ standinputfile }} # noqa 305
+    register: molcount_result
 
-# Set chunksize based on the expected input file(s) and number of CPUS. If this is development or too small
-# then this defaults.
-- name: Set chunksize_calc
-  set_fact:
-    standchunksize_calc: "{{ (0.5 *
-        vendors[vendor].approx_vendor_molecules|int/hardware[deployment].parallel_jobs)|int }}"
-  when:
-  - not standardised_file.stat.exists
-  - deployment=="production"
+  - name: Set mol_count
+    set_fact:
+      mol_count: "{{ molcount_result.stdout }}"
 
-- name: Set standardisation chunksize
-  set_fact:
-    standchunksize: "{{ standchunksize_calc|int }}"
-  when:
-  - not standardised_file.stat.exists
-  - standchunksize_calc|int>standchunksize
+  # Set chunksize based on the expected input file(s) and number of CPUS. If this is development or too small
+  # then this defaults.
+  - name: Set chunksize_calc
+    set_fact:
+      standchunksize_calc: "{{ (0.5 *
+          vendors[vendor].approx_vendor_molecules|int/hardware[deployment].parallel_jobs)|int }}"
+    when:
+    - not force_standchunksize | bool
+    - deployment == "production"
 
-- name: Variable sanity-check
-  assert:
-    that:
-    - standchunksize|int > 0
-  when:
-  - not standardised_file.stat.exists
+  - name: Set standardisation chunksize
+    set_fact:
+      standchunksize: "{{ standchunksize_calc|int }}"
+    when:
+    - not force_standchunksize | bool
+    - standchunksize_calc | int > standchunksize
 
-# Set nextflow_timeout_minutes based on the expected input file(s), speed of python script and number of CPUS.
-# If this is development or the value is lower than the default then the default is used.
-- name: Set nextflow_timeout_calc
-  set_fact:
-    nextflow_timeout_calc: "{{ (safety_factor * vendors[vendor].approx_vendor_molecules/(standardisation_mols_minute * hardware[deployment].parallel_jobs))|int }}"
-  when:
-  - not standardised_file.stat.exists
-  - deployment=="production"
+  - name: Variable sanity-check
+    assert:
+      that:
+      - standchunksize | int > 0
 
-- name: Set nextflow_timeout_minutes
-  set_fact:
-    nextflow_timeout_minutes: "{{ nextflow_timeout_calc|int }}"
-  when:
-  - not standardised_file.stat.exists
-  - nextflow_timeout_calc|int>nextflow_timeout_minutes
+  - name: Display chunksize
+    debug:
+      var: standchunksize
 
-- debug:
-    var: nextflow_timeout_minutes
-  when:
-  - not standardised_file.stat.exists
+  # Set nextflow_timeout_minutes based on the expected input file(s), speed of python script and number of CPUS.
+  # If this is development or the value is lower than the default then the default is used.
+  - name: Set nextflow_timeout_calc
+    set_fact:
+      nextflow_timeout_calc: "{{ (safety_factor * vendors[vendor].approx_vendor_molecules/(standardisation_mols_minute * hardware[deployment].parallel_jobs))|int }}"
+    when:
+    - not force_nextflow_timeout_minutes | bool
+    - deployment == "production"
 
-# Set nextflow_poll_period_minutes based on nextflow_timeout_minutes/30.
-# If this is development then this defaults.
-- name: Set nextflow_poll_period_minutes
-  set_fact:
-    nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/30)|int }}"
-  when:
-  - not standardised_file.stat.exists
-  - deployment=="production"
+  - name: Set nextflow_timeout_minutes
+    set_fact:
+      nextflow_timeout_minutes: "{{ nextflow_timeout_calc|int }}"
+    when:
+    - not force_nextflow_timeout_minutes | bool
+    - nextflow_timeout_calc | int > nextflow_timeout_minutes
 
-- debug:
-    var: nextflow_poll_period_minutes
-  when:
-  - not standardised_file.stat.exists
+  - name: Variable sanity-check
+    assert:
+      that:
+      - nextflow_timeout_minutes | int > 0
 
-- name: Log line to report
-  blockinfile:
-    marker: "<!-- {standardise-nextflow} ANSIBLE MANAGED BLOCK -->"
-    path: "{{ standpath }}/standardise/standardise_report.html"
-    block: |
-      <p><table>
-      <tr><th>Parameter</th><th>Value</th></tr>
-      <tr><td>Molecules to Standardise</td><td>{{ mol_count }}</td></tr>
-      <tr><td>Standardisation Chunk Size</td><td>{{ standchunksize }}</td></tr>
-      <tr><td>nextflow_timeout_minutes</td><td>{{ nextflow_timeout_minutes }}</td></tr>
-      <tr><td>nextflow_poll_period_minutes</td><td>{{ nextflow_poll_period_minutes }}</td></tr>
-      </table></p>
-  when:
-  - not standardised_file.stat.exists
+  - name: Display nextflow timeout (minutes)
+    debug:
+      var: nextflow_timeout_minutes
 
-# Move the nextflow workflow and config into place (from templates)
-# so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
+  # Set nextflow_poll_period_minutes based on nextflow_timeout_minutes/30.
+  # If this is development then this defaults.
+  - name: Set nextflow_poll_period_minutes
+    set_fact:
+      nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/30)|int }}"
+    when: deployment == "production"
 
-- name: Translate nextflow files
-  template:
-    src: "{{ item }}"
-    dest: "{{ reppath }}/nextflow/{{ item|regex_replace(deployment + '/')|regex_replace('.j2') }}"
-  loop:
-  - "standardizer.nf.j2"
-  - "{{ deployment }}/nextflow.config.j2"
-  when:
-  - not standardised_file.stat.exists
+  - name: Display nextflow poll period (minutes)
+    debug:
+      var: nextflow_poll_period_minutes
 
-- name: Set nextflow command
-  set_fact:
-    nextflow_cmd: >-
-      nextflow run -c {{ reppath }}/nextflow/nextflow.config
-      {{ reppath }}/nextflow/standardizer.nf
-      -w {{ nextpath }}
-      -with-report {{ standpath }}/standardise/standardise_nextflow_report.html
-      --script {{ standardiser }}
-      --inputs {{ datapath }}/data/{{ vendor }}/"{{ standinputfile }}"
-      --out_dir {{ standpath }}/standardise
-      --chunk_size {{ standchunksize|int }}
-      --compound_id_prefix {{ standard_compound_id_prefix }}
-      --compound_id_field {{ standard_compound_id_field }}
-      --split_token {{ standsplittoken }}
-  when:
-  - not standardised_file.stat.exists
+  - name: Log line to report
+    blockinfile:
+      marker: "<!-- {standardise-nextflow} ANSIBLE MANAGED BLOCK -->"
+      path: "{{ standpath }}/standardise/standardise_report.html"
+      block: |
+        <p><table>
+        <tr><th>Parameter</th><th>Value</th></tr>
+        <tr><td>Molecules to Standardise</td><td>{{ mol_count }}</td></tr>
+        <tr><td>Standardisation Chunk Size</td><td>{{ standchunksize }}</td></tr>
+        <tr><td>nextflow_timeout_minutes</td><td>{{ nextflow_timeout_minutes }}</td></tr>
+        <tr><td>nextflow_poll_period_minutes</td><td>{{ nextflow_poll_period_minutes }}</td></tr>
+        </table></p>
 
-- name: Display nextflow command
-  debug:
-    var: nextflow_cmd
-  when:
-  - not standardised_file.stat.exists
+  # Move the nextflow workflow and config into place (from templates)
+  # so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
 
-- name: Run nextflow (async)
-  command: "{{ nextflow_cmd }}"
-  async: "{{ nextflow_timeout_minutes|int * 60 }}"
-  poll: 0
-  register: nextflow_async
-  when:
-  - not standardised_file.stat.exists
+  - name: Translate nextflow files
+    template:
+      src: "{{ item }}"
+      dest: "{{ reppath }}/nextflow/{{ item|regex_replace(deployment + '/')|regex_replace('.j2') }}"
+    loop:
+    - "standardizer.nf.j2"
+    - "{{ deployment }}/nextflow.config.j2"
 
-- name: Wait for nextflow (async)
-  async_status:
-    jid: "{{ nextflow_async.ansible_job_id }}"
-  register: nextflow_result
-  until: nextflow_result.finished
-  delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
-  retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
-  when:
-  - not standardised_file.stat.exists
+  - name: Set nextflow command
+    set_fact:
+      nextflow_cmd: >-
+        nextflow run -c {{ reppath }}/nextflow/nextflow.config
+        {{ reppath }}/nextflow/standardizer.nf
+        -w {{ nextpath }}
+        -with-report {{ standpath }}/standardise/standardise_nextflow_report.html
+        --script {{ standardiser }}
+        --inputs {{ datapath }}/data/{{ vendor }}/"{{ standinputfile }}"
+        --out_dir {{ standpath }}/standardise
+        --chunk_size {{ standchunksize|int }}
+        --compound_id_prefix {{ standard_compound_id_prefix }}
+        --compound_id_field {{ standard_compound_id_field }}
+        --split_token {{ standsplittoken }}
+
+  - name: Display nextflow command
+    debug:
+      var: nextflow_cmd
+
+  - name: Run nextflow (async)
+    command: "{{ nextflow_cmd }}"
+    async: "{{ nextflow_timeout_minutes|int * 60 }}"
+    poll: 0
+    register: nextflow_async
+
+  - name: Wait for nextflow (async)
+    async_status:
+      jid: "{{ nextflow_async.ansible_job_id }}"
+    register: nextflow_result
+    until: nextflow_result.finished
+    delay: "{{ nextflow_poll_period_minutes|int * 60 }}"
+    retries: "{{ (nextflow_timeout_minutes|int / nextflow_poll_period_minutes|int)|int }}"
 
 - name: Log line to report
   blockinfile:

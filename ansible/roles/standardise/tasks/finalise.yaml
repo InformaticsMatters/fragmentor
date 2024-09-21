@@ -86,8 +86,10 @@
       src: "{{ item }}"
       object: "{{ s3_object_path }}/{{ item|basename }}"
       mode: put
-      region: "{{ s3_region }}"
       s3_url: "{{ s3_url }}"
+      aws_access_key: "{{ s3_access_key }}"
+      aws_secret_key: "{{ s3_secret_key }}"
+      region: "{{ s3_region }}"
     loop: "{{ files_found }}"
     when: s3_url|length > 0
 

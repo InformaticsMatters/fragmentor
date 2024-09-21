@@ -27,17 +27,14 @@
     that:
     - fragsmifile_result.stat.exists
 
-- debug:
+- name: Display fragchunksize
+  debug:
     var: fragchunksize
 
 - name: Variable sanity-check
   assert:
     that:
     - fragchunksize|int > 0
-
-- name: Variable sanity-check
-  assert:
-    that:
     - mols_to_fragment|int > 0
 
 # Set nextflow_timeout_minutes based on the expected time, proportion of total run being done and number of CPUS.
@@ -47,14 +44,24 @@
     nextflow_timeout_calc: "{{ (safety_factor
                                 * (vendors[vendor].est_total_fragmentation_time|int/hardware[deployment].parallel_jobs)
                                 * (mols_to_fragment|int/vendors[vendor].approx_vendor_molecules))|int }}"
-  when: deployment=="production"
+  when:
+  - deployment == "production"
+  - not force_nextflow_timeout_minutes | bool
 
 - name: Set nextflow_timeout_minutes
   set_fact:
     nextflow_timeout_minutes: "{{ nextflow_timeout_calc|int }}"
-  when: nextflow_timeout_calc|int>nextflow_timeout_minutes
+  when:
+  - nextflow_timeout_calc | int > nextflow_timeout_minutes
+  - not force_nextflow_timeout_minutes | bool
 
-- debug:
+- name: Variable sanity-check
+  assert:
+    that:
+    - nextflow_timeout_minutes | int > 0
+
+- name: Display nextflow timeout (minutes)
+  debug:
     var: nextflow_timeout_minutes
 
 # Set nextflow_poll_period_minutes based on nextflow_timeout_minutes/30.
@@ -64,7 +71,8 @@
     nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/60)|int }}"
   when: deployment=="production"
 
-- debug:
+- name: Display nextflow poll period (minutes)
+  debug:
     var: nextflow_poll_period_minutes
 
 - name: Log line to report
@@ -103,9 +111,6 @@
        --chunk_size {{ fragchunksize|int }}
        --max_hac {{ vendors[vendor].fraghac }}
        --max_frag {{ vendors[vendor].fragmaxfrags }}
-
-#time nextflow run -c $REPPATH/nextflow/nextflow.config $REPPATH/nextflow/fragmentation.nf -with-report $FRAGPATH/fragment/frag_report.html \
-#    --input $FRAGDATA/fragment/$FRAGSMIFILE --out_dir $FRAGPATH/fragment --tmp_dir $FRAGPATH/fragment --chunk_size $FRAGCHUNKSIZE --max_hac $FRAGHAC --max_frag $FRAGMAXFRAGS $@
 
 - name: Display nextflow command
   debug:

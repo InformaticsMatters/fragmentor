@@ -28,7 +28,7 @@ clean_finish: no
 # Blank assumes no registry (i.e. 'docker.io')
 nextflow_container_registry: ''
 nextflow_container_name: informaticsmatters/fragmentor
-nextflow_container_tag: '1.0.8'
+nextflow_container_tag: '1.2.0'
 
 # Memory requested by the 'sort' processes in the nextflow workflow
 # (namely fragmentation and combination). Where it's actually used
@@ -224,6 +224,15 @@ vendors:
   enamine_ro5:
     approx_vendor_molecules: 40000000
     est_total_fragmentation_time: 720000
+    fragminhac: 0
+    fraghac: 36
+    fragmaxfrags: 12
+    fraglimit: 0
+    indexchunksize: 3000
+    index_build_time: 17280
+  enamine_mferla:
+    approx_vendor_molecules: 20000000
+    est_total_fragmentation_time: 360000
     fragminhac: 0
     fraghac: 36
     fragmaxfrags: 12
