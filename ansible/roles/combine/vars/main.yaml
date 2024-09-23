@@ -39,7 +39,7 @@ shatterfile_large_threshold_kb: 1048576
 # and poll period for the (asynchronous) Nextflow process
 # Timeouts (minutes):  1440 (24 hours)
 nextflow_timeout_minutes: 1440
-nextflow_poll_period_seconds: 30
+nextflow_poll_period_minutes: 1
 
 compress_timeout_minutes: 1440
 compress_poll_period_minutes: 1

@@ -81,7 +81,7 @@
   when:
   - not combined_file.stat.exists
 
-- name: Set nextflow command
+- name: Set nextflow command (Merge)
   set_fact:
     nextflow_cmd: >-
       nextflow run -c {{ reppath }}/nextflow/nextflow.config
@@ -91,13 +91,19 @@
   when:
   - not combined_file.stat.exists
 
-- name: Display nextflow command
+- name: Display nextflow command (Merge)
   debug:
     var: nextflow_cmd
   when:
   - not combined_file.stat.exists
 
-- name: Run nextflow (async)
+- name: Display nextflow command timeout (Merge)
+  debug:
+    msg: nextflow_timeout_minutes={{ nextflow_timeout_minutes }} nextflow_poll_period_minutes={{ nextflow_poll_period_minutes }}
+  when:
+  - not combined_file.stat.exists
+
+- name: Run nextflow (Merge) (async)
   command: "{{ nextflow_cmd }}"
   async: "{{ nextflow_timeout_minutes|int * 60 }}"
   poll: 0
@@ -105,13 +111,13 @@
   when:
   - not combined_file.stat.exists
 
-- name: Wait for nextflow (async)
+- name: Wait for nextflow (Merge)
   async_status:
     jid: "{{ nextflow_async.ansible_job_id }}"
   register: nextflow_result
   until: nextflow_result.finished
-  delay: "{{ nextflow_poll_period_seconds|int }}"
-  retries: "{{ (nextflow_timeout_minutes|int / (nextflow_poll_period_seconds|int / 60))|int }}"
+  delay: "{{ nextflow_poll_period_minutes | int * 60 }}"
+  retries: "{{ (nextflow_timeout_minutes | int / nextflow_poll_period_minutes | int) | int }}"
   when:
   - not combined_file.stat.exists
 
@@ -149,7 +155,7 @@
   register: compress_task
   when: not file_type_file.stat.exists
 
-- name: Add this tasy to the list of compress tasks
+- name: Add this task to the list of compress tasks
   set_fact:
     compress_tasks: "{{ compress_tasks + [ compress_task ] }}"
   when: not file_type_file.stat.exists

@@ -69,7 +69,7 @@
 # Move the nextflow workflow and config into place (from templates)
 # so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
 
-- name: Translate nextflow files
+- name: Translate nextflow files (Generate Inchi)
   template:
     src: "{{ item }}"
     dest: "{{ reppath }}/nextflow/{{ item|regex_replace(deployment + '/')|regex_replace('.j2') }}"
@@ -81,7 +81,7 @@
 # python -m frag.network.scripts.generate_inchi -i $FRAGPATH/fragment/$FRAGNODEFILE -o $FRAGPATH/fragment/$INCHITAB -n -s
 #
 
-- name: Set nextflow command
+- name: Set nextflow command (Generate Non-Isomol Inchi)
   set_fact:
     nextflow_cmd: >-
       nextflow run -c {{ reppath }}/nextflow/nextflow.config
@@ -94,17 +94,17 @@
       --chunk_size {{ inchigenchunk|int }}
       --standard '{{ standard }}'
 
-- name: Display nextflow command
+- name: Display nextflow command (Generate Non-Isomol Inchi)
   debug:
     var: nextflow_cmd
 
-- name: Run nextflow (async)
+- name: Run nextflow (Generate Non-Isomol Inchi) (async)
   command: "{{ nextflow_cmd }}"
   async: "{{ nextflow_timeout_minutes|int * 60 }}"
   poll: 0
   register: nextflow_async
 
-- name: Wait for nextflow (async)
+- name: Wait for nextflow (Generate Non-Isomol Inchi)
   async_status:
     jid: "{{ nextflow_async.ansible_job_id }}"
   register: nextflow_result
