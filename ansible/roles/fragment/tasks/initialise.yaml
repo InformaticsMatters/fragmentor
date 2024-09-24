@@ -60,7 +60,6 @@
   - "{{ fragpath }}/fragment"
   - "{{ logpath }}/log/{{ vendor }}/{{ version }}/fragment"
 
-
 - name: Ensure sql, nextflow directories are present
   file:
     path: "{{ item }}"

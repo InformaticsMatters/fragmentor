@@ -27,7 +27,8 @@ then
     cd $IMPORT_DIRECTORY
     /var/lib/neo4j/bin/neo4j-admin import \
         --database $IMPORT_TO.db \
-        --ignore-missing-nodes \
+        --skip-bad-relationships \
+        --skip-duplicate-nodes \
 {{ node_text }}
 {{ relationship_text }}
 
