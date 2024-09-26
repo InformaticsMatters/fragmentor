@@ -37,6 +37,10 @@
     - fragchunksize|int > 0
     - mols_to_fragment|int > 0
 
+- name: Display calculation conditions
+  debug:
+    msg: deployment={{ deployment }} force_nextflow_timeout_minutes={{ force_nextflow_timeout_minutes }}
+
 # Set nextflow_timeout_minutes based on the expected time, proportion of total run being done and number of CPUS.
 # If this is development or the value is lower than the default then the default is used.
 - name: Set nextflow_timeout_calc
