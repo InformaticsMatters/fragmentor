@@ -54,10 +54,6 @@
       that:
       - standchunksize | int > 0
 
-  - name: Display chunksize
-    debug:
-      var: standchunksize
-
   # Set nextflow_timeout_minutes based on the expected input file(s), speed of python script and number of CPUS.
   # If this is development or the value is lower than the default then the default is used.
   - name: Set nextflow_timeout_calc
@@ -132,6 +128,10 @@
   - name: Display nextflow command timeout (Standardise)
     debug:
       msg: nextflow_timeout_minutes={{ nextflow_timeout_minutes }} nextflow_poll_period_minutes={{ nextflow_poll_period_minutes }}
+
+  - name: Display molecule count and chunk size
+    debug:
+      msg: Total molecules {{ mol_count }} chunk size {{ standchunksize }}
 
   - name: Run nextflow (Standardize) (async)
     command: "{{ nextflow_cmd }}"
