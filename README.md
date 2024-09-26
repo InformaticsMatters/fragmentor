@@ -550,7 +550,7 @@ Example: navigate to the ansible directory
     $ ansible-playbook site-backup-copy.yaml -e @parameters
 
 ## Tuning Parameters
-The file all.yaml contains the following parameters used to control the
+The file `all.yaml` contains the following parameters used to control the
 different steps of the process.
 
 >   Hardware sizing - used to calculate size of chunks in standardization/fragmentation.
@@ -558,6 +558,8 @@ different steps of the process.
     CPUs available on the machine/cluster and how many postgres parallel
     jobs that can be safely run. The second parameter is currently only used
     in building the index in the site-extract play.
+
+Fragmentation will typically require cores that have access to at least 200MB of memory.
 
 For example:
 
@@ -856,6 +858,58 @@ standard_compound_id_prefix: SDF
 # Field in SDF file to be used for compound id.
 standard_compound_id_field: mr_id
 ```
+
+## Fragmentation timing estimation
+By default the fragmentation process uses the `approx_vendor_molecules`
+and `est_total_fragmentation_time` (minutes) to estimate the time that should be
+allowed for the nextflow freagmentation process to run. The process is run
+_asynchronously_ in Ansible and so the playbook will need to _estinate_
+the time to allow it to run, polling the process exit code regularly, so that the
+playbook does not end prematurely.
+
+Estimating the fragmentation time is _critical_ to the process as the playbook
+is not written to run for ever - it expects the process to complete at some point.
+
+Internally the estimated time is calculated from the following equation: -
+
+```
+estimate (minutes) =
+    safety_factor x
+    (est_total_fragmentation_time / parallel_jobs) x
+    (actual_vendor_molecules / approx_vendor_molecules)
+```
+
+Where: `safety_factor` has a defautl of `3`.
+
+So, to get a good estimate you have to have some idea of how long it
+would take to fragment all the molecules (if you had just one core), that's
+your `est_total_fragmentation_time`.
+
+If you have 500 cores (`parallel_jobs`) and an estimated total time of
+two days (`2880` minutes) and an estimate of 1 million molecules
+but the fragmentor finds 800,000 the estimated run time
+(for the nextflow fragmentatioin step) will be: -
+
+```
+3 x (2880 / 500) x (800000 / 1000000)
+```
+
+(about 14 minutes)
+
+This is a very simple example.
+
+If all else fails, and you simply want to specify the fragmentation time yourself
+(for the nextflow process) you can _override_ the calculation with the following: -
+
+```
+nextflow_timeout_minutes: 240
+force_nextflow_timeout_minutes: yes
+```
+
+The `nextflow_timeout_minutes` will be used as a lower limit, regardless
+of whether you force it or not. If the calculation
+results in a value less than `nextflow_timeout_minutes` then `nextflow_timeout_minutes`
+wil be used.
 
 ## Running Python Scripts directly via a Conda Environment
 
