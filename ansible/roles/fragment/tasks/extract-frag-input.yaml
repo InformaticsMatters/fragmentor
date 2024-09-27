@@ -24,7 +24,8 @@
   set_fact:
     mols_to_fragment: "{{ wc_result.stdout.split(' ')[0]|int }}"
 
-- debug:
+- name: Display number of molecules to fragment
+  debug:
     var: mols_to_fragment
 
 - name: Set frag_chunksize_calc
@@ -37,5 +38,6 @@
     fragchunksize: "{{ fragchunksize_calc|int }}"
   when: fragchunksize_calc|int>fragchunksize
 
-- debug:
+- name: Display fragment chunk size
+  debug:
     var: fragchunksize

@@ -1,10 +1,6 @@
 ---
 
-- name: Display new edge chunk
-  debug:
-    var: item
-
-- name: Copy chunk to edge
+- name: Copy edge chunk to edge ({{ item }})
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database_login_host }} --echo-all
      --set AUTOCOMMIT=on --set ON_ERROR_STOP=on

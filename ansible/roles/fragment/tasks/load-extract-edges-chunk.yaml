@@ -1,15 +1,11 @@
 ---
 
-- name: Display chunk
-  debug:
-    var: item
-
 - name: (Re) create i_edge table
   postgresql_query:
     path_to_script: "{{ role_path }}/files/f90_create_i_edges.sql"
     autocommit: yes
 
-- name: Copy chunk to i_edge
+- name: Copy chunk to i_edge ({{ item }})
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database_login_host }} --echo-all
      --set AUTOCOMMIT=on --set ON_ERROR_STOP=on

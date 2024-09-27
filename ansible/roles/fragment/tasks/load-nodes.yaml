@@ -12,7 +12,6 @@
       <h2>Step: Load Fragmented Molecules</h2>
       <p>Begin: {{ now(utc=True).isoformat() }}</p>
 
-
 - name: Variable sanity-check
   assert:
     that:
@@ -57,7 +56,7 @@
   args:
     chdir: "{{ fragpath }}/fragment"
 
-- name: Load chunk
+- name: Load node chunks
   include_tasks: load-nodes-chunk.yaml
   with_fileglob:
   - "{{ fragpath }}/fragment/nodechunk_*"

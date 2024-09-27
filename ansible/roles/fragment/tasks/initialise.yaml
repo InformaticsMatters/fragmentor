@@ -25,13 +25,14 @@
     - psycopg2-binary==2.8.5
   when: deployment=="development"
 
-- name: Retrieve source_id
+- name: Select source_id ({{ vendor }} and {{ version }})
   postgresql_query:
     query: select max(id) from source where name = '{{ vendor }}' and version = '{{ version }}';
     autocommit: no
   register: query_result
 
-- debug:
+- name: Display selection result
+  debug:
     var: query_result
 
 - name: Set source_id
