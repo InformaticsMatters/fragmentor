@@ -20,6 +20,10 @@
   set_fact:
     stand_count: "{{ standcount_result.stdout|int - 1 }}"
 
+- name: Display molecule count
+  debug:
+    var: stand_count
+
 - name: Log line to report
   blockinfile:
     marker: "<!-- {standardise-load} ANSIBLE MANAGED BLOCK -->"

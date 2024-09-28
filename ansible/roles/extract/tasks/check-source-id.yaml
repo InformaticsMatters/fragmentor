@@ -6,7 +6,8 @@
     autocommit: no
   register: query_result
 
-- debug:
+- name: Display query result
+  debug:
     var: query_result
 
 - name: Variable sanity-check

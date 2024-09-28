@@ -1,9 +1,5 @@
 ---
 
-- name: Display chunk
-  debug:
-    var: item
-
 - name: (Re) create i_iso_inchi table
   postgresql_query:
     path_to_script: "{{ role_path }}/files/f75_create_i_iso_inchi.sql"
@@ -13,7 +9,7 @@
 #       the tab file must be uploaded with (FORMAT csv, DELIMITER E'\t'). Using CSV format means that the \ is not read
 #       is an escape character os as a linefeed (as \n).
 
-- name: Copy chunk to i_iso_inchi
+- name: Copy chunk to i_iso_inchi ({{ item }})
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database_login_host }} --echo-all
      --set AUTOCOMMIT=on --set ON_ERROR_STOP=on

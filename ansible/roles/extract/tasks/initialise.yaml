@@ -36,7 +36,7 @@
   set_fact:
     source_tables: '{{ "''" + source_table_lst | join("'',''")  + "''" }}'
 
-- name: show list of source_tables
+- name: Show list of source_tables
   debug:
     msg: "{{ source_tables }}"
 

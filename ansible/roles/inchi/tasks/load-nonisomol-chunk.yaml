@@ -1,15 +1,11 @@
 ---
 
-- name: Display chunk
-  debug:
-    var: item
-
 - name: (Re) create i_noniso_inchi table
   postgresql_query:
     path_to_script: "{{ role_path }}/files/f85_create_i_noniso_inchi.sql"
     autocommit: yes
 
-- name: Copy chunk to i_noniso_inchi
+- name: Copy chunk to i_noniso_inchi ({{ item }})
   command: >-
     psql -X -U {{ database[deployment].login_user }} -h {{ database_login_host }} --echo-all
      --set AUTOCOMMIT=on --set ON_ERROR_STOP=on

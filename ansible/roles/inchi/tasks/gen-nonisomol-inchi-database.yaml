@@ -20,9 +20,6 @@
   set_fact:
     inchis_to_process: "{{ wc_result.stdout.split(' ')[0]|int }}"
 
-- debug:
-    var: inchis_to_process
-
 - name: Set inchigenchunk_calc
   set_fact:
     inchigenchunk_calc: "{{ (0.5 * inchis_to_process|int/hardware[deployment].parallel_jobs)|int }}"
@@ -33,8 +30,9 @@
     inchigenchunk: "{{ inchigenchunk_calc|int }}"
   when: inchigenchunk_calc|int>inchigenchunk|int
 
-- debug:
-    var: inchigenchunk
+- name: Display work to be done
+  debug:
+    msg: inchis_to_process={{ inchis_to_process }} inchigenchunk={{ inchigenchunk }} inchi_mols_minute={{ inchi_mols_minute}}
 
 - name: Variable sanity-check
   assert:
@@ -53,18 +51,12 @@
     nextflow_timeout_minutes: "{{ nextflow_timeout_calc|int }}"
   when: nextflow_timeout_calc|int>nextflow_timeout_minutes
 
-- debug:
-    var: nextflow_timeout_minutes
-
 # Set nextflow_poll_period_minutes based on nextflow_timeout_minutes/30.
 # If this is development then this defaults.
 - name: Set nextflow_poll_period_minutes
   set_fact:
     nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/30)|int }}"
   when: deployment=="production"
-
-- debug:
-    var: nextflow_poll_period_minutes
 
 # Move the nextflow workflow and config into place (from templates)
 # so they move from "<templates>/{{ deployment }}" to "{{ reppath }}/nextflow"...
@@ -97,6 +89,10 @@
 - name: Display nextflow command (Generate Non-Isomol Inchi)
   debug:
     var: nextflow_cmd
+
+- name: Display nextflow command timeout (Fragmentation)
+  debug:
+    msg: nextflow_timeout_minutes={{ nextflow_timeout_minutes }} nextflow_poll_period_minutes={{ nextflow_poll_period_minutes }}
 
 - name: Run nextflow (Generate Non-Isomol Inchi) (async)
   command: "{{ nextflow_cmd }}"
