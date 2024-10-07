@@ -4,7 +4,7 @@
 #
 # The container runs as root.
 
-FROM python:3.8.6-buster
+FROM python:3.8.20-bullseye
 LABEL maintainer="Tim Dudgeon<tdudgeon@informaticsmatters.com>"
 ARG NF_VERSION=20.10.0
 ARG KUBECTL_VERSION=1.23.16
