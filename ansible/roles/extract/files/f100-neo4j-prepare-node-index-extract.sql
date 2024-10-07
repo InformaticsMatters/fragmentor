@@ -13,12 +13,12 @@
  */
 
 create TABLE IF NOT EXISTS public.o_node_parent (
-    nonisomol_id integer,
+    nonisomol_id bigint,
     PRIMARY KEY (nonisomol_id)
 );
 
 CREATE OR REPLACE PROCEDURE extract_o_node_index_src(
-   src_id INTEGER,
+   src_id bigint,
    chunk_size INTEGER,
    run_offset INTEGER,
    run_limit INTEGER,

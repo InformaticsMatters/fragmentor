@@ -3,6 +3,7 @@
  * Purpose: Creates fragmentation company specific tables
  *
  * Author | Date    | Version
+ * Alan   | 10/2024 | BIGINT Version
  * Duncan | 03/2020 | Initial Version
  *
  */
@@ -22,6 +23,6 @@ CREATE TABLE i_mols_molport (
   price_5 TEXT,
   price_50 TEXT,
   lead_time TEXT,
-  isomol_id INTEGER,
-  nonisomol_id INTEGER
+  isomol_id bigint,
+  nonisomol_id bigint
 );

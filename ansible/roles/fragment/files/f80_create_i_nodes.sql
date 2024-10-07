@@ -10,12 +10,12 @@
 
 
 /*
- * Create i_node             
+ * Create i_node
  */
 DROP TABLE IF EXISTS i_node;
 CREATE TABLE i_node (
   smiles TEXT,
-  nonisomol_id INTEGER,
+  nonisomol_id bigint,
   hac SMALLINT,
   rac SMALLINT,
   ring_smiles TEXT,

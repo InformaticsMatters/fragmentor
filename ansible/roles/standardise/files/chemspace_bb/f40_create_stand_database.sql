@@ -3,13 +3,14 @@
  * Purpose: Creates fragmentation company specific tables
  *
  * Author | Date    | Version
+ * Duncan | 10/2020 | BIGINT Version
  * Duncan | 03/2020 | Initial Version
  *
  */
 
 
 /*
- * Drop all tables if they exist (NB Order because of table key constrants) 
+ * Drop all tables if they exist (NB Order because of table key constrants)
  */
 
 DROP TABLE IF EXISTS i_mols_chemspace;
@@ -23,7 +24,7 @@ CREATE TABLE i_mols_chemspace (
   nonisosmiles TEXT,
   hac SMALLINT,
   cmpd_id TEXT,
-  price INTEGER,
-  isomol_id INTEGER,
-  nonisomol_id INTEGER
+  price bigint,
+  isomol_id bigint,
+  nonisomol_id bigint
 );

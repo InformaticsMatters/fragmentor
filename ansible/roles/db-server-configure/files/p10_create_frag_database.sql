@@ -1,20 +1,21 @@
 /*
- * Create Fragmentation  Database SQL Statements: 
+ * Create Fragmentation  Database SQL Statements:
  * Purpose: Creates a Fragementation  database from scratch and reinitialises information
  *
- * Create Statements originally generated from fairmolecules and dumped 
+ * Create Statements originally generated from fairmolecules and dumped
  * from database version 12.2 by pg_dump version 12.2 (Ubuntu 12.2-2.pgdg18.04+1)
  *
- * NOTE: All tables are created under the public owner. If access permissions 
+ * NOTE: All tables are created under the public owner. If access permissions
  * are required, then these will have to be set.
- * 
- * Author | Date    | Version  
+ *
+ * Author | Date    | Version
+ * Alan   | 10/2024 | BIGINT Version
  * Duncan | 03/2020 | Initial Version
  *
  */
 
 /*
- * Drop all tables if they exist (NB Order because of table key constrants) 
+ * Drop all tables if they exist (NB Order because of table key constrants)
  */
 drop view IF EXISTS v_edge;
 drop view IF EXISTS v_edge_node;
@@ -56,7 +57,7 @@ drop table IF EXISTS o_edge_parent CASCADE;
 drop table IF EXISTS o_node_parent CASCADE;
 
 /*
- * Regenerate database 
+ * Regenerate database
  */
 
 --
@@ -64,11 +65,11 @@ drop table IF EXISTS o_node_parent CASCADE;
 --
 
 create TABLE public.edge (
-    id integer NOT NULL,
-    parent_id integer,
-    child_id integer,
+    id bigint NOT NULL,
+    parent_id bigint,
+    child_id bigint,
     label text NOT NULL,
-    source_id integer
+    source_id bigint
 );
 
 --
@@ -76,7 +77,7 @@ create TABLE public.edge (
 --
 
 create sequence public.edge_id_seq
-    AS integer
+    AS bigint
     start with 1
     increment by 1
     NO MINVALUE
@@ -95,7 +96,7 @@ alter sequence public.edge_id_seq OWNED BY public.edge.id;
 --
 
 create TABLE public.inchi (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     inchik text NOT NULL,
     inchis text NOT NULL
 );
@@ -105,7 +106,7 @@ create TABLE public.inchi (
 --
 
 create sequence public.inchi_id_seq
-    AS integer
+    AS bigint
     start with 1
     increment by 1
     NO MINVALUE
@@ -124,12 +125,12 @@ alter sequence public.inchi_id_seq OWNED BY public.inchi.id;
 --
 
 create TABLE public.isomol (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     smiles text NOT NULL,
     inchik text,
     inchis text,
-    nonisomol_id integer NOT NULL,
-    source_id integer
+    nonisomol_id bigint NOT NULL,
+    source_id bigint
 );
 
 --
@@ -137,7 +138,7 @@ create TABLE public.isomol (
 --
 
 create sequence public.isomol_id_seq
-    AS integer
+    AS bigint
     start with 1
     increment by 1
     NO MINVALUE
@@ -156,13 +157,13 @@ alter sequence public.isomol_id_seq OWNED BY public.isomol.id;
 --
 
 create TABLE public.mol_source (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     smiles text NOT NULL,
     code text NOT NULL,
-    source_id integer NOT NULL,
+    source_id bigint NOT NULL,
     lead_time INTEGER,
-    nonisomol_id integer,
-    isomol_id integer
+    nonisomol_id bigint,
+    isomol_id bigint
 );
 
 --
@@ -170,7 +171,7 @@ create TABLE public.mol_source (
 --
 
 create sequence public.mol_source_id_seq
-    AS integer
+    AS bigint
     start with 1
     increment by 1
     NO MINVALUE
@@ -188,7 +189,7 @@ alter sequence public.mol_source_id_seq OWNED BY public.mol_source.id;
 --
 
 create TABLE public.nonisomol (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     smiles text NOT NULL,
     inchik text,
     inchis text,
@@ -198,8 +199,8 @@ create TABLE public.nonisomol (
     child_count smallint,
     edge_count smallint,
     ftime integer,
-    inchi_id integer,
-    source_id integer
+    inchi_id bigint,
+    source_id bigint
 );
 
 --
@@ -207,7 +208,7 @@ create TABLE public.nonisomol (
 --
 
 create sequence public.nonisomol_id_seq
-    AS integer
+    AS bigint
     start with 1
     increment by 1
     NO MINVALUE
@@ -226,12 +227,12 @@ alter sequence public.nonisomol_id_seq OWNED BY public.nonisomol.id;
 --
 
 create TABLE public.price (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     quantity_mg integer,
     price integer,
     price_min integer,
     price_max integer,
-    molsource_id integer
+    molsource_id bigint
 );
 
 --
@@ -239,7 +240,7 @@ create TABLE public.price (
 --
 
 create sequence public.price_id_seq
-    AS integer
+    AS bigint
     start with 1
     increment by 1
     NO MINVALUE
@@ -258,7 +259,7 @@ alter sequence public.price_id_seq OWNED BY public.price.id;
 --
 
 create TABLE public.source (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     name text NOT NULL,
     version text NOT NULL,
     frag_limit integer,
@@ -275,7 +276,7 @@ create TABLE public.source (
 --
 
 create sequence public.source_id_seq
-    AS integer
+    AS bigint
     start with 1
     increment by 1
     NO MINVALUE
@@ -309,8 +310,8 @@ create TABLE public.vendor_name (
 --
 
 create TABLE public.o_edge_parent (
-    parent_id integer,
-    child_id integer,
+    parent_id bigint,
+    child_id bigint,
     label text NOT NULL,
     PRIMARY KEY (parent_id, child_id, label)
 );
@@ -598,7 +599,7 @@ alter table mol_source set (autovacuum_vacuum_cost_limit = 2000);
 --
 
 CREATE OR REPLACE PROCEDURE extract_o_edge_vendor(
-   src_id INTEGER,
+   src_id bigint,
    chunk_size INTEGER,
    run_offset INTEGER,
    run_limit INTEGER,

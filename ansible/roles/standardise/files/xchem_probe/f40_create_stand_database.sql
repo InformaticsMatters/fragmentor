@@ -10,6 +10,6 @@ CREATE TABLE i_mols_dsip (
   nonisosmiles TEXT,
   hac SMALLINT,
   cmpd_id TEXT,
-  isomol_id INTEGER,
-  nonisomol_id INTEGER
+  isomol_id bigint,
+  nonisomol_id bigint
 );
