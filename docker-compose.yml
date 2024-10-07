@@ -11,8 +11,6 @@
 #   IMAGE_TAG=1.0.0 docker-compose build
 #   IMAGE_TAG=1.0.0 docker-compose push
 
-version: '3.8'
-
 services:
 
   fragmentor:
