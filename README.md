@@ -158,7 +158,7 @@ physicals.
 ### AWS EC2
 If you're using AWS a production server can be instantiated automatically.
 You will need AWS credentials to allow general EC2 configuration and a set of
-parameters to define the server flavour: -
+parameters (in `parameters.yaml`) to define the server flavour: -
 
 You will need an AWS VPC and subnet.
 
@@ -176,7 +176,7 @@ aws_vpc_id: <CLUSTER_VPC_ID>
 
 Now create the server: -
 
-    $ ansible-playbook site-db-server.yaml -e @parameters
+    $ ansible-playbook site-db-server.yaml -e @parameters.yaml
 
 Adjust your parameters so that they include the address of the database server.
 You'll need this with other plays. The server's IP address is printed by the
@@ -205,8 +205,8 @@ to be of any use to you. You may also need to alter `ansible_user` and
 `ansible_ssh_private_key_file` to match your installation.
 You will also need to make matching changes to the 'inventory.yaml'
 
-From this point on you can create playbook paramters to match your installation in
-`ansible/parameters` (a YAML file). For example: -
+From this point on you can create playbook parameters to match your installation in
+`ansible/parameters.yaml`. For example: -
 
 ```yaml
 deployment: production
@@ -219,7 +219,7 @@ The `deployment` parameter must be one of `development` or `production` to
 setup/use a production database instance or a separate local database
 instance.
 
-> The `parameters` file will be excluded by the project's `.gitignore` file.
+> The `parameters.yaml` file will be excluded by the project's `.gitignore` file.
 
 ## Creating the Postgres Database
 The database is created in a docker container. Configuring the production
@@ -227,7 +227,7 @@ database server (a destructive action) is done via an ansible playbook.
 This playbook also pre-loads the `vendor_name` table in the database with
 the vendor file types currently supported by the process.
 
-    $ ansible-playbook site-db-server-configure.yaml -e @parameters
+    $ ansible-playbook site-db-server-configure.yaml -e @parameters.yaml
 
 >   You only really need to run the `site-db-server-configure` play once.
     It configures the server with Docker and runs the designated database
@@ -262,30 +262,30 @@ Example: navigate to the ansible directory
 For a production deployment, the ansible playbook `site-standardise` is
 configured to import vendor data files from a tree structure defined as either:
 
-    <raw><vendor><library><version>
+    raw/<vendor>/<library>/<version>
 
 or
 
-    <raw><vendor><version>
+    raw/<vendor>/<version>
 
 **Examples**
 
 -   Data files for version `v1` of the `dsip` library for vendor `xchem`
-    should be placed in directory `xchem/dsip/v1`
+    should be placed in directory `raw/xchem/dsip/v1`
 
 -   Data files for version `2020-10` for vendor `Molport` (only one library)
-    should be placed in directory `molport/2020-10`
+    should be placed in directory `raw/molport/2020-10`
 
 The ansible playbook `site-extract` is configured to export datasets to a
 tree structure defined as:
 
 For Neo4j extracts for individual vendor libraries: -
 
-    <extract><vendor_library><version>
+    extract/<vendor_library>/<version>
 
 For Neo4j extracts for combinations of vendor libraries: -
 
-    <combination><first vendor_library><date>
+    combination/<first vendor_library>/<date>
 
 **Examples**
 
@@ -375,13 +375,13 @@ at: `ansible/run-parameters.template` that you can copy.
 Armed with a parameter file, like the one shown above,
 the standardisation step is run as follows: -
 
-    $ ansible-playbook site-standardise.yaml -e @parameters
+    $ ansible-playbook site-standardise.yaml -e @parameters.yaml
 
 ### Fragmentation
 Armed with a parameter file,
 the fragmentation step is run as follows: -
 
-    $ ansible-playbook site-fragment.yaml -e @parameters
+    $ ansible-playbook site-fragment.yaml -e @parameters.yaml
 
 A fragmentation step would normally be processed directly after a
 standardisation step, but as this step is driven by the database it is
@@ -398,7 +398,7 @@ The Create Inchi step will identify any molecules that have not had inchi keys
 generated yet and process them. It is not vendor/library specific and can be
 run as follows:
 
-    $ ansible-playbook site-inchi.yaml -e @parameters
+    $ ansible-playbook site-inchi.yaml -e @parameters.yaml
 
 As this step is driven by the database it possible to run multiple
 standardisation/fragmentation steps for different
@@ -449,7 +449,7 @@ A template (`extract-parameters.template`) is provided for this file.
 
 The command is:
 
-    $ ansible-playbook site-extract.yaml -e @parameters
+    $ ansible-playbook site-extract.yaml -e @parameters.yaml
 
 ote that for the larger extracts to complete there needs to be sufficient
 temporary space on the postgres pgdata directory for the database queries to
@@ -525,7 +525,7 @@ directory on the `runpath`.
 
 The command is:
 
-    $ ansible-playbook site-combine.yaml -e @parameters
+    $ ansible-playbook site-combine.yaml .yaml
 
 ## Backing up and Restoring the Database
 The backup playbook can also be used in isolation from the other playbooks.
@@ -536,7 +536,7 @@ of backups retained defaults to 2, but can be adjusted per database
 
 Example:
 
-    $ ansible-playbook site-backup.yaml -e @parameters
+    $ ansible-playbook site-backup.yaml -e @parameters.yaml
 
 A backed up database can be restored with the restore playbook.
 It defaults to the latest saved backup. Other backups can be chosen by setting
@@ -545,10 +545,10 @@ folder.
 
 Examples:
 
-    $ ansible-playbook site-restore.yaml -e @parameters
+    $ ansible-playbook site-restore.yaml -e @parameters.yaml
 
     $ ansible-playbook site-restore.yaml \
-        -e @parameters \
+        -e @parameters.yaml \
         -e restore_file=backup-2020-07-23T16:12:56Z-dumpall.sql.gz
 
 Similarly there are playbooks to stop and start the database server.
@@ -556,10 +556,10 @@ The postgres startup configuration items are set
 up in the start-database playbook.
 
     $ ansible-playbook site-db-server-configure_stop-database.yaml \
-        -e @parameters
+        -e @parameters.yaml
 
     $ ansible-playbook site-db-server-configure_start-database.yaml \
-        -e @parameters
+        -e @parameters.yaml
 
 As an alternative to the pg_dump based backup and restore plays a simple
 backup play has also been created to copy the database volume to the backup
@@ -568,7 +568,7 @@ restarts the database: -
 
 Example: navigate to the ansible directory
 
-    $ ansible-playbook site-backup-copy.yaml -e @parameters
+    $ ansible-playbook site-backup-copy.yaml -e @parameters.yaml
 
 ## Tuning Parameters
 The file `all.yaml` contains the following parameters used to control the

@@ -9,6 +9,7 @@ work
 /ansible/SetMe/
 /ansible/parameters/
 /ansible/parameters
+/ansible/parameters.yaml
 /ansible/ec2.py
 /nextflow/
 /sql/*.sql
