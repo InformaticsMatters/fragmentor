@@ -96,7 +96,7 @@ environment, to avoid disturbing the system Python: -
 
 And, depending on your distribution, you might need SELinux bindings...
 
-    $ sudo yum install libselinux-python3
+    $ pip install selinux
 
 Install requirements: -
 
@@ -111,9 +111,9 @@ You will also need credentials for S3, so you will need to set up the
 following parameters. Regardless of whether you're _actually_ using an AWS
 bucket or not, we use the standard AWS variables: -
 
-    $ export AWS_ACCESS_KEY=<Access Key ID>
-    $ export AWS_SECRET_KEY=<Secret Access Key>
-    $ export AWS_REGION=eu-central-1
+    $ export AWS_ACCESS_KEY_ID=<Access Key ID>
+    $ export AWS_SECRET_ACCESS_KEY=<Secret Access Key>
+    $ export AWS_DEFAULT_REGION=eu-central-1
 
 >   If you're using an alternative provider's S3 store, just put the
     relevant details into the appropriate AWS variable.
@@ -123,7 +123,7 @@ If you are using a non-AWS S3 bucket you will need to provide the S3
 endpoint, but leaving this environment variable undefined if you are using
 AWS: -
 
-    $ export S3_URL=<Non-AWS S3 Sevrvide Endpoint/URL>
+    $ export AWS_ENDPOINT_URL=<Non-AWS S3 Service Endpoint URL>
 
 The playbooks will use `psql` commands to interact with the database, so you
 must ensure that the control host has access to `psql`. For ubuntu this can
@@ -472,12 +472,11 @@ default (`s3`):
 
 ```yaml
 ---
-database_login_host: 130.246.214.154
 deployment: production
-runpath: /data/fragmentor/run-01
 hardware:
   production:
-    postgres_jobs: 400
+    parallel_jobs: 100
+runpath: /share/fragmentor
 
 combine:
 - lib:
@@ -487,14 +486,18 @@ combine:
     path: extract/xchem_spot/v1
     data_source: s3
     bucket: "{{ bucket_in_1 }}"
-    aws_access_key: "{{ aws_access_key_in_1 }}"
-    aws_secret_key: "{{ aws_secret_key_in_1 }}"
+    s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+    s3_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+    s3_region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+    s3_url: "{{ lookup('env', 'AWS_ENDPOINT_URL') }}"
 - lib:
     path: extract/xchem_probe/v1
     data_source: s3
     bucket: "{{ bucket_in_2 }}"
-    aws_access_key: "{{ aws_access_key_in_2 }}"
-    aws_secret_key: "{{ aws_secret_key_in_2 }}"
+    s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+    s3_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+    s3_region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+    s3_url: "{{ lookup('env', 'AWS_ENDPOINT_URL') }}"
 
 # The path_out parameter defines the subdirectory that will be used
 # for the output in "combinations" .
@@ -504,28 +507,27 @@ data_source_out: disk
 ```
 
 There is a template file with all the above settings and more explanation
-at: ansible/roles/combine-parameters.template that you can copy.
+in the file `ansible/combine-parameters.template` that you can copy.
 
 **Notes**
 
 The AWS access keys are provided as external parameters to the script in a
 similar way to the other playbooks. In the repository configuration,
-they are all set to `AWS_ACCESS_KEY_ID` and `AWS_SECRET_KEY_ID`, but this mapping
+they are all set to `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, but this mapping
 can be changed in the file `roles/combine/defaults/main.yaml`.
-A template (`combination-parameters.template`) is provided.
 
-For data source S3, the path if the full path to the dataset in the bucket
+For data sourced from `s3`, the path is the full path to the dataset in the bucket
 rather than the vendor. This allows existing combinations to also be used as
 input sources.
 
-For data source disk - files are expected (by default) to be in a directory
+For data sourced from `disk` - files are expected (by default) to be in a directory
 called `extract` (configurable) in the `runpath`. If `data_source_out` is set
 to `disk`, then the combined extract will be available in the `combine`
 directory on the `runpath`.
 
 The command is:
 
-    $ ansible-playbook site-combine.yaml .yaml
+    $ ansible-playbook site-combine.yaml -e @parameters.yaml
 
 ## Backing up and Restoring the Database
 The backup playbook can also be used in isolation from the other playbooks.

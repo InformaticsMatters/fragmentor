@@ -5,6 +5,19 @@
 #
 # ansible-playbook site-combine.yaml -e @parameters -e deployment=development|production
 
+# The type of deployment (one of production or development)
+deployment: production
+# What do we have access to?
+hardware:
+  production:
+    # Approximate number of un-requested cores in the cluster
+    parallel_jobs: 100
+
+# Where all the work will be done.
+# A directory available to the control machine and its workers.
+# Files will be placed in a 'data' directory here.
+runpath: /share/fragmentor
+
 # Vendors to be combined will come from a single or combination database that
 # is available on S3. Combinations will be added to a new combination database.
 # A map of defaults based on the vendor and library.
@@ -12,7 +25,7 @@
 # When combining libraries the map contains a list of paths
 # that can either be sourced from 'disk' or 's3'. When the source is S3
 # you can provide individual buckets, access credentials and S3 hosts
-# (ie. the source of the combination can come from multiple locations).
+# (i.e. the source of the combination can come from multiple locations).
 # If you only have one S3 bucket then the access keys, URL and region
 # will all be the same.
 #
@@ -27,18 +40,18 @@ combine:
     path: 'extract/xchem_spot/v1'
     data_source: s3
     s3_bucket: im-fragnet
-    s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
-    s3_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
-    s3_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
-    s3_url: "{{ lookup('env', 'S3_URL') }}"
+    s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+    s3_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+    s3_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
+    s3_url: "{{ lookup('env', 'AWS_ENDPOINT_URL') }}"
 - lib:
     path: 'extract/xchem_probe/v1'
     data_source: s3
     s3_bucket: im-fragnet
-    s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
-    s3_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
-    s3_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
-    s3_url: "{{ lookup('env', 'S3_URL') }}"
+    s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+    s3_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+    s3_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
+    s3_url: "{{ lookup('env', 'AWS_ENDPOINT_URL') }}"
 
 # The path_out parameter defines the sub-directory in "combinations"
 # that will be used for the output.
@@ -52,7 +65,7 @@ output_destination: s3
 # Variables required if the destination is 's3': -
 s3_out_bucket: im-fragnet
 s3_out_bucket_requires_encryption: no
-s3_out_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
-s3_out_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
-s3_out_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
-s3_out_url: "{{ lookup('env', 'S3_URL') }}"
+s3_out_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+s3_out_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+s3_out_region: "{{ lookup('env', 'AWS_DEFAULT_REGION')|default('eu-central-1', true) }}"
+s3_out_url: "{{ lookup('env', 'AWS_ENDPOINT_URL') }}"
