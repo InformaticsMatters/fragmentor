@@ -51,11 +51,13 @@
     nextflow_timeout_minutes: "{{ nextflow_timeout_calc|int }}"
   when: nextflow_timeout_calc|int>nextflow_timeout_minutes
 
-# Set nextflow_poll_period_minutes based on nextflow_timeout_minutes/30.
+# Set nextflow_poll_period_minutes based on nextflow_timeout_minutes.
+# We'll poll for execution completion 100 times over the total timeout period.
+# This should be responsive without resulting in too many lines in the Ansible log.
 # If this is development then this defaults.
 - name: Set nextflow_poll_period_minutes
   set_fact:
-    nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes|int/30)|int }}"
+    nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes | int / 100) | int }}"
   when: deployment=="production"
 
 # Move the nextflow workflow and config into place (from templates)
