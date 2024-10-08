@@ -325,9 +325,30 @@ intensive fragmentation step.
 The process consists of three steps, described below:
 
 ### Standardisation
-It's easier to run playbooks using a YAML-based parameter file,
-where all the control variables can be set. A typical parameter file
-(`parameters`) might look like this: -
+Standardisation "normalises" the customer SMILES into a format suitable for
+on-going processing. It relies on files located in an S3 bucket as
+described above in **Configuring the S3 Directory Structure**.
+
+Using Ansible variables: -
+
+-  `unpacker` identifies the task file (in `roles/standardise/tasks`) that
+    will be used to unpack the raw data files. A value of `decompress-gz-all`
+    will use the logic defined in the task file `unpack-raw-decompress-gz-all.yaml`.
+-   `standinputfile` identifies the names of the decompressed files to be standardised,
+    and is typically a regular expression like `s*.cxsmiles`
+-   `standardiser` identifies the Python module in the project `frag/standardise/scripts`
+    directory that will interpret the raw data and produce the standardised file
+    (based on the files collected by the `standinputfile` filename filter).
+    It is responsible for parsing the decompressed input file so it and the file
+    must be compatible.
+
+These values are provided to the standardise play using a parameter file in the
+`roles/standardise/vars` directory. Its name is based on the vendor/library name.
+For example, the `xchem_dsip` library, e.g. `xchem_dsip-variables.yaml`.
+
+It's easier to run all our playbooks using a YAML-based parameter file,
+where all the main control variables can be set. A typical parameter file
+(`parameters.yaml`) might look like this: -
 
 ```yaml
 ---

@@ -114,7 +114,7 @@
         -w {{ nextpath }}
         -with-report {{ standpath }}/standardise/standardise_nextflow_report.html
         --script {{ standardiser }}
-        --inputs {{ datapath }}/data/{{ vendor }}/"{{ standinputfile }}"
+        --inputs {{ datapath }}/data/{{ vendor }}/{{ standinputfile }}
         --out_dir {{ standpath }}/standardise
         --chunk_size {{ standchunksize|int }}
         --compound_id_prefix {{ standard_compound_id_prefix }}
