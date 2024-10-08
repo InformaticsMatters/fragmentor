@@ -101,14 +101,14 @@
   set_fact:
     nextflow_cmd: >-
       nextflow run -c {{ reppath }}/nextflow/nextflow.config
-       {{ reppath }}/nextflow/fragmentation.nf
-       -w {{ nextpath }}
-       -with-report {{ fragpath }}/fragment/fragmentation_nextflow_report.html
-       --input {{ fragpath }}/fragment/{{ fragsmifile }}
-       --out_dir {{ fragpath }}/fragment
-       --chunk_size {{ fragchunksize|int }}
-       --max_hac {{ vendors[vendor].fraghac }}
-       --max_frag {{ vendors[vendor].fragmaxfrags }}
+      {{ reppath }}/nextflow/fragmentation.nf
+      -w {{ nextpath }}
+      -with-report {{ fragpath }}/fragment/fragmentation_nextflow_report.html
+      --input {{ fragpath }}/fragment/{{ fragsmifile }}
+      --out_dir {{ fragpath }}/fragment
+      --chunk_size {{ fragchunksize|int }}
+      --max_hac {{ vendors[vendor].fraghac }}
+      --max_frag {{ vendors[vendor].fragmaxfrags }}
 
 - name: Display nextflow command (Fragmentation)
   debug:
