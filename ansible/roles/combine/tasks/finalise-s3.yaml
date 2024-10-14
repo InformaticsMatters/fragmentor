@@ -195,7 +195,7 @@
       mode: put
       region: "{{ s3_out_region }}"
     loop: "{{ files_found }}"
-    when: s3_url|length == 0
+    when: s3_out_url|length == 0
 
   - name: Transfer log files (non-AWS)
     aws_s3:
