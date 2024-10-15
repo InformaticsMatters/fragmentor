@@ -73,6 +73,11 @@
     nextflow_poll_period_minutes: "{{ (nextflow_timeout_minutes | int / 100) | int }}"
   when: deployment=="production"
 
+- name: Ensure nextflow_poll_period_minutes is not zero
+  set_fact:
+    nextflow_poll_period_minutes: 1
+  when: nextflow_poll_period_minutes | int == 0
+
 - name: Log line to report
   blockinfile:
     marker: "<!-- {fragmentation-nextflow} ANSIBLE MANAGED BLOCK -->"

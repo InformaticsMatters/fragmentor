@@ -97,6 +97,11 @@
   when:
   - not combined_file.stat.exists
 
+- name: Ensure nextflow_poll_period_minutes is not zero
+  set_fact:
+    nextflow_poll_period_minutes: 1
+  when: nextflow_poll_period_minutes | int == 0
+
 - name: Display nextflow command timeout (Deduplicate)
   debug:
     msg: nextflow_timeout_minutes={{ nextflow_timeout_minutes }} nextflow_poll_period_minutes={{ nextflow_poll_period_minutes }}
