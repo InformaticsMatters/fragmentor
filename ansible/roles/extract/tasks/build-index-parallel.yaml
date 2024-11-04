@@ -105,6 +105,7 @@
   when:
   - deployment=="production"
   - index_timeout_minutes|int > 120
+  - not force_index_timeout_minutes | bool
 
 - name: Display index poll period
   debug:
