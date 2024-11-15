@@ -83,7 +83,10 @@
 - name: Set nextflow command (Generate Non-Isomol Inchi)
   set_fact:
     nextflow_cmd: >-
-      nextflow run -c {{ reppath }}/nextflow/nextflow.config
+      nextflow
+      -log {{ fragpath }}/standardise/nextflow.log
+      run
+      -c {{ reppath }}/nextflow/nextflow.config
       {{ reppath }}/nextflow/generateinchi.nf
       -w {{ nextpath }}
       -with-report {{ fragpath }}/inchi/generateinchi_report.html

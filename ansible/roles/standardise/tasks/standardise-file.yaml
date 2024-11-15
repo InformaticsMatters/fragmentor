@@ -116,7 +116,10 @@
   - name: Set nextflow command (Standardise)
     set_fact:
       nextflow_cmd: >-
-        nextflow run -c {{ reppath }}/nextflow/nextflow.config
+        nextflow
+        -log {{ standpath }}/standardise/nextflow.log
+        run
+        -c {{ reppath }}/nextflow/nextflow.config
         {{ reppath }}/nextflow/standardizer.nf
         -w {{ nextpath }}
         -with-report {{ standpath }}/standardise/standardise_nextflow_report.html

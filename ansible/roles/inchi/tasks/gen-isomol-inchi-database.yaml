@@ -95,7 +95,10 @@
 - name: Set nextflow command (Generate Isomol Inchi)
   set_fact:
     nextflow_cmd: >-
-      nextflow run -c {{ reppath }}/nextflow/nextflow.config
+      nextflow
+      -log {{ fragpath }}/standardise/nextflow.log
+      run
+      -c {{ reppath }}/nextflow/nextflow.config
       {{ reppath }}/nextflow/generateinchi.nf
       -w {{ nextpath }}
       -with-report {{ fragpath }}/isoinchi/generateinchi_report.html

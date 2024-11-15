@@ -105,7 +105,10 @@
 - name: Set nextflow command (Fragmentation)
   set_fact:
     nextflow_cmd: >-
-      nextflow run -c {{ reppath }}/nextflow/nextflow.config
+      nextflow
+      -log {{ fragpath }}/fragment/nextflow.log
+      run
+      -c {{ reppath }}/nextflow/nextflow.config
       {{ reppath }}/nextflow/fragmentation.nf
       -w {{ nextpath }}
       -with-report {{ fragpath }}/fragment/fragmentation_nextflow_report.html
