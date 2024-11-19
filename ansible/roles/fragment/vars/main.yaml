@@ -25,6 +25,7 @@ nextflow_timeout_calc: 0
 
 # Minimum chunk size for fragmentation processing
 fragchunksize: 10
+force_fragchunksize: no
 
 # Safety factor is used in case, for example, other processes are on the machine
 safety_factor: 3

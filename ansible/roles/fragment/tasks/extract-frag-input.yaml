@@ -36,7 +36,9 @@
 - name: Set frag_chunksize
   set_fact:
     fragchunksize: "{{ fragchunksize_calc|int }}"
-  when: fragchunksize_calc|int>fragchunksize
+  when:
+  - fragchunksize_calc | int > fragchunksize
+  - not force_fragchunksize | bool
 
 - name: Display fragment chunk size
   debug:
