@@ -84,10 +84,12 @@ echo "+> Played"
 
 if [ "${EXIT_CODE}" -ne "0" ]; then
 
-    # An error - display the Nextflow log file f there is one.
-    # Even if Nextflow is not the problem (as it's easier than figuring out what failed).
+    # An error - display the Nextflow log file if there is one.
+    # We do this even if Nextflow turns out not to be the source of the problem
+    # because it's easier than figuring out what failed in the playbook.
     #
-    # The logfile will be in play's working directory.
+    # The logfile will be in the working directory for the play,
+    # set by each play's nextflow command with the '-log' option.
     NEXTFLOW_LOG="/work/${FRAGMENTOR_PLAY}/nextflow.log"
     if [ -f "${NEXTFLOW_LOG}" ]; then
         echo "+> Found a Nextflow logfile."
