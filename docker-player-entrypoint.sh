@@ -5,7 +5,7 @@ set -e
 
 # The controller-container entrypoint.
 # The environment variable FRAGMENTOR_PLAY defines
-# what the container image will do.
+# what the container image will do (and a working directory).
 # It is expected to be one of the plays.
 # i.e. 'standardise' for the site-standardise.yaml play.
 
@@ -30,8 +30,9 @@ if [ ! -f "${PARAMETER_FILE}" ]; then
     exit 1
 fi
 
-# A Nextflow configuration file '$HOME/nextflow.config' is expected to be mapped
-# into the container.
+# A Nextflow configuration file ('$HOME/nextflow.config')
+# is expected to be mapped
+# into the container...
 
 NF_CONFIG_FILE=${HOME}/.nextflow/config
 echo "+> NF_CONFIG_FILE is ${NF_CONFIG_FILE}"
@@ -83,18 +84,20 @@ echo "+> Played"
 
 if [ "${EXIT_CODE}" -ne "0" ]; then
 
-    # Display the Nextflow log? If there is one.
-    # The latest will be in [CWD]/.nextflow.log
-    ERROR_NEXTFLOW_LOG=".nextflow.log"
-    if [ -f "${ERROR_NEXTFLOW_LOG}" ]; then
-        echo "+> Found a ${ERROR_NEXTFLOW_LOG} file."
-        echo "+> ${ERROR_NEXTFLOW_LOG} BEGIN..."
+    # An error - display the Nextflow log file f there is one.
+    # Even if Nextflow is not the problem (as it's easier than figuring out what failed).
+    #
+    # The logfile will be in play's working directory.
+    NEXTFLOW_LOG="/work/${FRAGMENTOR_PLAY}/nextflow.log"
+    if [ -f "${NEXTFLOW_LOG}" ]; then
+        echo "+> Found a Nextflow logfile."
+        echo "+> ${NEXTFLOW_LOG} BEGIN..."
         echo "+>"
-        cat "${ERROR_NEXTFLOW_LOG}"
+        cat "${NEXTFLOW_LOG}"
         echo "+>"
-        echo "+> ...${ERROR_NEXTFLOW_LOG} END"
+        echo "+> ...${NEXTFLOW_LOG} END"
     else
-        echo "+> No ${ERROR_NEXTFLOW_LOG} file to display."
+        echo "+> No ${NEXTFLOW_LOG} file to display."
     fi
 
     # Finish with a bold error statement...
