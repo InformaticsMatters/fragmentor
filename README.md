@@ -197,6 +197,13 @@ database_login_host: 10.0.0.192
 Using the AWS console wait for the database server instance to become ready
 (initialise) before trying to create the database.
 
+**Crucially** it is vitally important that you ensure any custom database parameters
+have been correctly applied to the running database. A `ConfigMap` that is
+written to the database Pod by our playbook will be *read only* and you must move it to
+where PostgreSQL expects to find it (typically `/var/lib/postgresql/data/pgdata/postgresql.conf`).
+You can see where the server expects to find the configuration file by running
+`show config_file;` in  a PSQL prompt.
+
 ## Adjust the Ansible inventory
 
 You may need to adjust your `ansible/inventory`
