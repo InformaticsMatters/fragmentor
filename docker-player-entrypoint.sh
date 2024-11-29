@@ -8,6 +8,9 @@ set -e
 # what the container image will do (and a working directory).
 # It is expected to be one of the plays.
 # i.e. 'standardise' for the site-standardise.yaml play.
+#
+# The user can also add arbitrary arguments to the play
+# using FRAGMENTOR_PLAY_EXTRA_ARGS.
 
 : "${FRAGMENTOR_PLAY?Need to set FRAGMENTOR_PLAY}"
 : "${FRAGMENTOR_NAMESPACE?Need to set FRAGMENTOR_NAMESPACE}"
@@ -75,12 +78,12 @@ ansible --version
 
 PLAYBOOK="site-${FRAGMENTOR_PLAY}.yaml"
 echo "+> Playing ${PLAYBOOK}..."
-echo "+> PLAYBOOK_EXTRA_ARGS='${PLAYBOOK_EXTRA_ARGS}'"
+echo "+> FRAGMENTOR_PLAY_EXTRA_ARGS='${FRAGMENTOR_PLAY_EXTRA_ARGS}'"
 pushd ansible || exit 1
 EXIT_CODE=0
 ansible-playbook "${PLAYBOOK}" -e "@${PARAMETER_FILE}" \
   -e "ansible_python_interpreter=/usr/local/bin/python" \
-  "${PLAYBOOK_EXTRA_ARGS}" \
+  "${FRAGMENTOR_PLAY_EXTRA_ARGS}" \
   || EXIT_CODE=$?
 echo "+> Played"
 
