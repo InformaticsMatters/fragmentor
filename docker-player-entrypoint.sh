@@ -75,10 +75,12 @@ ansible --version
 
 PLAYBOOK="site-${FRAGMENTOR_PLAY}.yaml"
 echo "+> Playing ${PLAYBOOK}..."
+echo "+> PLAYBOOK_EXTRA_ARGS='${PLAYBOOK_EXTRA_ARGS}'"
 pushd ansible || exit 1
 EXIT_CODE=0
 ansible-playbook "${PLAYBOOK}" -e "@${PARAMETER_FILE}" \
   -e "ansible_python_interpreter=/usr/local/bin/python" \
+  "${PLAYBOOK_EXTRA_ARGS}" \
   || EXIT_CODE=$?
 echo "+> Played"
 
