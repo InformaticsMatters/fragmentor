@@ -81,9 +81,8 @@ echo "+> Playing ${PLAYBOOK}..."
 echo "+> FRAGMENTOR_PLAY_EXTRA_ARGS='${FRAGMENTOR_PLAY_EXTRA_ARGS}'"
 pushd ansible || exit 1
 EXIT_CODE=0
-ansible-playbook "${PLAYBOOK}" -e "@${PARAMETER_FILE}" \
-  -e "ansible_python_interpreter=/usr/local/bin/python" \
-  "${FRAGMENTOR_PLAY_EXTRA_ARGS}" \
+ansible-playbook ${FRAGMENTOR_PLAY_EXTRA_ARGS} "${PLAYBOOK}" -e @${PARAMETER_FILE} \
+  -e ansible_python_interpreter=/usr/local/bin/python \
   || EXIT_CODE=$?
 echo "+> Played"
 
