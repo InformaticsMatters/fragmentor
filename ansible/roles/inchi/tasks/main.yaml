@@ -19,11 +19,22 @@
 
 - block:
 
-  - import_tasks: initialise.yaml
-  - import_tasks: gen-nonisomol-inchi-database.yaml
-  - import_tasks: load-nonisomol-inchi.yaml
-  - import_tasks: gen-isomol-inchi-database.yaml
-  - import_tasks: load-isomol-inchi.yaml
+  - name: Run initialisation logic
+    import_tasks: initialise.yaml
+
+  - name: Non-isomol database
+    include_tasks: gen-nonisomol-inchi-database.yaml
+    tags: non_isomol
+  - name: Load non-isomol
+    include_tasks: load-nonisomol-inchi.yaml
+    tags: non_isomol
+
+  - name: Isomol database
+    include_tasks: gen-isomol-inchi-database.yaml
+    tags: isomol
+  - name: Load isomol
+    include_tasks: load-isomol-inchi.yaml
+    tags: isomol
 
   module_defaults:
     postgresql_query:
