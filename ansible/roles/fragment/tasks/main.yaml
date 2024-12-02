@@ -44,12 +44,24 @@
 
 - block:
 
-  - import_tasks: initialise.yaml
-  - import_tasks: extract-frag-input.yaml
-  - import_tasks: fragmentation.yaml
-  - import_tasks: load-nodes.yaml
-  - import_tasks: load-edges.yaml
-  - import_tasks: finalise.yaml
+  - name: Run initialisation logic
+    import_tasks: initialise.yaml
+  - name: Extract fragmentation input
+    import_tasks: extract-frag-input.yaml
+
+  - name: Run fragmentation
+    include_tasks: fragmentation.yaml
+    tags: fragmentation
+
+  - name: Load nodes
+    include_tasks: load-nodes.yaml
+    tags: load_nodes
+  - name: Load edges
+    include_tasks: load-edges.yaml
+    tags: load_edges
+
+  - name: Run finalisation logic
+    import_tasks: finalise.yaml
 
   module_defaults:
     postgresql_query:
