@@ -76,8 +76,7 @@ pip list
 echo "+> Ansible version..."
 ansible --version
 
-PLAYBOOK="site-${FRAGMENTOR_PLAY}.yaml"
-echo "+> Playing ${PLAYBOOK}..."
+# Display an 'extra arguments'
 echo "+> FRAGMENTOR_PLAY_EXTRA_ARGS='${FRAGMENTOR_PLAY_EXTRA_ARGS}'"
 # Has the 'skip tags' environment variable been?
 echo "+> FRAGMENTOR_PLAY_SKIP_TAGS='${FRAGMENTOR_PLAY_SKIP_TAGS}'"
@@ -85,6 +84,8 @@ if [ -n "${FRAGMENTOR_PLAY_SKIP_TAGS}" ]; then
   FRAGMENTOR_PLAY_SKIP_TAGS="--skip-tags ${FRAGMENTOR_PLAY_SKIP_TAGS}"
 fi
 
+PLAYBOOK="site-${FRAGMENTOR_PLAY}.yaml"
+echo "+> Playing ${PLAYBOOK}..."
 pushd ansible || exit 1
 EXIT_CODE=0
 ansible-playbook ${FRAGMENTOR_PLAY_SKIP_TAGS} ${FRAGMENTOR_PLAY_EXTRA_ARGS} "${PLAYBOOK}" \
