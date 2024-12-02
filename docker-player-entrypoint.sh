@@ -81,7 +81,7 @@ echo "+> Playing ${PLAYBOOK}..."
 echo "+> FRAGMENTOR_PLAY_EXTRA_ARGS='${FRAGMENTOR_PLAY_EXTRA_ARGS}'"
 # Has the 'skip tags' environment variable been?
 if [ -n "${FRAGMENTOR_PLAY_SKIP_TAGS}" ]; then
-  FRAGMENTOR_PLAY_SKIP_TAGS="--skiptags \"${FRAGMENTOR_PLAY_SKIP_TAGS}\""
+  FRAGMENTOR_PLAY_SKIP_TAGS="--skip-tags ${FRAGMENTOR_PLAY_SKIP_TAGS}"
 fi
 
 pushd ansible || exit 1
