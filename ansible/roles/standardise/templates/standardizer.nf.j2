@@ -6,8 +6,11 @@
  * Tim    | 03/2020 | Initial Version
  * Duncan | 03/2020 | Updated for multiple input files and no gzip.
  * Duncan | 12/2020 | Updated to change file splitter to python script.
+ * Tim    | 12/2024 | Convert to DSL2
  *
  */
+
+nextflow.enable.dsl=2
 
 params.inputs = 'run/data/chemspace_bb/chemspace_bb.txt'
 params.chunk_size = 15000
@@ -34,7 +37,7 @@ process split {
     file files
 
     output:
-    file 'split_*' into split_files mode flatten
+    file 'split_*'
 
     """
     # Check if a token has been set, if so - supply the token to the python script.
@@ -49,7 +52,7 @@ process split {
 
 }
 
-process standardise {
+process standardise_mols {
 
 {% if nextflow_container_registry %}
     container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
@@ -60,10 +63,10 @@ process standardise {
     maxErrors = 3
 
     input:
-    file chunks from split_files
+    file chunks
 
     output:
-    file 'split_*.tab' into standardised
+    file 'split_*.tab'
 
     """
     cp $chunks input.dat
@@ -80,5 +83,19 @@ process standardise {
 
 }
 
-standardised.collectFile(name: "standardised-compounds.tab", storeDir: "${params.out_dir}", keepHeader: true)
 
+// workflow definitions
+workflow standardise {
+
+    take:
+    file files
+
+    main:
+    split(files) | flatten | standardise_mols \
+    | collectFile(name: "standardised-compounds.tab", storeDir: "${params.out_dir}", keepHeader: true)
+
+}
+
+workflow {
+    standardise(files)
+}
