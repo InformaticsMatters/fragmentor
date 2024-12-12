@@ -38,7 +38,7 @@ process fragment_mols {
     output:
     file 'nodes_*.csv'
     file 'edges_*.csv'
-    file 'rejects_*.smi'
+    file 'rejects_*.smi', optional: true
 
     """
     python -m frag.network.scripts.build_db_from_smiles --input $chunks --base_dir ./ --max-frag ${params.max_frag} --max-hac ${params.max_hac}
