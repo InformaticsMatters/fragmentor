@@ -36,9 +36,9 @@ process fragment_mols {
     file chunks
 
     output:
-    file 'nodes_*.csv'
-    file 'edges_*.csv'
-    file 'rejects_*.smi', optional: true
+    path('nodes_*.csv')
+    path('edges_*.csv')
+    path('rejects_*.smi'), optional: true
 
     """
     python -m frag.network.scripts.build_db_from_smiles --input $chunks --base_dir ./ --max-frag ${params.max_frag} --max-hac ${params.max_hac}
@@ -64,7 +64,7 @@ process collect_nodes {
     file chunks
 
     output:
-    file 'nodes.csv'
+    path 'nodes.csv'
 
     """
     sort -u -S {{ (nextflow_process_sort_memory_m * 0.8)|int }}M -T . $chunks > nodes.csv
@@ -87,7 +87,7 @@ process collect_edges {
     file chunks
 
     output:
-    file 'edges.csv'
+    path 'edges.csv'
 
     """
     sort -u -S {{ (nextflow_process_sort_memory_m * 0.8)|int }}M -T . $chunks > edges.csv
@@ -110,7 +110,7 @@ process collect_rejects {
     file chunks
 
     output:
-    file 'rejects.smi'
+    path 'rejects.smi'
 
     """
     sort -u -S {{ (nextflow_process_sort_memory_m * 0.8)|int }}M -T . $chunks > rejects.smi
@@ -126,7 +126,9 @@ workflow fragment {
     fragment_mols(chunks)
     collect_nodes(fragment_mols.out[0].collect())
     collect_edges(fragment_mols.out[1].collect())
-    collect_rejects(fragment_mols.out[2].collect())
+    if (fragment_mols.out[2].collect()) {
+        collect_rejects(fragment_mols.out[2].collect())
+    }
 }
 
 workflow {
