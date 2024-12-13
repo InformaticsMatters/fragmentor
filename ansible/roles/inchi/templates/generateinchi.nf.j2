@@ -49,7 +49,7 @@ process generate_mols {
     file chunks
 
     output:
-    file 'chunk_*.tab'
+    path 'chunk_*.tab'
 
     """
     python -m frag.network.scripts.generate_inchi -i $chunks -o inchitab.tab ${params.non_standard} $STAN $NODE
