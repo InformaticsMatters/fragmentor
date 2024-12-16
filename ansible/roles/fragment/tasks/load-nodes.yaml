@@ -57,6 +57,16 @@
     chdir: "{{ fragpath }}/fragment"
   tags: load_nodes_split
 
+- name: Find the node files to load
+  find:
+    paths: "{{ fragpath }}/fragment"
+    patterns: "nodechunk_*"
+  register: node_files
+
+- name: Display the number of node files we are loading
+  debug:
+    var: node_files.matched
+
 - name: Load node chunks
   include_tasks: load-nodes-chunk.yaml
   with_fileglob:
