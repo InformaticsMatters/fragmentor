@@ -62,10 +62,10 @@ process generate_mols {
 workflow generate {
 
     take:
-    file files
+    file chunks
 
     main:
-    generate_mols(files) | collectFile(name: "${params.outputfile}", storeDir: "${params.out_dir}", keepHeader: true)
+    generate_mols(chunks) | collectFile(name: "${params.outputfile}", storeDir: "${params.out_dir}", keepHeader: true)
 
 }
 
