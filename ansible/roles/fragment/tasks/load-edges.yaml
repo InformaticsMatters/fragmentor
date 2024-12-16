@@ -57,18 +57,19 @@
     cat {{ fragedgefile }} | split -d -l {{ edgechunk }} - edgechunk_
   args:
     chdir: "{{ fragpath }}/fragment"
+  tags: load_edges_split
 
 - name: Extract edges for loading
   include_tasks: load-extract-edges-chunk.yaml
   with_fileglob:
   - "{{ fragpath }}/fragment/edgechunk_*"
+  tags: load_edges_extract
 
 - name: Drop indexes for speed
   postgresql_query:
     query: DROP INDEX IF EXISTS ix_edge_parent_id
     autocommit: yes
   when: edge_count|int > edgeindexthreshold
-
 
 - name: Load edges into database
   include_tasks: load-edges-chunk.yaml

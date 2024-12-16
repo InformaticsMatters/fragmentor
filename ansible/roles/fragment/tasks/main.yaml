@@ -46,9 +46,10 @@
 
   - name: Run initialisation logic
     import_tasks: initialise.yaml
-  - name: Extract fragmentation input
-    import_tasks: extract-frag-input.yaml
 
+  - name: Extract fragmentation input
+    include_tasks: extract-frag-input.yaml
+    tags: fragmentation
   - name: Run fragmentation
     include_tasks: fragmentation.yaml
     tags: fragmentation
