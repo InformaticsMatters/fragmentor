@@ -32,7 +32,7 @@ if (params.nodefile != '') {
     NODE = ''
 }
 
-chunks = Channel.from(file(params.input))
+files = Channel.from(file(params.input))
     .splitText(by: params.chunk_size, file: 'chunk_')
 
 process generate_mols {
@@ -62,13 +62,13 @@ process generate_mols {
 workflow generate {
 
     take:
-    file chunks
+    file files
 
     main:
-    generate_mols(chunks) | collectFile(name: "${params.outputfile}", storeDir: "${params.out_dir}", keepHeader: true)
+    generate_mols(files) | collectFile(name: "${params.outputfile}", storeDir: "${params.out_dir}", keepHeader: true)
 
 }
 
 workflow {
-    generate(chunks)
+    generate(files)
 }

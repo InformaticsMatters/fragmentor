@@ -84,7 +84,7 @@
   set_fact:
     nextflow_cmd: >-
       nextflow
-      -log {{ fragpath }}/standardise/nextflow.log
+      -log {{ fragpath }}/inchi/nextflow.log
       run
       -c {{ reppath }}/nextflow/nextflow.config
       {{ reppath }}/nextflow/generateinchi.nf
