@@ -41,6 +41,10 @@
     msg: "{{ source_tables }}"
 
 # Erase and create the neo4j extract directory.
+- name: Display extract path
+  debug:
+    msg: "{{ copy_root }}/extract"
+
 - name: Remove extract path
   file:
     path: "{{ copy_root }}/extract"
@@ -53,6 +57,10 @@
     state: directory
     mode: 0777
   when: deployment=="production"
+
+- name: Display sql directory
+  debug:
+    msg: "{{ reppath }}/sql"
 
 - name: Ensure sql directory is present
   file:

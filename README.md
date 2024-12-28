@@ -510,7 +510,7 @@ combine:
 # for the output in "combinations" .
 path_out: xchem_combi_20200715
 
-data_source_out: disk
+data_source_out: s3
 ```
 
 There is a template file with all the above settings and more explanation
