@@ -5,7 +5,7 @@ from pathlib import Path
 digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
 
 
-def run(inputs, output):
+def run(inputs, output, sections=None):
 
     t0 = time.time()
     pairs = []
@@ -23,9 +23,9 @@ def run(inputs, output):
     if not out_dir.exists():
         out_dir.mkdir(parents=True)
 
-    for pair1 in pairs:
+    for pair1 in pairs if not sections else sections:
         print('processing', pair1)
-
+        s0 = time.time()
         for pair2 in pairs:
             # print('processing', pair1, pair2)
             for pair3 in digits: # actually not a pair but a single digit
@@ -62,7 +62,9 @@ def run(inputs, output):
                     for line in smiles.values():
                         out.write(line)
 
-        print('...', pair1, 'number with duplicates =', num_with_dups, 'number inputs =', num_inputs, 'number outputs =', num_outputs)
+        s1 = time.time()
+        print('...', pair1, 'number with duplicates =', num_with_dups, 'number inputs =', num_inputs,
+              'number outputs =', num_outputs, 'time =', round(s1 - s0), 'secs')
     t1 = time.time()
     print('Processing took', (t1 - t0), 'secs')
 
@@ -72,10 +74,11 @@ def main():
 
     parser.add_argument("-i", "--inputs", nargs="+", help="Input dirs")
     parser.add_argument("-o", "--output", help="Output dir")
+    parser.add_argument("-s", "--sections", nargs="*", help="Top level hashes to handle (if not specified all are handled")
 
     args = parser.parse_args()
 
-    run(args.inputs, args.output)
+    run(args.inputs, args.output, sections=args.sections)
 
 
 if __name__ == "__main__":
