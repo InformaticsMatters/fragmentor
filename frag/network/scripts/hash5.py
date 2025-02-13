@@ -34,7 +34,7 @@ def run(input, path, separator, header=False):
 
             if not d.is_dir():
                 d.mkdir(parents=True)
-            f = d / h[0:num_hash_chars]
+            f = d / h[0:5]
             if f.is_file():
                 collisions += 1
             with open(f, "a") as out:
