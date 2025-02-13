@@ -30,37 +30,36 @@ def run(inputs, output, sections=None):
             # print('processing', pair1, pair2)
             for pair3 in digits: # actually not a pair but a single digit
                 p1 = Path(pair1) / (pair1 + pair2 + pair3)
+                smiles = {}
+                num_lines = 0
                 count += 1
-                d = out_dir / pair1
-                if not d.is_dir():
-                    d.mkdir(parents=True)
-                # open the output file for writing
-                out_file = out_dir / p1
-                with open(out_file, 'wt') as out:
-                    smiles = {}
-                    num_lines = 0
 
-                    # if count % 10000 == 0:
-                    #     print('... processed', count, non_dups, num_with_dups)
-                    for input in inputs:
-                        p0 = Path(input) / p1
-                        if p0.is_file():
-                            with open(p0, "rt") as file:
-                                for line in file:
-                                    s = line.split(',')[0]
-                                    smiles[s] = line
-                                    num_lines += 1
-                                    num_inputs += 1
-                    # print(p1, len(smiles), num_lines)
-                    num_outputs += len(smiles)
-                    if len(smiles) == num_lines:
-                        non_dups += 1
-                        # print('0', p1, len(smiles), num_lines, non_dups)
-                    else:
-                        num_with_dups += 1
-                        # print('1', p1, len(smiles), num_lines, num_with_dups, non_dups)
-                    for line in smiles.values():
-                        out.write(line)
+                # if count % 10000 == 0:
+                #     print('... processed', count, non_dups, num_with_dups)
+                for input in inputs:
+                    p0 = Path(input) / p1
+                    if p0.is_file():
+                        with open(p0, "rt") as file:
+                            for line in file:
+                                s = line.split(',')[0]
+                                smiles[s] = line
+                                num_lines += 1
+                                num_inputs += 1
+                num_outputs += len(smiles)
+                if len(smiles) == num_lines:
+                    non_dups += 1
+                else:
+                    num_with_dups += 1
+
+                if len(smiles) > 0:
+                    d = out_dir / pair1
+                    if not d.is_dir():
+                        d.mkdir(parents=True)
+                    # open the output file for writing
+                    out_file = out_dir / p1
+                    with open(out_file, 'wt') as out:
+                        for line in smiles.values():
+                            out.write(line)
 
         s1 = time.time()
         print('...', pair1, 'number with duplicates =', num_with_dups, 'number inputs =', num_inputs,
