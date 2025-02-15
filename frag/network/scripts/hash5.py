@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 
 
-def run(input, path, separator, header=False):
+def run(input, path, separator=",", token=None, header=False):
 
     hashseed = os.getenv('PYTHONHASHSEED')
     if hashseed != '0':
@@ -25,9 +25,12 @@ def run(input, path, separator, header=False):
         for line in file:
             if count % 1000000 == 0:
                 print('... processed', count, collisions)
-            tokens = line.split(separator)
-            smiles = tokens[0]
-            h = hashu(smiles).to_bytes(8,"big").hex()
+            if token is None:
+                data = line
+            else:
+                tokens = line.split(separator)
+                data = tokens[token]
+            h = hashu(data.strip()).to_bytes(8,"big").hex()
 
             p1 = h[0:2]
             d = Path(path) / p1
@@ -53,12 +56,13 @@ def main():
 
     parser.add_argument("-i", "--input", required=True)
     parser.add_argument("-o", "--output", required=True)
-    parser.add_argument("-s", "--separator", default="\t")
+    parser.add_argument("-s", "--separator", default=",")
+    parser.add_argument("-t", "--token")
     parser.add_argument("-l", "--header-line", action="store_true")
 
     args = parser.parse_args()
 
-    run(args.input, args.output, args.separator, header=-args.header_line)
+    run(args.input, args.output, separator=args.separator, token=args.token, header=-args.header_line)
 
 
 if __name__ == "__main__":
