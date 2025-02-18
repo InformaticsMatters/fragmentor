@@ -1,0 +1,77 @@
+---
+
+# Graph combination process.
+#
+# Given one or more vendor or combination extracts this process creates a new Neo4j combination.
+# It is 'simple' because, unlike 'combine' this does not deduplicate.
+#
+# The playbook: -
+#
+# - Downloads the individual or combined datasets
+# - Then depending on the file, processing will:
+# - - Concatenate files of similar names.
+# - Uploads the result as a new combination to S3
+#
+# Check that required command line parameters have been set:
+# - deployment
+# - Parameter file file containing the libraries has been created.
+#
+# e.g.
+#
+# runpath: /data/fragmentor/xchem_combi_20220202
+# clean_start: yes
+# clean_end: no
+#
+# combine:
+#    - lib:
+#        path: 'extract/xchem_dsip/v2'
+#        path: 'xchem_dsip'
+#        data_source: disk
+#    - lib:
+#        path: 'extract/xchem_spot/v2'
+#        data_source: s3
+#        s3_bucket: im-fragnet
+#        s3_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+#        s3_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+#        s3_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
+#        s3_url: "{{ lookup('env', 'S3_URL') }}"
+# path_out: 'xchem_combi_20220202'
+# output_destination: s3
+# s3_out_bucket: im-fragnet
+# s3_out_bucket_requires_encryption: no
+# s3_out_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+# s3_out_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+# s3_out_region: "{{ lookup('env', 'AWS_REGION')|default('eu-central-1', true) }}"
+# s3_out_url: "{{ lookup('env', 'S3_URL') }}"
+#
+# ansible-playbook site-combine-simple -e @parameters
+#
+
+- name: Assert user-variable definitions
+  assert:
+    that:
+    - "{{ combine[0].lib.path|string != 'SetMe'}}"
+    - "{{ combine[0].lib.data_source|string != 'SetMe'}}"
+    - "{{ output_destination|string != 'SetMe'}}"
+    - runpath|string|length > 0
+    - runpath|string != 'SetMe'
+    fail_msg: You must provide a list of extracts in a parameter file to combine and an output location.
+
+- name: List input datasets
+  debug:
+    msg: "{{ item.lib }}"
+  loop: "{{ combine }}"
+
+- import_tasks: initialise.yaml
+- import_tasks: download-datasets.yaml
+- import_tasks: concatenate.yaml
+
+# Finalise report
+- name: Write line to report
+  blockinfile:
+    marker: "<!-- {combination-init} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Combine play ended on: {{ now(utc=True).isoformat() }}</p>
+
+- include_tasks: finalise-{{ output_destination }}.yaml

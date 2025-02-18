@@ -1,0 +1,156 @@
+---
+
+# Gets 'raw' data from an AWS S3 path
+# 1.  Goes to the repo listed in the 'path' variable on disk and copies files to data
+#     directory (if not already present)
+# 2.  Each file in the s3 bucket should be copied to the work_path with the file
+#     prepended by the index.
+
+- name: Display library S3
+  debug:
+    msg: url={{ item.lib.s3_url }} region={{ item.lib.s3_region }}
+
+- name: Display library path
+  debug:
+    msg: bucket={{ item.lib.s3_bucket }} extract_path={{ item.lib.path }}
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-download} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Add file: {{ item.lib.s3_bucket }}/{{ item.lib.path }}</p>
+
+- name: Create data directory
+  file:
+    path: "{{ data_path }}/{{ item.lib.path }}"
+    state: directory
+
+# But don't get the files (which may be large)
+# if the data files appear to already exist.
+
+- name: Check if file is already on work path
+  stat:
+    path: "{{ work_path }}/{{ extract_index }}.csv.gz"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  register: gz_data_file
+  changed_when: false
+
+- name: List extract data (AWS)
+  block:
+
+  - name: List extract data (AWS)
+    aws_s3:
+      bucket: "{{ item.lib.s3_bucket }}"
+      aws_access_key: "{{ item.lib.s3_access_key }}"
+      aws_secret_key: "{{ item.lib.s3_secret_key }}"
+      mode: list
+      prefix: "{{ item.lib.path }}"
+      region: "{{ item.lib.s3_region }}"
+    register: extract_result
+
+  - name: Get S3 keys (AWS)
+    set_fact:
+      s3_keys: "{{ extract_result.s3_keys }}"
+
+  when:
+  - item.lib.s3_url|length == 0
+  - not gz_data_file.stat.exists
+
+- name: List extract data (non-AWS)
+  block:
+
+  - name: List extract data (non-AWS)
+    aws_s3:
+      bucket: "{{ item.lib.s3_bucket }}"
+      aws_access_key: "{{ item.lib.s3_access_key }}"
+      aws_secret_key: "{{ item.lib.s3_secret_key }}"
+      mode: list
+      prefix: "{{ item.lib.path }}"
+      region: "{{ item.lib.s3_region }}"
+      s3_url: "{{ item.lib.s3_url }}"
+    register: extract_result
+
+  - name: Get S3 keys (AWS)
+    set_fact:
+      s3_keys: "{{ extract_result.s3_keys }}"
+
+  when:
+  - item.lib.s3_url|length > 0
+  - not gz_data_file.stat.exists
+
+- name: Display result
+  debug:
+    var: s3_keys
+  when:
+  - not gz_data_file.stat.exists
+
+- name: Check extract data
+  assert:
+    that: s3_keys|length > 1
+  when:
+  - not gz_data_file.stat.exists
+
+- name: Display extract file count
+  debug:
+    msg: Found {{ s3_keys|length - 1 }} extract files
+  when:
+  - not gz_data_file.stat.exists
+
+- name: Set destination path
+  set_fact:
+    destination: "{{ data_path }}/{{ item.lib.path }}"
+  when:
+  - not gz_data_file.stat.exists
+
+# Get the files, here we make sure the object does not end with a '/'
+# as there's a danger (especially if the user has created the bucket manually)
+# that the containing directory is also part of the list.
+
+- name: Get extract data (AWS)
+  aws_s3:
+    bucket: "{{ item.lib.s3_bucket }}"
+    aws_access_key: "{{ item.lib.s3_access_key }}"
+    aws_secret_key: "{{ item.lib.s3_secret_key }}"
+    mode: get
+    region: "{{ item.lib.s3_region }}"
+    object: "{{ file_item }}"
+    dest: "{{ destination }}/{{ file_item|basename }}"
+  loop: "{{ s3_keys }}"
+  loop_control:
+    loop_var: file_item
+  when:
+  - item.lib.s3_url|length == 0
+  - not gz_data_file.stat.exists
+  - not file_item|regex_search('.*/$')
+
+- name: Get extract data (non-AWS)
+  aws_s3:
+    bucket: "{{ item.lib.s3_bucket }}"
+    aws_access_key: "{{ item.lib.s3_access_key }}"
+    aws_secret_key: "{{ item.lib.s3_secret_key }}"
+    mode: get
+    object: "{{ file_item }}"
+    dest: "{{ destination }}/{{ file_item|basename }}"
+    region: "{{ item.lib.s3_region }}"
+    s3_url: "{{ item.lib.s3_url }}"
+  loop: "{{ s3_keys }}"
+  loop_control:
+    loop_var: file_item
+  when:
+  - item.lib.s3_url|length > 0
+  - not gz_data_file.stat.exists
+  - not file_item|regex_search('.*/$')
+
+# Change the name and move it to the common work directory
+- name: Move to work directory
+  command: cp {{ file_item }} {{ work_path }}/{{ extract_index }}-{{ file_item | basename }}
+  with_fileglob:
+  - "{{ data_path }}//{{ item.lib.path }}/*.gz"
+  loop_control:
+    loop_var: file_item
+  when:
+  - not gz_data_file.stat.exists

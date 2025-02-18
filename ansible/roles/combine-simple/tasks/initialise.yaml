@@ -1,0 +1,110 @@
+---
+
+# Check run path
+- name: Ensure runpath is present
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ runpath }}"
+
+# Install the required modules to be able to synchronise the data from S3
+# and use ansible python modules.
+# Note that on prod this is done as "sudo" (become = yes)
+- name: Install requirements
+  pip:
+    name:
+    - python-dateutil==2.8.1
+    - boto3==1.12.49
+
+
+# For each extract given in the parameters file, do some sanity checks
+- name: Check libraries to combine
+  include_tasks: check-extract.yaml
+  loop: "{{ combine }}"
+
+# Check output credentials
+- name: Output Path sanity-check
+  assert:
+    that:
+    - '{{ path_out|length > 0 }}'
+
+- name: Destination sanity-check
+  assert:
+    that:
+    - '{{ output_destination == "s3" or output_destination == "disk" }}'
+
+- name: Check buckets for s3 storage
+  assert:
+    that:
+    - '{{ s3_out_bucket|length > 0 }}'
+    - '{{ s3_out_access_key|length > 0 }}'
+    - '{{ s3_out_secret_key|length > 0 }}'
+  when: output_destination == "s3"
+
+# Clean-up before the run...
+# The following task does not run if 'clean_start' is false.
+
+- name: Remove existing directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - "{{ data_path }}"
+  - "{{ work_path }}"
+  - "{{ combine_path }}"
+  - "{{ log_path }}"
+  - "{{ next_path }}"
+  when: clean_start|bool
+
+# Now ensure that the working directories exist
+# and write some provenance information to the combination directory
+# (which will eventually be uploaded to S3)
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ data_path }}"
+  - "{{ work_path }}"
+  - "{{ combine_path }}"
+  - "{{ log_path }}"
+  - "{{ next_path }}"
+
+- name: Get Fragmentor commit reference (or 0)
+  shell: git log --pretty=format:'%h' -n 1 || echo 0
+  args:
+    chdir: "{{ reppath }}"
+  register: fragmentor_commit_result
+  changed_when: false
+
+- name: Set Fragmentor Facts
+  set_fact:
+    fragmentor_commit_ref: "{{ fragmentor_commit_result.stdout }}"
+
+- name: Collect environment
+  command: env
+  register: env_result
+
+- name: Write environment provenance
+  copy:
+    content: "{{ env_result.stdout }}"
+    dest: "{{ log_path }}/env.prov"
+
+# Create Combination Summary Report. This is saved with the playbook results.
+- name: Create Combination HTML log report
+  blockinfile:
+    path: "{{ log_path }}/combination_report.html"
+    create: yes
+    marker: "<!-- {combination-init} ANSIBLE MANAGED BLOCK -->"
+    insertafter: "<body>"
+    block: |
+      <h1>Ansible Combination Playbook</h1>
+      <p><table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>User: </td><td>{{ inventory_hostname }}</td></tr>
+      <tr><td>Deployment: </td><td>{{ deployment }}</td></tr>
+      <tr><td>Fragmentor Commit Ref: </td><td>{{ fragmentor_commit_ref }}</td></tr>
+      </table></p>
+      <p>Combine play started on: {{ now(utc=True).isoformat() }}</p>
