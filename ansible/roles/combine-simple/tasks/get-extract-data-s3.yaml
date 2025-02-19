@@ -10,9 +10,9 @@
   debug:
     msg: url={{ item.lib.s3_url }} region={{ item.lib.s3_region }}
 
-- name: Display library path
+- name: Display extract index (0..9), bucket and library path
   debug:
-    msg: bucket={{ item.lib.s3_bucket }} extract_path={{ item.lib.path }}
+    msg: extract_index={{ extract_index }} bucket={{ item.lib.s3_bucket }} extract_path={{ item.lib.path }}
 
 - name: Log line to report
   blockinfile:
@@ -126,11 +126,11 @@
 
 # Change the name and move it to the common work directory
 
-- name: Display final destination path
+- name: Display final (combine) destination path and file prefix
   debug:
-    msg: Moving files to destination ({{ work_path }}/{{ extract_index }}-)
+    msg: Moving files to combine area ({{ work_path }}/{{ extract_index }}-)
 
-- name: Move to work directory
+- name: Move to work (combine) directory
   command: mv {{ file_item }} {{ work_path }}/{{ extract_index }}-{{ file_item | basename }}
   with_fileglob:
   - "{{ data_path }}//{{ item.lib.path }}/*.gz"
