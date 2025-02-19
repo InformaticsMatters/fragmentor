@@ -27,7 +27,7 @@
 
 - name: Display destination path
   debug:
-    var: "{{ destination }}"
+    var: destination
 
 - name: Create data directory
   file:
