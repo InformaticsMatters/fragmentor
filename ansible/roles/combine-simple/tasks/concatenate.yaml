@@ -17,7 +17,7 @@
   include_tasks: concatenate-file.yaml
   loop: "{{ concat }}"
   loop_control:
-    loop_var: file_type
+    loop_var: basename
 
 - name: Log line to report
   blockinfile:
