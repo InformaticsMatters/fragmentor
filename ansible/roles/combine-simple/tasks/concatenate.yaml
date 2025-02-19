@@ -27,6 +27,10 @@
   debug:
     var: combined_total_size
 
+- name: Display total concatenated file size (human readable)
+  debug:
+    msg: size={{ combined_total_size | human_readable }} (human readable)
+
 - name: Log line to report
   blockinfile:
     marker: "<!-- {combine-concatenate} ANSIBLE MANAGED BLOCK -->"
