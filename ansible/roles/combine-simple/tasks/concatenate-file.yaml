@@ -6,7 +6,7 @@
 
 - name: Display basename to be concatenated
   debug:
-    var: basename={{ basename }} combine_path={{ combine_path }}
+    msg: basename={{ basename }} combine_path={{ combine_path }}
 
 - name: Display file to be created
   set_fact:
