@@ -62,11 +62,12 @@
     msg: "{{ item.lib }}"
   loop: "{{ combine }}"
 
-- name: Check that we have no more than 10 combinations (0..9)
+- name: Check that we have between 2 and 10 combinations (0..9)
   assert:
     that:
+    - combine | length >= 2
     - combine | length <= 10
-    fail_msg: You must provide 10 or fewer libs in the combine list.
+    fail_msg: You must provide between 2 and 10 libs in the combine list.
 
 - import_tasks: initialise.yaml
 - import_tasks: get-extract-data.yaml
