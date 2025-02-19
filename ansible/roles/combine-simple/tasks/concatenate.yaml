@@ -23,13 +23,13 @@
   loop_control:
     loop_var: basename
 
-- name: Display total concatenated file size
+- name: Display TOTAL concatenated file size (int)
   debug:
-    var: combined_total_size
+    msg: combined_total_size={{ combined_total_size | int }}
 
-- name: Display total concatenated file size (human readable)
+- name: Display TOTAL concatenated file size (human readable)
   debug:
-    msg: size={{ combined_total_size | human_readable }} (human readable)
+    msg: combined_total_size={{ combined_total_size | int | human_readable }} (human readable)
 
 - name: Log line to report
   blockinfile:
