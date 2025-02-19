@@ -13,11 +13,19 @@
 
 # For each extract file type in the list
 # concatenate the files from the different libraries
+- name: Reset total concatenated file size
+  set_fact:
+    combined_total_size: 0
+
 - name: Concatenate files in the concat list
   include_tasks: concatenate-file.yaml
   loop: "{{ concat }}"
   loop_control:
     loop_var: basename
+
+- name: Display total concatenated file size
+  debug:
+    var: combined_total_size
 
 - name: Log line to report
   blockinfile:
