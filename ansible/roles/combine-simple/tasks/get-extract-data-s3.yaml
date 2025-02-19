@@ -21,23 +21,18 @@
     block: |
       <p>Add file: {{ item.lib.s3_bucket }}/{{ item.lib.path }}</p>
 
+- name: Set destination path
+  set_fact:
+    destination: "{{ data_path }}/{{ item.lib.path }}"
+
+- name: Display destination path
+  debug:
+    var: "{{ destination }}"
+
 - name: Create data directory
   file:
-    path: "{{ data_path }}/{{ item.lib.path }}"
+    path: "{{ destination }}"
     state: directory
-
-# But don't get the files (which may be large)
-# if the data files appear to already exist.
-
-- name: Check if file is already on work path
-  stat:
-    path: "{{ work_path }}/{{ extract_index }}.csv.gz"
-    get_checksum: no
-    get_md5: no
-    get_mime: no
-    get_attributes: no
-  register: gz_data_file
-  changed_when: false
 
 - name: List extract data (AWS)
   block:
@@ -57,8 +52,7 @@
       s3_keys: "{{ extract_result.s3_keys }}"
 
   when:
-  - item.lib.s3_url|length == 0
-  - not gz_data_file.stat.exists
+  - item.lib.s3_url | length == 0
 
 - name: List extract data (non-AWS)
   block:
@@ -79,32 +73,19 @@
       s3_keys: "{{ extract_result.s3_keys }}"
 
   when:
-  - item.lib.s3_url|length > 0
-  - not gz_data_file.stat.exists
+  - item.lib.s3_url | length > 0
 
 - name: Display result
   debug:
     var: s3_keys
-  when:
-  - not gz_data_file.stat.exists
 
 - name: Check extract data
   assert:
-    that: s3_keys|length > 1
-  when:
-  - not gz_data_file.stat.exists
+    that: s3_keys | length > 1
 
 - name: Display extract file count
   debug:
     msg: Found {{ s3_keys|length - 1 }} extract files
-  when:
-  - not gz_data_file.stat.exists
-
-- name: Set destination path
-  set_fact:
-    destination: "{{ data_path }}/{{ item.lib.path }}"
-  when:
-  - not gz_data_file.stat.exists
 
 # Get the files, here we make sure the object does not end with a '/'
 # as there's a danger (especially if the user has created the bucket manually)
@@ -123,9 +104,8 @@
   loop_control:
     loop_var: file_item
   when:
-  - item.lib.s3_url|length == 0
-  - not gz_data_file.stat.exists
-  - not file_item|regex_search('.*/$')
+  - item.lib.s3_url | length == 0
+  - not file_item | regex_search('.*/$')
 
 - name: Get extract data (non-AWS)
   aws_s3:
@@ -141,16 +121,18 @@
   loop_control:
     loop_var: file_item
   when:
-  - item.lib.s3_url|length > 0
-  - not gz_data_file.stat.exists
-  - not file_item|regex_search('.*/$')
+  - item.lib.s3_url | length > 0
+  - not file_item | regex_search('.*/$')
 
 # Change the name and move it to the common work directory
+
+- name: Display final destination path
+  debug:
+    msg: Moving files to destination ({{ work_path }}/{{ extract_index }}-)
+
 - name: Move to work directory
-  command: cp {{ file_item }} {{ work_path }}/{{ extract_index }}-{{ file_item | basename }}
+  command: mv {{ file_item }} {{ work_path }}/{{ extract_index }}-{{ file_item | basename }}
   with_fileglob:
   - "{{ data_path }}//{{ item.lib.path }}/*.gz"
   loop_control:
     loop_var: file_item
-  when:
-  - not gz_data_file.stat.exists

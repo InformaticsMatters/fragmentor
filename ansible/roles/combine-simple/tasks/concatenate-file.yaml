@@ -4,9 +4,9 @@
 # Files are grouped by file type: e.g. 0-supplier-nodes.csv.gz, 1-supplier-nodes.csv.gz
 # These are combined into a single supplier-nodes.csv.gz file on the combine directory.
 
-- name: Display file-type to be concatenated
+- name: Display file to be concatenated
   debug:
-    var: file_type
+    var: file={{ file_type }} combine_path={{ combine_path }}
 
 - name: Log line to report
   blockinfile:
@@ -28,6 +28,11 @@
 # For each file type given in the parameters file,
 # concatenate all files named <index>-<file_type>
 # This is skipped if it is already there.
+
+- name: Display combine Path
+  debug:
+    var: combine_path
+
 - name: Concatenate files into the combined files directory
   shell: cat {{ lib_item }} >> {{ combine_path }}/{{ file_type }}
   with_fileglob:

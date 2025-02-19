@@ -63,7 +63,7 @@
   loop: "{{ combine }}"
 
 - import_tasks: initialise.yaml
-- import_tasks: download-datasets.yaml
+- import_tasks: get-extract-data.yaml
 - import_tasks: concatenate.yaml
 
 # Finalise report

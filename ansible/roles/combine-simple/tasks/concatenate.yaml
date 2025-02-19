@@ -13,8 +13,8 @@
 
 # For each extract file type in the list
 # concatenate the files from the different libraries
-- name: Concatenate each file type in the concat list
-  include_tasks: concatenate-file-type.yaml
+- name: Concatenate files in the concat list
+  include_tasks: concatenate-file.yaml
   loop: "{{ concat }}"
   loop_control:
     loop_var: file_type

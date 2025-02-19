@@ -21,7 +21,7 @@
 # List all the node files into ' node-files.txt'.
 # This is a 1-file-per-line list of extracted nodes.
 
-- name: Collect node files
+- name: Collect node files ({{ combine_path }})
   shell: ls -1 *nodes*.gz > node-files.txt
   args:
     chdir: "{{ combine_path }}"
@@ -57,7 +57,7 @@
 # List all the edge files into 'edge-files.txt'.
 # This is a 1-file-per-line list of extracted edges.
 
-- name: Collect edge files
+- name: Collect edge files ({{ combine_path }})
   shell: ls -1 *edges*.gz > edge-files.txt
   args:
     chdir: "{{ combine_path }}"
@@ -135,7 +135,7 @@
       mode: put
       region: "{{ s3_out_region }}"
     loop: "{{ files_found }}"
-    when: s3_out_url|length == 0
+    when: s3_out_url | length == 0
 
   - name: Transfer files (non-AWS)
     aws_s3:
@@ -149,7 +149,7 @@
       region: "{{ s3_out_region }}"
       s3_url: "{{ s3_out_url }}"
     loop: "{{ files_found }}"
-    when: s3_out_url|length > 0
+    when: s3_out_url | length > 0
 
   when: deployment == "production"
 
@@ -195,7 +195,7 @@
       mode: put
       region: "{{ s3_out_region }}"
     loop: "{{ files_found }}"
-    when: s3_out_url|length == 0
+    when: s3_out_url | length == 0
 
   - name: Transfer log files (non-AWS)
     aws_s3:
@@ -209,7 +209,7 @@
       region: "{{ s3_out_region }}"
       s3_url: "{{ s3_out_url }}"
     loop: "{{ files_found }}"
-    when: s3_out_url|length > 0
+    when: s3_out_url | length > 0
 
   when: deployment == "production"
 
@@ -228,4 +228,4 @@
   - "{{ work_path }}"
   - "{{ nextflow_path }}"
   - "{{ log_path }}"
-  when: clean_finish|bool
+  when: clean_finish | bool

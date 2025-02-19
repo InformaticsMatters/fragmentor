@@ -18,7 +18,7 @@
 # List all the node files into ' node-files.txt'.
 # This is a 1-file-per-line list of extracted nodes.
 
-- name: Collect node files
+- name: Collect node files ({{ combine_path }})
   shell: ls -1 *nodes*.gz > node-files.txt
   args:
     chdir: "{{ combine_path }}"
@@ -54,7 +54,7 @@
 # List all the edge files into 'edge-files.txt'.
 # This is a 1-file-per-line list of extracted edges.
 
-- name: Collect edge files
+- name: Collect edge files ({{ combine_path }})
   shell: ls -1 *edges*.gz > edge-files.txt
   args:
     chdir: "{{ combine_path }}"
@@ -104,4 +104,4 @@
   loop:
   - "{{ work_path }}"
   - "{{ nextflow_path }}"
-  when: clean_finish|bool
+  when: clean_finish | bool
