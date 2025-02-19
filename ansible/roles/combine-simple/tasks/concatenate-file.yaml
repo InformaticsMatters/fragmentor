@@ -55,5 +55,10 @@
   debug:
     var: combined_file.stat.size
 
-- set_fact:
+- name: Update combined_total_size
+  set_fact:
     combined_total_size: "{{ combined_total_size | default(0) | int + combined_file.stat.size }}"
+
+- name: Display new combined_total_size
+  debug:
+    var: combined_total_size
