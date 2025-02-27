@@ -2,6 +2,7 @@ import argparse
 import time
 from pathlib import Path
 
+
 digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
 
 
@@ -41,7 +42,8 @@ def run(inputs, output, sections=None):
                     if p0.is_file():
                         with open(p0, "rt") as file:
                             for line in file:
-                                s = line.split(',')[0]
+                                tokens = line.split(',')
+                                s = tokens[0]
                                 smiles[s] = line
                                 num_lines += 1
                                 num_inputs += 1
@@ -65,15 +67,18 @@ def run(inputs, output, sections=None):
         print('...', pair1, 'number with duplicates =', num_with_dups, 'number inputs =', num_inputs,
               'number outputs =', num_outputs, 'time =', round(s1 - s0), 'secs')
     t1 = time.time()
-    print('Processing took', (t1 - t0), 'secs')
+    print('Processing took', round(t1 - t0), 'secs')
 
 
 def main():
+    #  python -m frag.network.scripts.dedup5 -i ~/hashed5-C1 ~/hashed5-C2 -o ~/hashed5-out
+
     parser = argparse.ArgumentParser(description="collator")
 
-    parser.add_argument("-i", "--inputs", nargs="+", help="Input dirs")
+    parser.add_argument("-i", "--inputs", nargs="+", help="Input dirs containing hashed data")
     parser.add_argument("-o", "--output", help="Output dir")
-    parser.add_argument("-s", "--sections", nargs="*", help="Top level hashes to handle (if not specified all are handled")
+    parser.add_argument("-s", "--sections", nargs="*",
+                        help="Top level 2 character hashes to handle (if not specified all are handled")
 
     args = parser.parse_args()
 
