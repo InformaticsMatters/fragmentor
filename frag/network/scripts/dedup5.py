@@ -1,12 +1,15 @@
 import argparse
+import csv
 import time
 from pathlib import Path
+
+from frag.network.scripts import patch_inchi
 
 
 digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
 
 
-def run(inputs, output, sections=None):
+def run(inputs, output, sections=None, delimiter=',', generate_inchi=False, merge_flags=False):
 
     t0 = time.time()
     pairs = []
@@ -19,6 +22,8 @@ def run(inputs, output, sections=None):
     non_dups = 0
     num_inputs = 0
     num_outputs = 0
+    num_patched_inchi = 0
+    num_merged_flags = 0
 
     out_dir = Path(output)
     if not out_dir.exists():
@@ -41,10 +46,32 @@ def run(inputs, output, sections=None):
                     p0 = Path(input) / p1
                     if p0.is_file():
                         with open(p0, "rt") as file:
-                            for line in file:
-                                tokens = line.split(',')
-                                s = tokens[0]
-                                smiles[s] = line
+                            reader = csv.reader(file, delimiter=delimiter)
+                            for row in reader:
+                                s = row[0]
+                                if s in smiles:
+                                    if merge_flags:
+                                        cur_flags = smiles[s][-1].split(';')
+                                        new_flags = row[-1].split(';')
+                                        cur_flags_len = len(cur_flags)
+
+                                        if len(cur_flags) > len(new_flags):
+                                            bigger = cur_flags
+                                            smaller = new_flags
+                                        else:
+                                            bigger = new_flags
+                                            smaller = cur_flags
+                                        for flag in smaller:
+                                            if flag not in bigger:
+                                                bigger.append(flag)
+                                        row[-1] = ';'.join(bigger)
+                                        smiles[s] = row
+                                        if len(bigger) != cur_flags_len:
+                                            num_merged_flags += 1
+
+                                else:
+                                    smiles[s] = row
+
                                 num_lines += 1
                                 num_inputs += 1
                 num_outputs += len(smiles)
@@ -60,12 +87,20 @@ def run(inputs, output, sections=None):
                     # open the output file for writing
                     out_file = out_dir / p1
                     with open(out_file, 'wt') as out:
-                        for line in smiles.values():
-                            out.write(line)
+                        for row in smiles.values():
+                            if generate_inchi:
+                                ikey = row[4]
+                                row = patch_inchi.patch_line(row, always=True)
+                                if ikey != row[4]:
+                                    num_patched_inchi += 1
+                            row[5] = '"' + row[5] + '"'
+
+                            out.write(','.join(row) + '\n')
 
         s1 = time.time()
         print('...', pair1, 'number with duplicates =', num_with_dups, 'number inputs =', num_inputs,
-              'number outputs =', num_outputs, 'time =', round(s1 - s0), 'secs')
+              'number outputs =', num_outputs, 'num merged flags =', num_merged_flags,
+              'time =', round(s1 - s0), 'secs')
     t1 = time.time()
     print('Processing took', round(t1 - t0), 'secs')
 
@@ -79,10 +114,14 @@ def main():
     parser.add_argument("-o", "--output", help="Output dir")
     parser.add_argument("-s", "--sections", nargs="*",
                         help="Top level 2 character hashes to handle (if not specified all are handled")
+    parser.add_argument("-d", "--delimiter", default=",", help="file delimiter")
+    parser.add_argument("-p", "--patch-inchi", action="store_true", help="regenerate inchi for all entries")
+    parser.add_argument("-m", "--merge-flags", action="store_true", help="merge flags in last column")
 
     args = parser.parse_args()
 
-    run(args.inputs, args.output, sections=args.sections)
+    run(args.inputs, args.output, sections=args.sections, delimiter=args.delimiter,
+        generate_inchi=args.patch_inchi, merge_flags=args.merge_flags)
 
 
 if __name__ == "__main__":
