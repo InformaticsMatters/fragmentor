@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 
-def run(input, path, delimiter=",", header=False, use_first_token=False, remove_inchi=False):
+def run(input, path, mode, delimiter=",", header=False, use_first_token=False, remove_inchi=False):
 
     hashseed = os.getenv('PYTHONHASHSEED')
     if hashseed != '0':
@@ -28,11 +28,12 @@ def run(input, path, delimiter=",", header=False, use_first_token=False, remove_
             if count % 1000000 == 0:
                 print('... processed', count, collisions)
 
-            if remove_inchi:
-                row[4] = ''
-                row[5] = ''
-            else:
-                row[5] = '"' + row[5] + '"'
+            if mode == 'nodes':
+                if remove_inchi:
+                    row[4] = ''
+                    row[5] = ''
+                else:
+                    row[5] = '"' + row[5] + '"'
 
             line = ','.join(row)
 
@@ -60,7 +61,8 @@ def run(input, path, delimiter=",", header=False, use_first_token=False, remove_
 
 def main():
     # run like this:
-    #   PYTHONHASHSEED=0 python -m frag.network.scripts.hash5 -i /work/nodes-C1.csv.gz -o /home/timbo/hashed5-C1
+    #   PYTHONHASHSEED=0 python -m frag.network.scripts.hash5 -i /work/nodes-C1.csv.gz -o /home/timbo/hashed5-C1 -m nodes
+    #   PYTHONHASHSEED=0 python -m frag.network.scripts.hash5 -i /work/enamine_mferla/sep2024/edges.csv.gz -o /home/timbo/edges-xxx -m edges
     parser = argparse.ArgumentParser(description="Analyse molecules")
 
     parser.add_argument("-i", "--input", required=True, help="input csv file")
@@ -68,11 +70,12 @@ def main():
     parser.add_argument("-s", "--delimiter", default=",", help="delimiter")
     parser.add_argument("-t", "--use-first-token", action="store_true", help="use first token for hashing (if not specified then whole line)")
     parser.add_argument("-l", "--header-line", action="store_true", help="skip the first line")
+    parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges'], help="nodes or edges mode")
     parser.add_argument("-r", "--remove-inchi", action="store_true", help="remove inchi columns")
 
     args = parser.parse_args()
 
-    run(args.input, args.output, delimiter=args.delimiter, header=-args.header_line,
+    run(args.input, args.output, args.mode, delimiter=args.delimiter, header=-args.header_line,
         use_first_token=args.use_first_token, remove_inchi=args.remove_inchi)
 
 
