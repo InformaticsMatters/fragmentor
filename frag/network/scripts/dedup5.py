@@ -54,20 +54,20 @@ def run(inputs, output, sections=None, delimiter=',', generate_inchi=False, merg
                                         cur_flags = smiles[s][-1].split(';')
                                         new_flags = row[-1].split(';')
                                         cur_flags_len = len(cur_flags)
-
-                                        if len(cur_flags) > len(new_flags):
-                                            bigger = cur_flags
-                                            smaller = new_flags
-                                        else:
-                                            bigger = new_flags
-                                            smaller = cur_flags
-                                        for flag in smaller:
-                                            if flag not in bigger:
-                                                bigger.append(flag)
-                                        row[-1] = ';'.join(bigger)
-                                        smiles[s] = row
-                                        if len(bigger) != cur_flags_len:
-                                            num_merged_flags += 1
+                                        if cur_flags != new_flags:
+                                            if len(cur_flags) > len(new_flags):
+                                                bigger = cur_flags
+                                                smaller = new_flags
+                                            else:
+                                                bigger = new_flags
+                                                smaller = cur_flags
+                                            for flag in smaller:
+                                                if flag not in bigger:
+                                                    bigger.append(flag)
+                                            row[-1] = ';'.join(bigger)
+                                            smiles[s] = row
+                                            if len(bigger) != cur_flags_len:
+                                                num_merged_flags += 1
 
                                 else:
                                     smiles[s] = row
@@ -93,7 +93,8 @@ def run(inputs, output, sections=None, delimiter=',', generate_inchi=False, merg
                                 row = patch_inchi.patch_line(row, always=True)
                                 if ikey != row[4]:
                                     num_patched_inchi += 1
-                            row[5] = '"' + row[5] + '"'
+                            if row[5] and row[5][0] != '"':
+                                row[5] = '"' + row[5] + '"'
 
                             out.write(','.join(row) + '\n')
 

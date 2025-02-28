@@ -1,4 +1,5 @@
 import argparse
+import csv
 import ctypes
 import gzip
 import os
@@ -6,7 +7,7 @@ import time
 from pathlib import Path
 
 
-def run(input, path, delimiter=",", header=False, use_first_token=False):
+def run(input, path, delimiter=",", header=False, use_first_token=False, remove_inchi=False):
 
     hashseed = os.getenv('PYTHONHASHSEED')
     if hashseed != '0':
@@ -20,14 +21,22 @@ def run(input, path, delimiter=",", header=False, use_first_token=False):
     t0 = time.time()
 
     with (gzip.open(input, 'rt') if input.endswith('.gz') else open(input, 'rt')) as file:
-        for line in file:
+        reader = csv.reader(file, delimiter=delimiter)
+        for row in reader:
             if count == 0 and header:
                 continue
             if count % 1000000 == 0:
                 print('... processed', count, collisions)
 
+            if remove_inchi:
+                row[4] = ''
+                row[5] = ''
+            else:
+                row[5] = '"' + row[5] + '"'
+
+            line = ','.join(row)
+
             if use_first_token:
-                row = line.split(delimiter)
                 h = hashu(row[0].strip()).to_bytes(8,"big").hex()
             else:
                 h = hashu(line).to_bytes(8,"big").hex()
@@ -41,7 +50,7 @@ def run(input, path, delimiter=",", header=False, use_first_token=False):
             if f.is_file():
                 collisions += 1
             with open(f, "a") as out:
-                out.write(line)
+                out.write(line + '\n')
 
             count += 1
 
@@ -59,11 +68,12 @@ def main():
     parser.add_argument("-s", "--delimiter", default=",", help="delimiter")
     parser.add_argument("-t", "--use-first-token", action="store_true", help="use first token for hashing (if not specified then whole line)")
     parser.add_argument("-l", "--header-line", action="store_true", help="skip the first line")
+    parser.add_argument("-r", "--remove-inchi", action="store_true", help="remove inchi columns")
 
     args = parser.parse_args()
 
     run(args.input, args.output, delimiter=args.delimiter, header=-args.header_line,
-        use_first_token=args.use_first_token)
+        use_first_token=args.use_first_token, remove_inchi=args.remove_inchi)
 
 
 if __name__ == "__main__":
