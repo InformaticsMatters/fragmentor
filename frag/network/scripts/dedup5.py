@@ -43,6 +43,10 @@ def run(inputs, output, sections=None, delimiter=',', generate_inchi=False, merg
                 # if count % 10000 == 0:
                 #     print('... processed', count, non_dups, num_with_dups)
                 for input in inputs:
+                    d = Path(input) /pair1
+                    if not d.is_dir():
+                        print('no data for', d)
+                        continue
                     p0 = Path(input) / p1
                     if p0.is_file():
                         with open(p0, "rt") as file:

@@ -63,7 +63,8 @@ def main():
     # run like this:
     #   PYTHONHASHSEED=0 python -m frag.network.scripts.hash5 -i /work/nodes-C1.csv.gz -o /home/timbo/hashed5-C1 -m nodes
     #   PYTHONHASHSEED=0 python -m frag.network.scripts.hash5 -i /work/enamine_mferla/sep2024/edges.csv.gz -o /home/timbo/edges-xxx -m edges
-    parser = argparse.ArgumentParser(description="Analyse molecules")
+
+    parser = argparse.ArgumentParser(description="Shard using a hash")
 
     parser.add_argument("-i", "--input", required=True, help="input csv file")
     parser.add_argument("-o", "--output", required=True, help="output dir")
