@@ -30,78 +30,87 @@ def run(inputs, output, sections=None, delimiter=',', generate_inchi=False, merg
         out_dir.mkdir(parents=True)
 
     for pair1 in pairs if not sections else sections:
-        print('processing', pair1)
-        s0 = time.time()
-        for pair2 in pairs:
-            # print('processing', pair1, pair2)
-            for pair3 in digits: # actually not a pair but a single digit
-                p1 = Path(pair1) / (pair1 + pair2 + pair3)
-                smiles = {}
-                num_lines = 0
-                count += 1
+        data_found = False
+        for input in inputs:
+            d = Path(input) / pair1
+            if d.is_dir():
+                data_found = True
+        if not data_found:
+            print('skipping', pair1, 'as no data found')
+        else:
+            print('processing', pair1)
+            s0 = time.time()
+            for pair2 in pairs:
+                # print('processing', pair1, pair2)
+                for pair3 in digits: # actually not a pair but a single digit
+                    p1 = Path(pair1) / (pair1 + pair2 + pair3)
+                    smiles = {}
+                    num_lines = 0
+                    count += 1
 
-                # if count % 10000 == 0:
-                #     print('... processed', count, non_dups, num_with_dups)
-                for input in inputs:
-                    p0 = Path(input) / p1
-                    if p0.is_file():
-                        with open(p0, "rt") as file:
-                            reader = csv.reader(file, delimiter=delimiter)
-                            for row in reader:
-                                s = row[0]
-                                if s in smiles:
-                                    if merge_flags:
-                                        cur_flags = smiles[s][-1].split(';')
-                                        new_flags = row[-1].split(';')
-                                        cur_flags_len = len(cur_flags)
-                                        if cur_flags != new_flags:
-                                            if len(cur_flags) > len(new_flags):
-                                                bigger = cur_flags
-                                                smaller = new_flags
-                                            else:
-                                                bigger = new_flags
-                                                smaller = cur_flags
-                                            for flag in smaller:
-                                                if flag not in bigger:
-                                                    bigger.append(flag)
-                                            row[-1] = ';'.join(bigger)
-                                            smiles[s] = row
-                                            if len(bigger) != cur_flags_len:
-                                                num_merged_flags += 1
+                    # if count % 10000 == 0:
+                    #     print('... processed', count, non_dups, num_with_dups)
+                    for input in inputs:
+                        p0 = Path(input) / p1
+                        if p0.is_file():
+                            with open(p0, "rt") as file:
+                                reader = csv.reader(file, delimiter=delimiter)
+                                for row in reader:
+                                    s = row[0]
+                                    if s in smiles:
+                                        if merge_flags:
+                                            cur_flags = smiles[s][-1].split(';')
+                                            new_flags = row[-1].split(';')
+                                            cur_flags_len = len(cur_flags)
+                                            if cur_flags != new_flags:
+                                                if len(cur_flags) > len(new_flags):
+                                                    bigger = cur_flags
+                                                    smaller = new_flags
+                                                else:
+                                                    bigger = new_flags
+                                                    smaller = cur_flags
+                                                for flag in smaller:
+                                                    if flag not in bigger:
+                                                        bigger.append(flag)
+                                                row[-1] = ';'.join(bigger)
+                                                smiles[s] = row
+                                                if len(bigger) != cur_flags_len:
+                                                    num_merged_flags += 1
 
-                                else:
-                                    smiles[s] = row
+                                    else:
+                                        smiles[s] = row
 
-                                num_lines += 1
-                                num_inputs += 1
-                num_outputs += len(smiles)
-                if len(smiles) == num_lines:
-                    non_dups += 1
-                else:
-                    num_with_dups += 1
+                                    num_lines += 1
+                                    num_inputs += 1
+                    num_outputs += len(smiles)
+                    if len(smiles) == num_lines:
+                        non_dups += 1
+                    else:
+                        num_with_dups += 1
 
-                if len(smiles) > 0:
-                    d = out_dir / pair1
-                    if not d.is_dir():
-                        d.mkdir(parents=True)
-                    # open the output file for writing
-                    out_file = out_dir / p1
-                    with open(out_file, 'wt') as out:
-                        for row in smiles.values():
-                            if generate_inchi:
-                                ikey = row[4]
-                                row = patch_inchi.patch_line(row, always=True)
-                                if ikey != row[4]:
-                                    num_patched_inchi += 1
-                            if row[5] and row[5][0] != '"':
-                                row[5] = '"' + row[5] + '"'
+                    if len(smiles) > 0:
+                        d = out_dir / pair1
+                        if not d.is_dir():
+                            d.mkdir(parents=True)
+                        # open the output file for writing
+                        out_file = out_dir / p1
+                        with open(out_file, 'wt') as out:
+                            for row in smiles.values():
+                                if generate_inchi:
+                                    ikey = row[4]
+                                    row = patch_inchi.patch_line(row, always=True)
+                                    if ikey != row[4]:
+                                        num_patched_inchi += 1
+                                if row[5] and row[5][0] != '"':
+                                    row[5] = '"' + row[5] + '"'
 
-                            out.write(','.join(row) + '\n')
+                                out.write(','.join(row) + '\n')
 
-        s1 = time.time()
-        print('...', pair1, 'number with duplicates =', num_with_dups, 'number inputs =', num_inputs,
-              'number outputs =', num_outputs, 'num merged flags =', num_merged_flags,
-              'time =', round(s1 - s0), 'secs')
+            s1 = time.time()
+            print('...', pair1, 'number with duplicates =', num_with_dups, 'number inputs =', num_inputs,
+                  'number outputs =', num_outputs, 'num merged flags =', num_merged_flags,
+                  'time =', round(s1 - s0), 'secs')
+
     t1 = time.time()
     print('Processing took', round(t1 - t0), 'secs')
 
