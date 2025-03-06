@@ -24,15 +24,15 @@ def run(input, output, header=False):
                 out.write(','.join(tokens))
 
 
-def patch_line(tokens, always=False):
+def patch_line(tokens, ik_idx, is_idx, always=False):
 
     if always or not tokens[4] or not tokens[5]:
         smiles = tokens[0]
         mol = Chem.MolFromSmiles(smiles)
         inchis = Chem.inchi.MolToInchi(mol, '/SaveOpt /RecMet /FixedH')
         inchik = Chem.inchi.InchiToInchiKey(inchis)
-        tokens[4] = inchik
-        tokens[5] = inchis
+        tokens[ik_idx] = inchik
+        tokens[is_idx] = inchis
 
     return tokens
 

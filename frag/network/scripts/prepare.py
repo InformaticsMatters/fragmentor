@@ -1,5 +1,6 @@
 import argparse
 import csv
+import gzip
 import time
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from frag.network.scripts import patch_inchi
 digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
 
 
-def run(input_dir, sections=None, delimiter=',', generate_inchi=False):
+def run(input_dir, mode, sections=None, delimiter=',', generate_inchi=False):
 
     t0 = time.time()
     pairs = []
@@ -46,16 +47,24 @@ def run(input_dir, sections=None, delimiter=',', generate_inchi=False):
                                 rows.append(row)
 
             if len(rows) > 0:
-                out_file = out_dir / (pair1 + '.txt')
+                out_file = out_dir / (pair1 + '.txt.gz')
                 print('writing', len(rows), 'rows to', out_file)
-                with open(out_file, 'wt') as out:
+                with gzip.open(out_file, 'wt') as out:
                     for row in rows:
+                        if mode == 'nodes':
+                            _ik = 4
+                            _is = 5
+                        elif mode == 'isomol-nodes':
+                            _ik = 1
+                            _is = 2
                         if generate_inchi:
-                            ikey = row[4]
-                            row = patch_inchi.patch_line(row, always=True)
-                            if ikey != row[4]:
+                            ikey = row[_ik]
+                            row = patch_inchi.patch_line(row, _ik, _is, always=True)
+                            if ikey != row[_ik]:
                                 num_patched_inchi += 1
-                        row[5] = '"' + row[5] + '"'
+                        if row[_is] and row[_is][0] != '"':
+                            row[_is] = '"' + row[_is] + '"'
+
 
                         out.write(','.join(row) + '\n')
 
@@ -75,11 +84,13 @@ def main():
     parser.add_argument("-s", "--sections", nargs="*",
                         help="Top level 2 character hashes to handle (if not specified all are handled")
     parser.add_argument("-d", "--delimiter", default=",", help="file delimiter")
+    parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges', 'isomol-nodes'],
+                        help="which mode")
     parser.add_argument("-p", "--patch-inchi", action="store_true", help="regenerate inchi for all entries")
 
     args = parser.parse_args()
 
-    run(args.inputs, sections=args.sections, delimiter=args.delimiter,
+    run(args.inputs, args.mode, sections=args.sections, delimiter=args.delimiter,
         generate_inchi=args.patch_inchi)
 
 

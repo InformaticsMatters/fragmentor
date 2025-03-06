@@ -1,3 +1,27 @@
+# Takes a nodes.csv or edges.csv from fragmentation and "shards" the rows into a data hierarchy based on a python hash.
+# Those shards can be used to deduplicate the nodes or edges (the same entry is guaranteed to be in the same shard)
+# which means that the deduplication is parallelisable 256-fold (each top level 2 character directory).
+# The first 5 characters (from 16) are used, the first two define a directory into which files names with all 5
+# characters are placed. e.g.
+#
+# 00
+#  | 00000
+#  | 00001
+#  | ...
+# 01
+#  | 01000
+#  | ...
+# ...
+# ff
+#  | ff000
+#  | ...
+#  | fffff
+#
+# Each file has the row from the input for that particular (first 5 character) hash.
+#
+# The hashing can be done on the first token or the whole line (the --use-first-token argument).
+# Typically nodes should be hashed using the first token (SMILES) whilst edges should be hashed using the whole line.
+
 import argparse
 import csv
 import ctypes
@@ -29,11 +53,16 @@ def run(input, path, mode, delimiter=",", header=False, use_first_token=False, r
                 print('... processed', count, collisions)
 
             if mode == 'nodes':
-                if remove_inchi:
-                    row[4] = ''
-                    row[5] = ''
-                else:
-                    row[5] = '"' + row[5] + '"'
+                _ik = 4
+                _is = 5
+            elif mode == 'isomol-nodes':
+                _ik = 1
+                _is = 2
+            if remove_inchi:
+                row[_ik] = ''
+                row[_is] = ''
+            elif row[_is] and row[_is][0] != '"':
+                row[_is] = '"' + row[_is] + '"'
 
             line = ','.join(row)
 
@@ -71,7 +100,7 @@ def main():
     parser.add_argument("-s", "--delimiter", default=",", help="delimiter")
     parser.add_argument("-t", "--use-first-token", action="store_true", help="use first token for hashing (if not specified then whole line)")
     parser.add_argument("-l", "--header-line", action="store_true", help="skip the first line")
-    parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges'], help="nodes or edges mode")
+    parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges', 'isomol-nodes'], help="which mode")
     parser.add_argument("-r", "--remove-inchi", action="store_true", help="remove inchi columns")
 
     args = parser.parse_args()

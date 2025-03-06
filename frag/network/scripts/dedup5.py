@@ -9,13 +9,26 @@ from frag.network.scripts import patch_inchi
 digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
 
 
-def run(inputs, output, sections=None, delimiter=',', generate_inchi=False, merge_flags=False):
+def run(inputs, output, mode, sections=None, delimiter=',', generate_inchi=False, merge_flags=False):
 
     t0 = time.time()
     pairs = []
     for i in digits:
         for j in digits:
             pairs.append(i + j)
+
+    sections_to_use = []
+    if sections:
+        for i in range(len(sections)):
+            section = sections[i]
+            if len(section) == 1:
+                for d in digits:
+                    sections_to_use.append(section + d)
+            elif len(section) == 2:
+                sections_to_use.append(section)
+            else:
+                raise ValueError("sections must has 1 or 2 characters")
+        print('using sections', sections_to_use)
 
     num_with_dups = 0
     count = 0
@@ -29,7 +42,7 @@ def run(inputs, output, sections=None, delimiter=',', generate_inchi=False, merg
     if not out_dir.exists():
         out_dir.mkdir(parents=True)
 
-    for pair1 in pairs if not sections else sections:
+    for pair1 in pairs if not sections_to_use else sections_to_use:
         data_found = False
         for input in inputs:
             d = Path(input) / pair1
@@ -96,13 +109,19 @@ def run(inputs, output, sections=None, delimiter=',', generate_inchi=False, merg
                         out_file = out_dir / p1
                         with open(out_file, 'wt') as out:
                             for row in smiles.values():
+                                if mode == 'nodes':
+                                    _ik = 4
+                                    _is = 5
+                                elif mode == 'isomol-nodes':
+                                    _ik = 1
+                                    _is = 2
                                 if generate_inchi:
-                                    ikey = row[4]
-                                    row = patch_inchi.patch_line(row, always=True)
-                                    if ikey != row[4]:
+                                    ikey = row[_ik]
+                                    row = patch_inchi.patch_line(row, _ik, _is, always=True)
+                                    if ikey != row[_ik]:
                                         num_patched_inchi += 1
-                                if row[5] and row[5][0] != '"':
-                                    row[5] = '"' + row[5] + '"'
+                                if row[_is] and row[_is][0] != '"':
+                                    row[_is] = '"' + row[_is] + '"'
 
                                 out.write(','.join(row) + '\n')
 
@@ -125,12 +144,13 @@ def main():
     parser.add_argument("-s", "--sections", nargs="*",
                         help="Top level 2 character hashes to handle (if not specified all are handled")
     parser.add_argument("-d", "--delimiter", default=",", help="file delimiter")
+    parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges'], help="nodes or edges mode")
     parser.add_argument("-p", "--patch-inchi", action="store_true", help="regenerate inchi for all entries")
-    parser.add_argument("-m", "--merge-flags", action="store_true", help="merge flags in last column")
+    parser.add_argument("-f", "--merge-flags", action="store_true", help="merge flags in last column")
 
     args = parser.parse_args()
 
-    run(args.inputs, args.output, sections=args.sections, delimiter=args.delimiter,
+    run(args.inputs, args.output, args.mode, sections=args.sections, delimiter=args.delimiter,
         generate_inchi=args.patch_inchi, merge_flags=args.merge_flags)
 
 
