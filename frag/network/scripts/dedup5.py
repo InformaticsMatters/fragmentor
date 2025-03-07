@@ -27,7 +27,7 @@ def run(inputs, output, mode, sections=None, delimiter=',', generate_inchi=False
             elif len(section) == 2:
                 sections_to_use.append(section)
             else:
-                raise ValueError("sections must has 1 or 2 characters")
+                raise ValueError("sections must have 1 or 2 characters")
         print('using sections', sections_to_use)
 
     num_with_dups = 0
@@ -109,19 +109,20 @@ def run(inputs, output, mode, sections=None, delimiter=',', generate_inchi=False
                         out_file = out_dir / p1
                         with open(out_file, 'wt') as out:
                             for row in smiles.values():
-                                if mode == 'nodes':
-                                    _ik = 4
-                                    _is = 5
-                                elif mode == 'isomol-nodes':
-                                    _ik = 1
-                                    _is = 2
-                                if generate_inchi:
-                                    ikey = row[_ik]
-                                    row = patch_inchi.patch_line(row, _ik, _is, always=True)
-                                    if ikey != row[_ik]:
-                                        num_patched_inchi += 1
-                                if row[_is] and row[_is][0] != '"':
-                                    row[_is] = '"' + row[_is] + '"'
+                                if mode == 'nodes' or mode == 'isomol-nodes':
+                                    if mode == 'nodes':
+                                        _ik = 4
+                                        _is = 5
+                                    elif mode == 'isomol-nodes':
+                                        _ik = 1
+                                        _is = 2
+                                    if generate_inchi:
+                                        ikey = row[_ik]
+                                        row = patch_inchi.patch_line(row, _ik, _is, always=True)
+                                        if ikey != row[_ik]:
+                                            num_patched_inchi += 1
+                                    if row[_is] and row[_is][0] != '"':
+                                        row[_is] = '"' + row[_is] + '"'
 
                                 out.write(','.join(row) + '\n')
 
@@ -135,14 +136,14 @@ def run(inputs, output, mode, sections=None, delimiter=',', generate_inchi=False
 
 
 def main():
-    #  python -m frag.network.scripts.dedup5 -i ~/hashed5-C1 ~/hashed5-C2 -o ~/hashed5-out
+    #  python -m frag.network.scripts.dedup5 -i ~/hashed5-C1 ~/hashed5-C2 -o ~/hashed5-out -mode nodes
 
     parser = argparse.ArgumentParser(description="collator")
 
     parser.add_argument("-i", "--inputs", nargs="+", help="Input dirs containing hashed data")
     parser.add_argument("-o", "--output", help="Output dir")
     parser.add_argument("-s", "--sections", nargs="*",
-                        help="Top level 2 character hashes to handle (if not specified all are handled")
+                        help="Top level 2 or 1 character hashes to handle (if not specified all are handled")
     parser.add_argument("-d", "--delimiter", default=",", help="file delimiter")
     parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges'], help="nodes or edges mode")
     parser.add_argument("-p", "--patch-inchi", action="store_true", help="regenerate inchi for all entries")
