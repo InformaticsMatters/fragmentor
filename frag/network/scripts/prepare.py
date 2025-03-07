@@ -51,20 +51,20 @@ def run(input_dir, mode, sections=None, delimiter=',', generate_inchi=False):
                 print('writing', len(rows), 'rows to', out_file)
                 with gzip.open(out_file, 'wt') as out:
                     for row in rows:
-                        if mode == 'nodes':
-                            _ik = 4
-                            _is = 5
-                        elif mode == 'isomol-nodes':
-                            _ik = 1
-                            _is = 2
-                        if generate_inchi:
-                            ikey = row[_ik]
-                            row = patch_inchi.patch_line(row, _ik, _is, always=True)
-                            if ikey != row[_ik]:
-                                num_patched_inchi += 1
-                        if row[_is] and row[_is][0] != '"':
-                            row[_is] = '"' + row[_is] + '"'
-
+                        if mode == 'nodes' or mode == 'isomol-nodes':
+                            if mode == 'nodes':
+                                _ik = 4
+                                _is = 5
+                            elif mode == 'isomol-nodes':
+                                _ik = 1
+                                _is = 2
+                            if generate_inchi:
+                                ikey = row[_ik]
+                                row = patch_inchi.patch_line(row, _ik, _is, always=True)
+                                if ikey != row[_ik]:
+                                    num_patched_inchi += 1
+                            if row[_is] and row[_is][0] != '"':
+                                row[_is] = '"' + row[_is] + '"'
 
                         out.write(','.join(row) + '\n')
 
