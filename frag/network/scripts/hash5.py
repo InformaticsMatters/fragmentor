@@ -31,7 +31,7 @@ import time
 from pathlib import Path
 
 
-def run(input, path, mode, delimiter=",", header=False, use_first_token=False, remove_inchi=False):
+def run(input, path, mode, delimiter=",", header=False):
 
     hashseed = os.getenv('PYTHONHASHSEED')
     if hashseed != '0':
@@ -53,20 +53,15 @@ def run(input, path, mode, delimiter=",", header=False, use_first_token=False, r
                 print('... processed', count, collisions)
 
             if mode == 'nodes':
-                _ik = 4
-                _is = 5
+                row[4] = ''
+                row[5] = ''
             elif mode == 'isomol-nodes':
-                _ik = 1
-                _is = 2
-            if remove_inchi:
-                row[_ik] = ''
-                row[_is] = ''
-            elif row[_is] and row[_is][0] != '"':
-                row[_is] = '"' + row[_is] + '"'
+                row[1] = ''
+                row[2] = ''
 
             line = ','.join(row)
 
-            if use_first_token:
+            if mode == 'nodes' or mode == 'isomol-nodes':
                 h = hashu(row[0].strip()).to_bytes(8,"big").hex()
             else:
                 h = hashu(line).to_bytes(8,"big").hex()
@@ -98,15 +93,12 @@ def main():
     parser.add_argument("-i", "--input", required=True, help="input csv file")
     parser.add_argument("-o", "--output", required=True, help="output dir")
     parser.add_argument("-s", "--delimiter", default=",", help="delimiter")
-    parser.add_argument("-t", "--use-first-token", action="store_true", help="use first token for hashing (if not specified then whole line)")
     parser.add_argument("-l", "--header-line", action="store_true", help="skip the first line")
     parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges', 'isomol-nodes'], help="which mode")
-    parser.add_argument("-r", "--remove-inchi", action="store_true", help="remove inchi columns")
 
     args = parser.parse_args()
 
-    run(args.input, args.output, args.mode, delimiter=args.delimiter, header=-args.header_line,
-        use_first_token=args.use_first_token, remove_inchi=args.remove_inchi)
+    run(args.input, args.output, args.mode, delimiter=args.delimiter, header=-args.header_line)
 
 
 if __name__ == "__main__":

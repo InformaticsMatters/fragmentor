@@ -9,7 +9,7 @@ from frag.network.scripts import patch_inchi
 digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
 
 
-def run(inputs, output, mode, sections=None, delimiter=',', generate_inchi=False, merge_flags=False):
+def run(inputs, output, mode, sections=None, delimiter=','):
 
     t0 = time.time()
     pairs = []
@@ -71,7 +71,7 @@ def run(inputs, output, mode, sections=None, delimiter=',', generate_inchi=False
                                 for row in reader:
                                     s = row[0]
                                     if s in smiles:
-                                        if merge_flags:
+                                        if mode == 'nodes':
                                             cur_flags = smiles[s][-1].split(';')
                                             new_flags = row[-1].split(';')
                                             cur_flags_len = len(cur_flags)
@@ -111,18 +111,11 @@ def run(inputs, output, mode, sections=None, delimiter=',', generate_inchi=False
                             for row in smiles.values():
                                 if mode == 'nodes' or mode == 'isomol-nodes':
                                     if mode == 'nodes':
-                                        _ik = 4
-                                        _is = 5
+                                        row[4] = ''
+                                        row[5] = ''
                                     elif mode == 'isomol-nodes':
-                                        _ik = 1
-                                        _is = 2
-                                    if generate_inchi:
-                                        ikey = row[_ik]
-                                        row = patch_inchi.patch_line(row, _ik, _is, always=True)
-                                        if ikey != row[_ik]:
-                                            num_patched_inchi += 1
-                                    if row[_is] and row[_is][0] != '"':
-                                        row[_is] = '"' + row[_is] + '"'
+                                        row[1] = ''
+                                        row[2] = ''
 
                                 out.write(','.join(row) + '\n')
 
@@ -146,13 +139,10 @@ def main():
                         help="Top level 2 or 1 character hashes to handle (if not specified all are handled")
     parser.add_argument("-d", "--delimiter", default=",", help="file delimiter")
     parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges'], help="nodes or edges mode")
-    parser.add_argument("-p", "--patch-inchi", action="store_true", help="regenerate inchi for all entries")
-    parser.add_argument("-f", "--merge-flags", action="store_true", help="merge flags in last column")
 
     args = parser.parse_args()
 
-    run(args.inputs, args.output, args.mode, sections=args.sections, delimiter=args.delimiter,
-        generate_inchi=args.patch_inchi, merge_flags=args.merge_flags)
+    run(args.inputs, args.output, args.mode, sections=args.sections, delimiter=args.delimiter)
 
 
 if __name__ == "__main__":
