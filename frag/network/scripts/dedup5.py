@@ -109,14 +109,6 @@ def run(inputs, output, mode, sections=None, delimiter=','):
                         out_file = out_dir / p1
                         with open(out_file, 'wt') as out:
                             for row in smiles.values():
-                                if mode == 'nodes' or mode == 'isomol-nodes':
-                                    if mode == 'nodes':
-                                        row[4] = ''
-                                        row[5] = ''
-                                    elif mode == 'isomol-nodes':
-                                        row[1] = ''
-                                        row[2] = ''
-
                                 out.write(','.join(row) + '\n')
 
             s1 = time.time()
@@ -138,7 +130,7 @@ def main():
     parser.add_argument("-s", "--sections", nargs="*",
                         help="Top level 2 or 1 character hashes to handle (if not specified all are handled")
     parser.add_argument("-d", "--delimiter", default=",", help="file delimiter")
-    parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges'], help="nodes or edges mode")
+    parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges', 'isomol-nodes'], help="which mode")
 
     args = parser.parse_args()
 
