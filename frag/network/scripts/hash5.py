@@ -59,7 +59,10 @@ def run(input, path, mode, delimiter=",", header=False):
                 row[1] = ''
                 row[2] = ''
 
-            line = ','.join(row)
+            if mode == 'isomol-nodes':
+                line = row[0].strip()
+            else:
+                line = ','.join(row)
 
             if mode == 'nodes' or mode == 'isomol-nodes':
                 h = hashu(row[0].strip()).to_bytes(8,"big").hex()
