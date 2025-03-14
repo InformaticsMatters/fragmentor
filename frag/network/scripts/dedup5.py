@@ -130,7 +130,9 @@ def main():
     parser.add_argument("-s", "--sections", nargs="*",
                         help="Top level 2 or 1 character hashes to handle (if not specified all are handled")
     parser.add_argument("-d", "--delimiter", default=",", help="file delimiter")
-    parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges', 'isomol-nodes'], help="which mode")
+    parser.add_argument("-m", "--mode", required=True,
+                        choices=['nodes', 'edges', 'isomol-nodes', 'isomol-molecule-edges'],
+                        help="which mode")
 
     args = parser.parse_args()
 
