@@ -45,45 +45,61 @@ def run(input, path, mode, delimiter=",", header=False):
     t0 = time.time()
 
     with (gzip.open(input, 'rt') if input.endswith('.gz') else open(input, 'rt')) as file:
-        reader = csv.reader(file, delimiter=delimiter)
-        for row in reader:
-            if count == 0 and header:
-                continue
-            if count % 1000000 == 0:
-                print('... processed', count, collisions)
+        if mode == 'isomol-molecule-edges':
+            # here we just use the whole line and don't need to tokenise it
+            for line in file:
+                if count == 0 and header:
+                    continue
 
-            if mode == 'nodes':
-                row[4] = ''
-                row[5] = ''
-            elif mode == 'isomol-nodes':
-                row[1] = ''
-                row[2] = ''
-
-            if mode == 'isomol-nodes':
-                line = row[0].strip()
-            else:
-                line = ','.join(row)
-
-            if mode == 'nodes' or mode == 'isomol-nodes':
-                h = hashu(row[0].strip()).to_bytes(8,"big").hex()
-            else:
+                if count % 1000000 == 0:
+                    print('... processed', count, collisions)
                 h = hashu(line).to_bytes(8,"big").hex()
 
-            p1 = h[0:2]
-            d = Path(path) / p1
+                write_data(h, path, line)
+                count += 1
+        else:
+            # here we need the individual tokens
+            reader = csv.reader(file, delimiter=delimiter)
+            for row in reader:
+                if count == 0 and header:
+                    continue
+                if count % 1000000 == 0:
+                    print('... processed', count, collisions)
 
-            if not d.is_dir():
-                d.mkdir(parents=True)
-            f = d / h[0:5]
-            if f.is_file():
-                collisions += 1
-            with open(f, "a") as out:
-                out.write(line + '\n')
+                if mode == 'nodes':
+                    row[4] = ''
+                    row[5] = ''
+                elif mode == 'isomol-nodes':
+                    row[1] = ''
+                    row[2] = ''
 
-            count += 1
+                if mode == 'isomol-nodes':
+                    line = row[0].strip()
+                else:
+                    line = ','.join(row)
+
+                if mode == 'nodes' or mode == 'isomol-nodes':
+                    h = hashu(row[0].strip()).to_bytes(8,"big").hex()
+                else:
+                    h = hashu(line).to_bytes(8,"big").hex()
+
+                write_data(h, path, line + '\n')
+                count += 1
 
     t1 = time.time()
     print('Processed', count, collisions, 'in', (t1 - t0), 'secs')
+
+
+def write_data(h, path, line):
+    p1 = h[0:2]
+    d = Path(path) / p1
+
+    if not d.is_dir():
+        d.mkdir(parents=True)
+    f = d / h[0:5]
+
+    with open(f, "a") as out:
+        out.write(line)
 
 
 def main():
@@ -97,7 +113,9 @@ def main():
     parser.add_argument("-o", "--output", required=True, help="output dir")
     parser.add_argument("-s", "--delimiter", default=",", help="delimiter")
     parser.add_argument("-l", "--header-line", action="store_true", help="skip the first line")
-    parser.add_argument("-m", "--mode", required=True, choices=['nodes', 'edges', 'isomol-nodes'], help="which mode")
+    parser.add_argument("-m", "--mode", required=True,
+                        choices=['nodes', 'edges', 'isomol-nodes', 'isomol-molecule-edges'],
+                        help="which mode")
 
     args = parser.parse_args()
 
