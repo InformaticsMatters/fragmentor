@@ -121,12 +121,12 @@ def run(inputs, output, mode, sections=None, delimiter=','):
 
 
 def main():
-    #  python -m frag.network.scripts.dedup5 -i ~/hashed5-C1 ~/hashed5-C2 -o ~/hashed5-out -mode nodes
+    #  python -m frag.network.scripts.dedup5 -i ~/hashed5-C1 ~/hashed5-C2 -o ~/hashed5-out --mode nodes
 
     parser = argparse.ArgumentParser(description="collator")
 
-    parser.add_argument("-i", "--inputs", nargs="+", help="Input dirs containing hashed data")
-    parser.add_argument("-o", "--output", help="Output dir")
+    parser.add_argument("-i", "--inputs", required=True, nargs="+", help="Input dirs containing hashed data")
+    parser.add_argument("-o", "--output", required=True, help="Output dir")
     parser.add_argument("-s", "--sections", nargs="*",
                         help="Top level 2 or 1 character hashes to handle (if not specified all are handled")
     parser.add_argument("-d", "--delimiter", default=",", help="file delimiter")
