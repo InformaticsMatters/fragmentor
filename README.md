@@ -510,11 +510,21 @@ combine:
 # for the output in "combinations" .
 path_out: xchem_combi_20200715
 
-data_source_out: disk
+data_source_out: s3
 ```
 
 There is a template file with all the above settings and more explanation
 in the file `ansible/combine-parameters.template` that you can copy.
+
+The new **combine-simple** play differs from the `combine` play in that the extract files
+do not undergo deduplication. Instead the **combine-simple** process simply
+concatenates the individual `.csv.gz` files from each extract. This then relies
+on neo4j's built-in capability of ignoring *missing nodes* and *bad relationships*.
+**combine-simple** therefore is significantly faster, instead relying on trading that
+speed with the neo4j import logic.
+
+**combine-simple** creates a `load-ne4j.sh` script that uses the `neo4j-admin import`
+command line options `--skip-duplicate-nodes` and `--skip-bad-relationships`.
 
 **Notes**
 
@@ -535,6 +545,10 @@ directory on the `runpath`.
 The command is:
 
     $ ansible-playbook site-combine.yaml -e @parameters.yaml
+
+>   The `combine` (and `combine-simple`) process is limited to combining no more
+    than 10 extracts. This side-effect of a simple single-digit 'extract index'
+    used in the playbook.
 
 ## Backing up and Restoring the Database
 The backup playbook can also be used in isolation from the other playbooks.

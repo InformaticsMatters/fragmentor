@@ -1,0 +1,68 @@
+---
+
+# These files contain data that does not contain duplicates,
+# Files are grouped by file type: e.g. 0-supplier-nodes.csv.gz, 1-supplier-nodes.csv.gz
+# These are combined into a single supplier-nodes.csv.gz file on the combine directory.
+
+- name: Display basename to be concatenated
+  debug:
+    msg: basename={{ basename }} combine_path={{ combine_path }}
+
+- name: Display file to be created
+  set_fact:
+    target_file: "{{ basename }}.csv.gz"
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-concatenate} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>Merging: {{ basename }} - Timestamp: {{ now(utc=True).isoformat() }}</p>
+
+- name: Check if result file is already on combine path
+  stat:
+    path: "{{ combine_path }}/{{ target_file }}"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  register: combined_file
+  changed_when: false
+
+# For each file type given in the parameters file,
+# concatenate all files named <index>-<target_file>
+# This is skipped if it is already there.
+
+- name: Display paths
+  debug:
+    msg: work_path={{ work_path }} combine_path={{ combine_path }} target_file={{ target_file }}
+
+- name: Concatenate (to {{ target_file }})
+  shell: cat {{ lib_item }} >> {{ combine_path }}/{{ target_file }}
+  with_fileglob:
+  - "{{ work_path }}/[0-9]-{{ target_file }}"
+  loop_control:
+    loop_var: lib_item
+  when:
+  - not combined_file.stat.exists
+
+- name: Get concatenated file size ({{ target_file }})
+  stat:
+    path: "{{ combine_path }}/{{ target_file }}"
+  register: combined_file
+
+- name: Display concatenated file size ({{ target_file }})
+  debug:
+    var: combined_file.stat.size
+
+- name: Update combined_total_size
+  set_fact:
+    combined_total_size: "{{ combined_total_size | default(0) | int + combined_file.stat.size }}"
+
+- name: Display latest combined_total_size (int)
+  debug:
+    msg: combined_total_size={{ combined_total_size | int }}
+
+- name: Display latest total combined file size (human readable)
+  debug:
+    msg: combined_total_size={{ combined_total_size | int | human_readable }} (human readable)

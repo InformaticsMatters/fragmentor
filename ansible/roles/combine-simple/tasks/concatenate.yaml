@@ -1,0 +1,39 @@
+---
+
+# In this 'simple' combination we concatenate files from different libraries.
+# For each file type in the concatenate list, concatenate into a single file.
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-concatenate} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <h2>Step: Concatenate Files</h2>
+      <p>Start: {{ now(utc=True).isoformat() }}</p>
+
+# For each extract file type in the list
+# concatenate the files from the different libraries
+- name: Reset total concatenated file size
+  set_fact:
+    combined_total_size: 0
+
+- name: Concatenate files in the concat list
+  include_tasks: concatenate-file.yaml
+  loop: "{{ concat }}"
+  loop_control:
+    loop_var: basename
+
+- name: Display TOTAL concatenated file size (int)
+  debug:
+    msg: combined_total_size={{ combined_total_size | int }}
+
+- name: Display TOTAL concatenated file size (human readable)
+  debug:
+    msg: combined_total_size={{ combined_total_size | int | human_readable }} (human readable)
+
+- name: Log line to report
+  blockinfile:
+    marker: "<!-- {combine-concatenate} ANSIBLE MANAGED BLOCK -->"
+    path: "{{ log_path }}/combination_report.html"
+    block: |
+      <p>End: {{ now(utc=True).isoformat() }}</p>

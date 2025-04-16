@@ -57,11 +57,13 @@
     cat {{ fragedgefile }} | split -d -l {{ edgechunk }} - edgechunk_
   args:
     chdir: "{{ fragpath }}/fragment"
+  tags: load_edges_split
 
 - name: Extract edges for loading
   include_tasks: load-extract-edges-chunk.yaml
   with_fileglob:
   - "{{ fragpath }}/fragment/edgechunk_*"
+  tags: load_edges_extract
 
 - name: Drop indexes for speed
   postgresql_query:
@@ -69,6 +71,20 @@
     autocommit: yes
   when: edge_count|int > edgeindexthreshold
 
+- name: Find the (.new) edge files to load
+  find:
+    paths: "{{ fragpath }}/fragment"
+    patterns: "edgechunk_*.new"
+  register: edge_files
+
+- name: Display the number of edge files we are loading
+  debug:
+    var: edge_files.matched
+
+- name: Truncate the edge table
+  postgresql_query:
+    query: TRUNCATE TABLE edge
+    autocommit: yes
 
 - name: Load edges into database
   include_tasks: load-edges-chunk.yaml

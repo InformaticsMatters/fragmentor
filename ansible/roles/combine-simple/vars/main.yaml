@@ -1,0 +1,28 @@
+---
+
+# All the '.csv.gz' files to combine
+file_edges: edges
+file_inch_nodes: inchi-nodes
+file_isomol_molecule_edges: isomol-molecule-edges
+file_isomol_nodes: isomol-nodes
+file_isosup_mole_edges: isomol-suppliermol-edges
+file_molecule_inchi_edges: molecule-inchi-edges
+file_molecule_supplier_edges: molecule-suppliermol-edges
+file_nodes: nodes
+file_supplier_nodes: supplier-nodes
+file_suppliermol_nodes: suppliermol-nodes
+file_suppliermol_supplier_edges: suppliermol-supplier-edges
+
+# The collection of files to concatenate
+concat:
+- '{{ file_edges }}'
+- '{{ file_inch_nodes }}'
+- '{{ file_isomol_molecule_edges }}'
+- '{{ file_isomol_nodes }}'
+- '{{ file_isosup_mole_edges }}'
+- '{{ file_molecule_inchi_edges }}'
+- '{{ file_molecule_supplier_edges }}'
+- '{{ file_nodes }}'
+- '{{ file_supplier_nodes }}'
+- '{{ file_suppliermol_nodes }}'
+- '{{ file_suppliermol_supplier_edges }}'

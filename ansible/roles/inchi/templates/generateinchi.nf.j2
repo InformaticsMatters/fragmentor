@@ -4,8 +4,11 @@
  *
  * Author | Date    | Version
  * Duncan | 05/2020 | Initial version.
+ * Alan   | 12/2024 | Convert to DSL 2
  *
  */
+
+nextflow.enable.dsl=2
 
 params.input = 'run/fragemnt/inchi.csv'
 params.chunk_size = 15000
@@ -29,11 +32,10 @@ if (params.nodefile != '') {
     NODE = ''
 }
 
-
-chunks = Channel.from(file(params.input))
+files = Channel.from(file(params.input))
     .splitText(by: params.chunk_size, file: 'chunk_')
 
-process generate {
+process generate_mols {
 
 {% if nextflow_container_registry %}
     container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
@@ -47,7 +49,7 @@ process generate {
     file chunks
 
     output:
-    file 'chunk_*.tab' into generated
+    path 'chunk_*.tab'
 
     """
     python -m frag.network.scripts.generate_inchi -i $chunks -o inchitab.tab ${params.non_standard} $STAN $NODE
@@ -56,5 +58,17 @@ process generate {
 
 }
 
-generated.collectFile(name: "${params.outputfile}", storeDir: "${params.out_dir}", keepHeader: true)
+// workflow definitions
+workflow generate {
 
+    take:
+    file files
+
+    main:
+    generate_mols(files) | collectFile(name: "${params.outputfile}", storeDir: "${params.out_dir}", keepHeader: true)
+
+}
+
+workflow {
+    generate(files)
+}

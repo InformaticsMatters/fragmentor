@@ -5,8 +5,11 @@
  * Author | Date    | Version
  * Tim    | 03/2020 | Initial Version
  * Duncan | 03/2020 | Add comtainer to collect* processes.
+ * Alan   | 12/2024 | Convert to DSL 2
  *
  */
+
+nextflow.enable.dsl=2
 
 params.input = 'nonisomol.smi'
 params.chunk_size = 500000
@@ -19,7 +22,7 @@ params.tmp_dir = '.'
 chunks = Channel.from(file(params.input))
     .splitText(by: params.chunk_size, file: 'chunk_')
 
-process fragment {
+process fragment_mols {
 
 {% if nextflow_container_registry %}
     container '{{ nextflow_container_registry }}/{{ nextflow_container_name }}:{{ nextflow_container_tag }}'
@@ -33,9 +36,9 @@ process fragment {
     file chunks
 
     output:
-    file 'nodes_*.csv' into node_chunks
-    file 'edges_*.csv' into edge_chunks
-    file 'rejects_*.smi' optional true into rejects_chunks
+    path('nodes_*.csv')
+    path('edges_*.csv')
+    path('rejects_*.smi'), optional: true
 
     """
     python -m frag.network.scripts.build_db_from_smiles --input $chunks --base_dir ./ --max-frag ${params.max_frag} --max-hac ${params.max_hac}
@@ -58,10 +61,10 @@ process collect_nodes {
     maxErrors = 3
 
     input:
-    file chunks from node_chunks.collect()
+    file chunks
 
     output:
-    file 'nodes.csv'
+    path 'nodes.csv'
 
     """
     sort -u -S {{ (nextflow_process_sort_memory_m * 0.8)|int }}M -T . $chunks > nodes.csv
@@ -81,10 +84,10 @@ process collect_edges {
     maxErrors = 3
 
     input:
-    file chunks from edge_chunks.collect()
+    file chunks
 
     output:
-    file 'edges.csv'
+    path 'edges.csv'
 
     """
     sort -u -S {{ (nextflow_process_sort_memory_m * 0.8)|int }}M -T . $chunks > edges.csv
@@ -104,12 +107,30 @@ process collect_rejects {
     maxErrors = 3
 
     input:
-    file chunks from rejects_chunks.collect()
+    file chunks
 
     output:
-    file 'rejects.smi'
+    path 'rejects.smi'
 
     """
     sort -u -S {{ (nextflow_process_sort_memory_m * 0.8)|int }}M -T . $chunks > rejects.smi
     """
+}
+
+// workflow definitions
+workflow fragment {
+    take:
+    file chunks
+
+    main:
+    fragment_mols(chunks)
+    collect_nodes(fragment_mols.out[0].collect())
+    collect_edges(fragment_mols.out[1].collect())
+    if (fragment_mols.out[2].collect()) {
+        collect_rejects(fragment_mols.out[2].collect())
+    }
+}
+
+workflow {
+    fragment(chunks)
 }
