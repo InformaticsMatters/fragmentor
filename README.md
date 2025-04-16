@@ -988,6 +988,204 @@ Or, an Intel image on Apple/ARM silicon using `buildx`: -
         -t informaticsmatters/fragmentor-player:latest \
         --push
 
+
+## Manual combine process using hashing
+
+Combining multiple fragmented datasets on a multi-core machine.
+Inputs are hashed so that duplicates are guaranteed to be in the same hash.
+Standard Python hashing is used, but only the first 5 characters are used.
+
+The following inputs need to be deduplicated:
+- nodes.csv.gz
+- edges.csv.gz
+- isomol-nodes.csv.gz
+- isomol-molecule-edges.csv.gz
+
+The other inputs do not have duplicates and just need to be concatenated.
+
+### Hashing the inputs
+
+```
+PYTHONHASHSEED=0 python -m frag.network.scripts.hash5 -i /work/inputs/chemspace/bb/December2021/nodes.csv.gz -o /work/outputs/12_chemspace_20M/hash5/nodes/combined -m nodes
+```
+
+```
+PYTHONHASHSEED=0 python -m frag.network.scripts.hash5 -i /work/inputs/chemspace/bb/December2021/edges.csv.gz -o /work/outputs/12_chemspace_20M/hash5/edges/combined -m edges
+```
+
+```
+PYTHONHASHSEED=0 python -m frag.network.scripts.hash5 -i /work/inputs/chemspace/bb/December2021/isomol-nodes.csv.gz -o /work/outputs/12_chemspace_20M/hash5/isomol-nodes/combined -m isomol-nodes
+```
+
+```
+PYTHONHASHSEED=0 python -m frag.network.scripts.hash5 -i /work/inputs/chemspace/bb/December2021/isomol-molecule-edges.csv.gz -o /work/outputs/12_chemspace_20M/hash5/isomol-molecule-edges/combined -m isomol-molecule-edges
+```
+
+This process can take some time.
+
+The output are files corresponding to the first 5 characters of the hash, partitioned in directories with names of
+the first 2 characters of the hash. e.g.
+
+```
+00
+ |- 00000
+ |- 00001
+ |- 00002
+ ...
+ |- 00FFF
+01
+ |- 01000
+ |- 01001
+...
+FF
+ |- FF000
+ ...
+ |- FFFFF
+```
+
+### Parallelisation
+
+That directory structure can be processed as is for the next steps, but the process can be sped up by creating subsets.
+For instance, create 2-slice subsets:
+```commandline
+mkdir 0-1
+mkdir 2-3
+mkdir 4-5
+mkdir 6-7
+mkdir 8-9
+mkdir a-b
+mkdir c-d
+mkdir e-f
+
+mv [0-1]?.tgz 0-1
+mv [2-3]?.tgz 2-3
+mv [4-5]?.tgz 4-5
+mv [6-7]?.tgz 6-7
+mv [8-9]?.tgz 8-9
+mv [a-b]?.tgz a-b
+mv [c-d]?.tgz c-d
+mv [e-f]?.tgz e-f
+```
+
+Or to create 4-slice subsets:
+```commandline
+mkdir 0-3
+mkdir 4-7
+mkdir 8-b
+mkdir c-f
+
+mv [0-3]? 0-3
+mv [4-7]? 4-7
+mv [8-b]? 8-b
+mv [c-f]? c-f
+```
+
+### Deduplication
+
+Multiple datasets need to be deduplicated. Hash each of them as described above and partition into the SAME number of
+subsets.
+
+The command uses an environment variable ($S) to specify the subset.
+
+```commandline
+S=0-1
+
+conda activate fragmentor
+python -m frag.network.scripts.dedup5 -i /work/inputs/250M-C1/hash5/nodes/$S /work/inputs/250M-C2/hash5/nodes/$S /work/inputs/250M-C3/hash5/nodes/$S /work/inputs/250M-C4/hash5/nodes/$S /work/outputs/c5-nodes/$S -o /work/outputs/01_enamine_mferla/hash5/nodes/combined/$S -m nodes
+```
+
+Repeat for the other sections (e.g. 2-3, 4-5 ... e-f).
+
+Note that the `-i` argument allows to specify multiple inputs, and the `-m` argument specifies what type of inputs are 
+being handled. 
+
+Repeat for the edges, isomol-nodes and isomol-molecule-edges inputs.
+
+Best to run each execution in a screen.
+
+The outputs are files layed out in the same way as the inputs.
+
+### Preparation
+
+Following deduplication data needs to be "prepared". This is similar to deduplication.
+Preparing combines the multiple files for the first 2 character hashes into a single file (e.g. 256 files in total) and
+generates additional data (e.g. InCHI).
+
+```commandline
+S=0-1
+
+python -m frag.network.scripts.prepare5 -i /work/outputs/11_enamine_mferla_xchem_libs/hash5/nodes/combined/$S -m nodes
+```
+
+Again, repeat for the other sections and then for the other types of inputs.
+
+
+### Upload
+
+The "prepared" data is already compressed. The deduplicated data needs to be tar gzipped.
+Use the `tgz-dirs.sh` bash script in the root dir for this. In the dir containing the 2-character dirs run this:
+
+```commandline
+/path/to/repo/tgz-dirs.sh
+```
+
+Now restore the contents of each section to the appropriate location:
+
+```
+nodes
+  |- combined
+    |- 00.tgz
+    |- 01.tgz
+    ...
+    |- ff.tgz
+  |- prepared
+    |- 00.txt.gz
+    |- 01.txt.gz
+    ...
+    |- ff.txt.gz
+```
+
+This should then be copied to echo S3. The location should be:
+```
+im-fragnet/datasets/<dataset-name>/hash5/nodes
+```
+
+Repeat for the edges, isomol-nodes and isomol-molecule-edges.
+
+
+### Checks
+
+If you want to test things, then use the combined data (needs to be uncompressed).
+
+#### Nodes
+These simple fragments should be present in all datasets. Check that they appear in the expected slice, and only that slice.
+
+Molecule	slice
+C  		    af
+Cl 		    b9
+Br 		    5a
+N  		    ed
+CC 		    85
+O  		    c2
+C1CCCCC1 	72
+
+Move into the nodes/combined dir and execute:
+```commandline
+for d in ??; do echo $d $(cat $d/* | grep "^C,"); done
+```
+
+Repeat for the other SMILES.
+
+
+#### Edges
+
+Edge				slice
+CC1CCCCC1,C		a6
+
+for f in ??.txt.gz; do echo $f $(zcat $f | grep "^CC1CCCCC1,C,"); done
+
+
+1
 ---
 
 [ssh-agent]: https://www.ssh.com/ssh/agent
