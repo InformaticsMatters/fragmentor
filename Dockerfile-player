@@ -18,7 +18,7 @@ ENV PYTHONUNBUFFERED=1
 # Install Java (required by nextflow)
 RUN apt-get update -y && \
     apt-get install -y \
-        default-jdk
+        openjdk-17-jdk
 
 # Install nextflow
 # and run a nextflow command to force it to pull down dependent code...
