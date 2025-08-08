@@ -29,10 +29,13 @@ def calculate(tokens1):
 
     synthon = tokens2[1]
     core = tokens2[4]
-    mol = Chem.MolFromSmiles(smiles1)
-    fp = calc_pharmfp(mol)
-    #print(synthon, core, fp)
+    if synthon.count('Xe') == 1:
+        mol = Chem.MolFromSmiles(smiles1)
+        fp = calc_pharmfp(mol)
+    else:
+        fp = ""
     return synthon, core, fp
+
 
 featFactory = ChemicalFeatures.BuildFeatureFactory('FeatureswAliphaticXenon.fdef')
 sigFactory = SigFactory(featFactory, maxPointCount=2)
