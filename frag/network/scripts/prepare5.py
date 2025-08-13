@@ -4,7 +4,7 @@ import gzip
 import time
 from pathlib import Path
 
-from frag.network.scripts import patch_inchi
+from frag.network.scripts import molprops, patch_inchi
 
 
 digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
@@ -66,6 +66,12 @@ def run(input_dir, mode, sections=None, delimiter=','):
 
                             if row[_is] and row[_is][0] != '"':
                                 row[_is] = '"' + row[_is] + '"'
+
+                        elif mode == 'edges':
+                            synthon, core, fp = molprops.calculate(row)
+                            row.append(synthon)
+                            row.append(core)
+                            row.append(fp)
 
                         out.write(','.join(row) + '\n')
 
